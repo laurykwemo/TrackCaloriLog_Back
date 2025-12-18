@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Management Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding-top: 40px;
+        }
+        .container-box {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+        }
+        .table-container {
+            margin-top: 40px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-box">
+        <h2 class="text-center mb-4">User Information Form</h2>
+        <div class="text-end mb-3">
+            <a href="/admin" class="btn btn-dark">🔐 Espace Admin</a>
+        </div>
+        <form id="userForm">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter your name" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="email" class="form-label">Email address</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="birthDate" class="form-label">Birth Date</label>
+                    <input type="date" class="form-control" id="birthDate" name="birthDate" required />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="sex" class="form-label">Sex</label>
+                <select id="sex" name="sex" class="form-select" required>
+                <option value="" disabled selected>Select your sex</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="height" class="form-label">Height (cm)</label>
+                    <input type="number" class="form-control" id="height" name="height" placeholder="Enter height" min="0" step="any" required />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="weight" class="form-label">Weight (kg)</label>
+                    <input type="number" class="form-control" id="weight" name="weight" placeholder="Enter weight" min="0" step="any" required />
+                </div>
+            </div>
+                    
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <select id="role" name="role" class="form-select" required>
+                    <option value="" disabled selected>Select role</option>
+                    <option value="User">User</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Active Status</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="isActive" id="activeYes" value="true" checked>
+                    <label class="form-check-label" for="activeYes">Active</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="isActive" id="activeNo" value="false">
+                    <label class="form-check-label" for="activeNo">Inactive</label>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+            </div>
+        </form>
+
+        <div class="table-container table-responsive">
+            <div class="d-flex justify-content-between mb-3">
+                <h4>Users List</h4>
+                <input type="text" id="search" class="form-control w-25" placeholder="Search users..." />
+            </div>
+
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Birth Date</th>
+                        <th>Sex</th>
+                        <th>Height</th>
+                        <th>Weight</th>
+                        <th>CreatedAt</th>
+                        <th>Role</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <!-- Dynamic rows will appear here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-3">
+            <strong id="nbt">  </strong>    
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        
+        //const axios = require('axios');
+        let users = [];
+
+        let nb = 0;
+
+        let sexs = [];  
+
+        editingUserId = null;
+
+        async function loadSex(){
+            try{
+                const response = await fetch('http://localhost:3000/api/AllSexes');
+                sexs = await response.json();
+                renderCombobox();
+            }catch(error){
+                console.error("Erreur lors du chargement des sexes :", error);
+            }
+        }
+
+        async function loadUser(){
+            try {
+                const response = await fetch('http://localhost:3000/api/AllUsers');
+                users = await response.json();
+                renderTable();
+            }catch (error){
+                console.error("Erreur lors du chargement des utilisateurs :", error);
+            }
+        }
+
+        window.onload = () => {
+            loadSex();
+            loadUser();
+        };
+        document.getElementById('userForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const user = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                birthDate: document.getElementById('birthDate').value,
+                sex: document.getElementById('sex').value,
+                height: document.getElementById('height').value,
+                weight: document.getElementById('weight').value,
+                role: document.getElementById('role').value,
+                isActive: document.querySelector('input[name="isActive"]:checked').value === 'true'
+            };
+
+            try {
+                let response;
+
+                if (!editingUserId) {
+                    // Mode ajout
+                    response = await fetch('http://localhost:3000/api/addusers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(user)
+                    });
+
+                    if (response.ok) alert('Utilisateur ajouté avec succès!');
+                    else return alert("Erreur lors de l'ajout");
+                } 
+                else {
+                    // Mode modification
+                    response = await fetch(`http://localhost:3000/api/${editingUserId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(user)
+                    });
+
+                    if (response.ok) alert("Utilisateur modifié avec succès!");
+                    else return alert("Erreur lors de la modification");
+
+                    editingUserId = null;
+                    updateSubmitButton(false);
+                }
+
+                await loadUser(); 
+                this.reset();  
+
+            } catch (error) {
+                console.error("Erreur lors de la requête :", error);
+                alert("Une erreur s'est produite.");
+            }
+        });
+
+        /*document.getElementById('search').addEventListener('input', function () {
+            const searchValue = this.value.toLowerCase();
+
+            const filteredUsers = users.filter(user =>
+                user.name.toLowerCase().includes(searchValue) ||
+                user.email.toLowerCase().includes(searchValue) ||
+                user.sex.toLowerCase().includes(searchValue)
+            );
+
+            const filteredUsers = users.filter(user =>
+                Object.values(user).some(value =>
+                    String(value).toLowerCase().includes(searchValue)
+                )
+            );
+
+            renderTable(filteredUsers);
+        });*/
+        
+        function renderTable(filteredUsers = users) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            filteredUsers.forEach(user => {
+                tbody.innerHTML += `
+                    <tr data-id="${user._id}">
+                        <td ondblclick="makeEditable(this)">${user.name}</td>
+                        <td ondblclick="makeEditable(this)">${user.email}</td>
+                        <td ondblclick="makeEditable(this)">${user.birthDate.substring(0,10)}</td>
+                        <td ondblclick="makeEditable(this, 'sex')">
+                            ${user.sex?.label || getSexLabel(user.sex) || 'N/A'}
+                        </td>
+                        <td ondblclick="makeEditable(this)">${user.height}</td>
+                        <td ondblclick="makeEditable(this)">${user.weight}</td>
+                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                        <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
+                        <td ondblclick="makeEditable(this, 'isActive')">${user.isActive ? 'Active' : 'Inactive'}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="saveRow('${user._id}')">Modifier</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}')">Supprimer</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('nbt').innerHTML = `Nombre total de Users : ${filteredUsers.length}`;
+        }
+
+        function renderCombobox(){
+            const cmb = document.getElementById('sex');
+            cmb.innerHTML = '<option value="" disabled selected>Select sex</option>';
+            sexs.forEach((sex, index) => {
+                cmb.innerHTML += `<option value="${sex._id}">${sex.label}</option>`;
+            });
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm("Supprimer cet utilisateur ?")) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    alert("Utilisateur supprimé avec succès !");
+                    await loadUser();
+                    document.getElementById('userForm').reset();
+                    editingUserId = null;
+                    updateSubmitButton(false);
+                } else {
+                    alert("Erreur lors de la suppression.");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la suppression :", error);
+                alert("Erreur lors de la suppression.");
+            }
+        }
+
+
+        function editUser(userId) {
+            const user = users.find(u => u._id === userId);
+            if (!user) return;
+
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('birthDate').value = user.birthDate;
+            document.getElementById('height').value = user.height;
+            document.getElementById('weight').value = user.weight;
+            document.getElementById('sex').value = user.sex._id || user.sex;
+            document.getElementById('role').value = user.role;
+            document.querySelector(`input[name="isActive"][value="${user.isActive}"]`).checked = true;
+
+            editingUserId = user._id;
+            updateSubmitButton(true);
+        }
+
+        function updateSubmitButton(isEditing) {
+            const submitBtn = document.getElementById('submitBtn');
+            if (isEditing) {
+                submitBtn.textContent = "Edit";
+                submitBtn.classList.remove("btn-primary");
+                submitBtn.classList.add("btn-warning");
+            } else {
+                submitBtn.textContent = "Submit";
+                submitBtn.classList.remove("btn-warning");
+                submitBtn.classList.add("btn-primary");
+            }
+        }
+
+        document.getElementById('search').addEventListener('input', function () {
+            const value = this.value.toLowerCase();
+            const filteredUsers = users.filter(user =>
+                JSON.stringify(user).toLowerCase().includes(value)
+            );
+            renderTable(filteredUsers);
+        });
+
+        function makeEditable(cell, type = 'text') {
+            const oldValue = cell.innerText;
+            cell.setAttribute('data-old-value', oldValue);
+
+            if (type === 'sex') {
+                const options = sexs.map(s => `<option value="${s._id}">${s.label}</option>`).join('');
+                cell.innerHTML = `<select class="form-select form-select-sm">${options}</select>`;
+            }
+            else if (type === 'role') {
+                cell.innerHTML = `
+                    <select class="form-select form-select-sm">
+                        <option value="User">User</option>
+                        <option value="Admin">Admin</option>
+                    </select>`;
+            }
+            else if (type === 'isActive') {
+                cell.innerHTML = `
+                    <select class="form-select form-select-sm">
+                        <option value="true">Active</option>
+                        <option value="false">Inactive</option>
+                    </select>`;
+            }
+            else {
+                cell.innerHTML = `<input type="${type}" class="form-control form-control-sm" value="${oldValue}">`;
+            }
+        }
+
+        async function saveRow(userId) {
+            const row = document.querySelector(`tr[data-id="${userId}"]`);
+            const cells = row.querySelectorAll('td');
+
+            const updatedUser = {
+                name: cells[0].innerText || cells[0].querySelector('input')?.value,
+                email: cells[1].innerText || cells[1].querySelector('input')?.value,
+                birthDate: cells[2].innerText || cells[2].querySelector('input')?.value,
+                sex: cells[3].querySelector('select')?.value || users.find(u => u._id === userId).sex?._id || users.find(u => u._id === userId).sex,
+                height: cells[4].innerText || cells[4].querySelector('input')?.value,
+                weight: cells[5].innerText || cells[5].querySelector('input')?.value,
+                role: cells[7].querySelector('select')?.value || cells[7].innerText,
+                isActive: cells[8].querySelector('select')?.value === "true"
+            };
+
+            console.log("Mise à jour envoyée :", updatedUser);
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/${userId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedUser)
+                });
+
+                if (response.ok) {
+                    alert('Utilisateur modifié avec succès !');
+                    await loadUser();
+                } else {
+                    alert('Erreur lors de la modification');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la requête PUT :', error);
+            }
+        }
+
+        function getSexLabel(sexField) {
+            if (!sexField) return 'N/A';
+            if (typeof sexField === 'object') return sexField.label; // populate actif
+            const sex = sexs.find(s => s._id === sexField); // sinon ID
+            return sex ? sex.label : 'N/A';
+        }
+
+    </script>
+</body>
+</html>
