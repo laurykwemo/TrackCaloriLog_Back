@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- EXACTEMENT le même CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #ff4444; width: 33%; }
+        .strength-medium { background: #ffaa00; width: 66%; }
+        .strength-strong { background: #00cc66; width: 100%; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Créer un compte</h2>
+    <p class="subtitle">Rejoignez-nous</p>
+
+    <form id="register-form">
+        <div class="input-group">
+            <label for="register-name">Nom complet</label>
+            <input type="text" id="register-name" placeholder="" required>
+        </div>
+
+        <div class="input-group">
+            <label for="register-email">Adresse email</label>
+            <input type="email" id="register-email" placeholder="exemple@email.com" required>
+            <div class="error-message" id="email-error">Veuillez entrer une adresse email valide.</div>
+        </div>
+
+        <div class="input-group">
+            <label for="register-password">Mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" id="register-password" placeholder="••••••••" required>
+                <span class="toggle-password" onclick="togglePassword('register-password')">👁️</span>
+                <div class="error-message" id="password-error">
+                    Le mot de passe doit contenir 8 caractères, dont une majuscule et un chiffre.
+                </div>
+            </div>
+            <div class="password-strength">
+                <div class="password-strength-bar" id="strength-bar"></div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="register-confirm">Confirmer le mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" id="register-confirm" placeholder="••••••••" required>
+                <span class="toggle-password" onclick="togglePassword('register-confirm')">👁️</span>
+            </div>
+            <div class="error-message" id="confirm-error">Les mots de passe ne correspondent pas</div>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label for="register-gender">Sexe</label>
+                <select id="sex" name="sex" class="form-select" required>
+                <option value="" disabled selected>Select your sex</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label for="register-birthdate">Date de naissance</label>
+                <input type="date" id="register-birthdate" required>
+                <div class="error-message" id="age-error">Vous devez avoir au moins 13 ans pour vous inscrire.</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="input-group">
+                <label for="register-height">Taille (cm)</label>
+                <input type="number" id="register-height" step="any" placeholder="170" min="100" max="250">
+            </div>
+
+            <div class="input-group">
+                <label for="register-weight">Poids (kg)</label>
+                <input type="number" id="register-weight" step="any" placeholder="70" min="30" max="300">
+            </div>
+        </div>
+
+        <button type="submit">S'inscrire</button>
+    </form>
+
+    <div class="link">
+        Déjà un compte ?
+        <a href="./login">Se connecter</a>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+    let sexs = [];  
+
+    function validateAge() {
+        const input = document.getElementById('register-birthdate');
+        const ageerrorMsg = document.getElementById('age-error');
+        const submitBtn = document.querySelector('button[type="submit"]');
+
+        if (!input.value) return; // Si vide, on ne fait rien
+
+        // CORRECT : On transforme la String en objet Date
+        const birthDate = new Date(input.value);
+        const today = new Date();
+
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const mois = today.getMonth() - birthDate.getMonth();
+
+        if (mois < 0 || (mois === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+
+        if (age < 13) {
+            ageerrorMsg.classList.add('show');
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.5";
+            return false;
+        } else {
+            ageerrorMsg.classList.remove('show');
+            submitBtn.disabled = false;
+            submitBtn.style.opacity = "1";
+            return true;
+        }
+    }
+
+    function validateEmail() {
+        const emailInput = document.getElementById('register-email');
+        const emailError = document.getElementById('email-error');
+        // Regex standard pour l'email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!emailRegex.test(emailInput.value)) {
+            emailError.classList.add('show');
+            return false;
+        } else {
+            emailError.classList.remove('show');
+            return true;
+        }
+    }
+
+    function validatePasswordComplexity() {
+        const passwordInput = document.getElementById('register-password');
+        const passwordError = document.getElementById('password-error');
+        const pass = passwordInput.value;
+
+        // Critères : 8 caractères, 1 Majuscule, 1 Chiffre
+        const hasLength = pass.length >= 8;
+        const hasUpper = /[A-Z]/.test(pass);
+        const hasNumber = /[0-9]/.test(pass);
+
+        if (hasLength && hasUpper && hasNumber) {
+            passwordError.classList.remove('show');
+            return true;
+        } else {
+            passwordError.classList.add('show');
+            return false;
+        }
+    }
+
+    document.getElementById('register-birthdate').addEventListener('change', validateAge);
+    document.getElementById('register-email').addEventListener('input', validateEmail);
+    document.getElementById('register-password').addEventListener('input', validatePasswordComplexity);
+
+    // Validation formulaire d'inscription
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const errorMsg = document.getElementById('confirm-error');
+
+            // On lance TOUTES les validations
+        const isAgeValid = validateAge();
+        const isEmailValid = validateEmail();
+        const isPasswordValid = validatePasswordComplexity();
+        
+        const password = document.getElementById('register-password').value;
+        const confirm = document.getElementById('register-confirm').value;
+        const confirmError = document.getElementById('confirm-error');
+
+        // Vérification de la correspondance des mots de passe
+        const passwordsMatch = password === confirm;
+        if (!passwordsMatch) {
+            confirmError.classList.add('show');
+        } else {
+            confirmError.classList.remove('show');
+        }
+
+        // On arrête tout si une seule validation échoue
+        if (!isAgeValid || !isEmailValid || !isPasswordValid || !passwordsMatch) {
+            return; 
+        }
+
+        // On vérifie l'âge avant de continuer
+        if (!validateAge()) {
+            return; // On arrête tout si moins de 13 ans
+        }
+
+        const user = {
+            name: document.getElementById('register-name').value,
+            email: document.getElementById('register-email').value,
+            password: document.getElementById('register-password').value,
+            birthDate: document.getElementById('register-birthdate').value,
+            sex: document.getElementById('sex').value,
+            height: document.getElementById('register-height').value,
+            weight: document.getElementById('register-weight').value,
+        };
+
+        try {
+            let response;
+            // Mode ajout
+            response = await fetch('/trackcalorilog/register/registerok', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(user)
+            });
+
+            if (response.ok) { 
+                alert('Utilisateur ajouté avec succès!');
+                window.location.href = '/trackcalorilog/login';
+            }
+            else{ 
+                return alert("Erreur : " + (result.message || "Problème lors de l'inscription"));
+            }
+            this.reset();  
+        } catch (error) {
+            console.error("Erreur lors de la requête :", error);
+            alert("Une erreur s'est produite.");
+        }
+
+        errorMsg.classList.remove('show');
+    });
+
+    // Vérification en temps réel de la confirmation du mot de passe
+    document.getElementById('register-confirm').addEventListener('input', function(e) {
+        const password = document.getElementById('register-password').value;
+        const confirm = e.target.value;
+        const errorMsg = document.getElementById('confirm-error');
+
+        if (confirm && password !== confirm) {
+            errorMsg.classList.add('show');
+        } else {
+            errorMsg.classList.remove('show');
+        }
+    });
+
+    // Formulaire mot de passe oublié
+    /*document.getElementById('forgot-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const successMsg = document.getElementById('reset-success');
+        successMsg.classList.add('show');
+
+        setTimeout(() => {
+            successMsg.classList.remove('show');
+            showSection('login-section');
+        }, 3000);
+    });*/
+    document.addEventListener('DOMContentLoaded', () => {
+        // Récupère la date d'aujourd'hui
+        const today = new Date().toISOString().split('T')[0];
+        const dateInput = document.getElementById('register-birthdate');
+        
+        // Applique la limite au calendrier
+        document.getElementById('register-birthdate').setAttribute('max', today);
+
+        // Min = Il y a 100 ans (optionnel)
+        const minDate = new Date();
+        minDate.setFullYear(minDate.getFullYear() - 100);
+        dateInput.setAttribute('min', minDate.toISOString().split('T')[0]);
+
+        dateInput.addEventListener('input', function() {
+            if (this.value > today) {
+                this.value = today; // Force à aujourd'hui si date future
+                alert("La date de naissance ne peut pas être dans le futur.");
+            }
+        });
+        loadSex();
+    });
+    async function loadSex(){
+        try{
+            const response = await fetch('/api/AllSexes');
+            sexs = await response.json();
+            renderCombobox();
+        }catch(error){
+            console.error("Erreur lors du chargement des sexes :", error);
+        }
+    }
+    function renderCombobox(){
+        const cmb = document.getElementById('sex');
+        cmb.innerHTML = '<option value="" disabled selected>Select sex</option>';
+        sexs.forEach((sex, index) => {
+            cmb.innerHTML += `<option value="${sex._id}">${sex.label}</option>`;
+        });
+    }
+    function getSexLabel(sexField) {
+        if (!sexField) return 'N/A';
+        if (typeof sexField === 'object') return sexField.label; // populate actif
+        const sex = sexs.find(s => s._id === sexField); // sinon ID
+        return sex ? sex.label : 'N/A';
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #ff4444; width: 33%; }
+        .strength-medium { background: #ffaa00; width: 66%; }
+        .strength-strong { background: #00cc66; width: 100%; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Section Connexion -->
+        <div id="login-section" class="form-section active">
+            <h2>Bienvenue !</h2>
+            <p class="subtitle">Connectez-vous à votre compte</p>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="login-email">Adresse email</label>
+                    <input type="email" id="login-email" placeholder="exemple@email.com" required>
+                    <div class="error-message" id="login-email-error">Veuillez entrer un email valide</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="login-password">Mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="login-password" placeholder="••••••••" required>
+                        <span class="toggle-password" onclick="togglePassword('login-password')">👁️</span>
+                    </div>
+                    <div class="error-message" id="login-password-error">Le mot de passe est requis</div>
+                </div>
+
+                <div class="forgot-password">
+                    <a onclick="showSection('forgot-section')">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit">Se connecter</button>
+            </form>
+
+            <div class="link">
+                Pas encore de compte ? <a onclick="showSection('register-section')">S'inscrire</a>
+            </div>
+        </div>
+
+        <!-- Section Inscription -->
+        <div id="register-section" class="form-section">
+            <h2>Créer un compte</h2>
+            <p class="subtitle">Rejoignez-nous dès maintenant</p>
+
+            <form id="register-form">
+                <div class="input-group">
+                    <label for="register-name">Nom complet</label>
+                    <input type="text" id="register-name" placeholder="Jean Dupont" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="register-email">Adresse email</label>
+                    <input type="email" id="register-email" placeholder="exemple@email.com" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="register-password">Mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="register-password" placeholder="••••••••" required>
+                        <span class="toggle-password" onclick="togglePassword('register-password')">👁️</span>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strength-bar"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="register-confirm">Confirmer le mot de passe</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="register-confirm" placeholder="••••••••" required>
+                        <span class="toggle-password" onclick="togglePassword('register-confirm')">👁️</span>
+                    </div>
+                    <div class="error-message" id="confirm-error">Les mots de passe ne correspondent pas</div>
+                </div>
+
+                <div class="row">
+                    <div class="input-group">
+                        <label for="register-gender">Sexe</label>
+                        <select id="register-gender" required>
+                            <option value="">Choisir...</option>
+                            <option value="homme">Homme</option>
+                            <option value="femme">Femme</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="register-birthdate">Date de naissance</label>
+                        <input type="date" id="register-birthdate" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-group">
+                        <label for="register-height">Taille (cm)</label>
+                        <input type="number" id="register-height" placeholder="170" min="100" max="250">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="register-weight">Poids (kg)</label>
+                        <input type="number" id="register-weight" placeholder="70" min="30" max="300">
+                    </div>
+                </div>
+
+                <button type="submit">S'inscrire</button>
+            </form>
+
+            <div class="link">
+                Déjà un compte ? <a onclick="showSection('login-section')">Se connecter</a>
+            </div>
+        </div>
+
+        <!-- Section Mot de passe oublié -->
+        <div id="forgot-section" class="form-section">
+            <h2>Mot de passe oublié</h2>
+            <p class="subtitle">Entrez votre email pour réinitialiser votre mot de passe</p>
+
+            <div class="success-message" id="reset-success">
+                Un email de réinitialisation a été envoyé à votre adresse !
+            </div>
+
+            <form id="forgot-form">
+                <div class="input-group">
+                    <label for="forgot-email">Adresse email</label>
+                    <input type="email" id="forgot-email" placeholder="exemple@email.com" required>
+                </div>
+
+                <button type="submit">Réinitialiser le mot de passe</button>
+            </form>
+
+            <div class="link">
+                <a onclick="showSection('login-section')">← Retour à la connexion</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Gestion des sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Toggle visibilité du mot de passe
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // Indicateur de force du mot de passe
+        document.getElementById('register-password').addEventListener('input', function(e) {
+            const password = e.target.value;
+            const strengthBar = document.getElementById('strength-bar');
+            
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/[0-9]/)) strength++;
+            if (password.match(/[^a-zA-Z0-9]/)) strength++;
+
+            strengthBar.className = 'password-strength-bar';
+            if (strength === 1 || strength === 2) {
+                strengthBar.classList.add('strength-weak');
+            } else if (strength === 3) {
+                strengthBar.classList.add('strength-medium');
+            } else if (strength >= 4) {
+                strengthBar.classList.add('strength-strong');
+            } else {
+                strengthBar.style.width = '0';
+            }
+        });
+
+        // Validation formulaire de connexion
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            // Simulation de connexion
+            if (email && password) {
+                alert('Connexion réussie ! Bienvenue 🎉');
+            }
+        });
+
+        // Validation formulaire d'inscription
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+            const errorMsg = document.getElementById('confirm-error');
+
+            if (password !== confirm) {
+                errorMsg.classList.add('show');
+                return;
+            }
+
+            errorMsg.classList.remove('show');
+            alert('Inscription réussie ! Bienvenue dans la communauté 🎉');
+            showSection('login-section');
+        });
+
+        // Vérification en temps réel de la confirmation du mot de passe
+        document.getElementById('register-confirm').addEventListener('input', function(e) {
+            const password = document.getElementById('register-password').value;
+            const confirm = e.target.value;
+            const errorMsg = document.getElementById('confirm-error');
+
+            if (confirm && password !== confirm) {
+                errorMsg.classList.add('show');
+            } else {
+                errorMsg.classList.remove('show');
+            }
+        });
+
+        // Formulaire mot de passe oublié
+        document.getElementById('forgot-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const successMsg = document.getElementById('reset-success');
+            successMsg.classList.add('show');
+
+            setTimeout(() => {
+                successMsg.classList.remove('show');
+                showSection('login-section');
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

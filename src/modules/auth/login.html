@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS réutilisé -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak { background: #ff4444; width: 33%; }
+        .strength-medium { background: #ffaa00; width: 66%; }
+        .strength-strong { background: #00cc66; width: 100%; }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .forgot-password a { cursor: pointer; color: #667eea; text-decoration: none; font-size: 14px; }
+        .forgot-password a:hover { text-decoration: underline; }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 30px 25px;
+            }
+            
+            .row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Bienvenue !</h2>
+    <p class="subtitle">Connectez-vous à votre compte</p>
+
+    <form id="login-form">
+        <div class="input-group">
+            <label for="login-email">Adresse email</label>
+            <input type="email" id="login-email" placeholder="exemple@email.com" required>
+            <div class="error-message" id="login-email-error">Veuillez entrer un email valide</div>
+        </div>
+
+        <div class="input-group">
+            <label for="login-password">Mot de passe</label>
+            <div class="password-wrapper">
+                <input type="password" id="login-password" placeholder="••••••••" required>
+                <span class="toggle-password" onclick="togglePassword('login-password')">👁️</span>
+            </div>
+        </div>
+
+        <div class="forgot-password">
+            <a href="/trackcalorilog/forgot-password">Mot de passe oublié ?</a>
+        </div>
+
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <div class="link">
+        Pas encore de compte ?
+        <a href="/trackcalorilog/register">S'inscrire</a>
+    </div>
+</div>
+
+<script>
+    // 1. Toggle visibilité (Fonctionne bien)
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        if(input) {
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    }
+
+    // 2. Gestion du formulaire de connexion
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const response = await fetch('/trackcalorilog/login/loginok', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.token && data.user) {
+                        localStorage.setItem('token', data.token); 
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        
+                        alert('Connexion réussie !');
+                        // REDIRECTION SELON LE RÔLE
+                        if (data.user.role.toLowerCase() === 'admin') {
+                            window.location.href = "/admin"; // Vers le dashboard
+                        } else {
+                            window.location.href = "/";  // Vers la page user.html
+                        }
+                    } else {
+                        alert("Erreur: Données utilisateur manquantes dans la réponse");
+                    }
+                } else {
+                    alert(data.message || 'Identifiants incorrects');
+                }
+            } catch (error) {
+                console.error("Erreur login:", error);
+                alert("Impossible de se connecter au serveur.");
+            }
+        });
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('verified')) {
+        alert("Votre compte a été activé avec succès ! Vous pouvez maintenant vous connecter.");
+    }
+
+    // SUPPRIMÉ : l'écouteur sur 'login-password' pour la strength-bar 
+    // car l'élément 'strength-bar' n'existe pas dans ce HTML.
+
+    /*window.onload = () => {
+        const token = localStorage.getItem('token');
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (token && user) {
+            // Déjà connecté ? On le redirige direct selon son rôle
+            if (user.role.toLowerCase() === 'admin') {
+                window.location.href = "/admin";
+            } else {
+                window.location.href = "/";
+            }
+        }
+    };*/
+</script>
+</body>
+</html>

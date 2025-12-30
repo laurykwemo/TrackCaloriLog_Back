@@ -2,13 +2,18 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('./admin.controller');
 const deleteduserController = require('../deleteduser/deleteduser.controller')
-const { isAdmin,  isAuthenticated} = require('../../middlewares/authMiddleware');
+const authMiddleware = require('../../middlewares/authMiddleware');
 
 // Route réservée aux admins pour modifier un rôle
-router.put('/updateRole/:id', isAdmin, adminController.updateUserRole);
+router.put('/updateRole/:id', authMiddleware.isAuthenticated, 
+    authMiddleware.isAdmin, adminController.updateUserRole);
 
 //router.patch('/toggleActive/:id', isAdmin, adminController.toggleUserActiveStatus);
-router.patch('/toggleActive/:id', isAdmin, adminController.toggleActiveStatus);
+router.patch('/toggleActive/:id', 
+    authMiddleware.isAuthenticated, 
+    authMiddleware.isAdmin, 
+    adminController.toggleActiveStatus
+);
 
 // Toutes les routes admin doivent être protégées
 //router.use(isAuthenticated, isAdmin);

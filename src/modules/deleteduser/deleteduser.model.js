@@ -4,7 +4,7 @@ const deletedUserSchema = new mongoose.Schema({
     originalUserId: { type: mongoose.Schema.Types.ObjectId, required: true },
     name: String,
     email: String,
-    password: { type: String, required: true },
+    password: { type: String, required: true, minlength: 8},
     birthDate: Date,
     sex: { 
         type: Number,

@@ -1,5 +1,5 @@
 const adminService = require('./admin.service');
-
+const User = require('../user/user.model');
 const adminController = {
 
     // Liste des utilisateurs
@@ -18,7 +18,7 @@ const adminController = {
             const { id } = req.params;
             const { role } = req.body;
 
-            if (!['Admin', 'User'].includes(role)) {
+            if (!['admin', 'user'].includes(role)) {
                 return res.status(400).json({ message: "Rôle invalide" });
             }
 

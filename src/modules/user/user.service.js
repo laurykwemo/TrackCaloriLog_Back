@@ -1,6 +1,7 @@
 const User = require('./user.model');
 const bcrypt = require('bcrypt');
 const deletedUser = require('../deleteduser/deleteduser.model');
+const crypto = require('crypto');
 
 const userService = {
     calculAge: (data) => {
@@ -23,11 +24,16 @@ const userService = {
                 throw new Error('Email et mot de passe sont oligatoires.'); 
             }
 
+            if (data.password.length < 8) {
+                throw new Error("Le mot de passe doit faire au moins 8 caractères");
+            }
+
             //Hashage du mot de passe
-            const hashedPassword = await bcrypt.hash(data.password, 7);
+            const hashedPassword = await bcrypt.hash(data.password, 8);
 
             const age = await userService.calculAge(data);
-
+            
+            const verificationToken = crypto.randomBytes(32).toString('hex');
 
             // Bloquer les moins de 13 ans
             if (age < 13) {
@@ -43,19 +49,30 @@ const userService = {
                 height: data.height,
                 weight: data.weight,
                 role: data.role || 'user',
-                isActive: data.isActive ?? true
+                isActive: data.isActive ?? true,
+                emailVerificationToken: verificationToken,
+                emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000 // Expire dans 24h
             });
             const userObject = newUser.toObject();
             delete userObject.password; //Supprimes le champ password de l'objet retouné
-
             
             return userObject;
         }catch(error){
-            console.error("Erreur lors de la création de l'utilisateur dans la BD :", error);
+            if (process.env.NODE_ENV !== 'test') {
+                console.error("Erreur lors de la création de l'utilisateur :", error);
+            }
             if(error.code==11000){
                 throw new Error("Cet email est déjà utilisé");
             }
             throw error;
+        }
+    },
+    findByEmail: async (email) => {
+        try {
+            // .lean() est optionnel mais améliore les performances si tu ne fais que de la lecture
+            return await User.findOne({ email: email.toLowerCase() });
+        } catch (error) {
+            throw new Error("Erreur lors de la recherche de l'utilisateur par email : " + error.message);
         }
     },
     getAllUsers: async () => {
@@ -91,13 +108,11 @@ const userService = {
     },
     deleteUser: async (userId) => {
         try {
-            // 1️⃣ Récupérer l'utilisateur AVEC le password
+            // Récupérer l'utilisateur AVEC le password
             const user = await User.findById(userId).select('+password');
             if (!user) return null;
 
-            console.log('User avant suppression, password =', user.password); // 👈 vérifie en console
-
-            // 2️⃣ Sauvegarder une copie dans DeletedUser
+            // Sauvegarder une copie dans DeletedUser
             await deletedUser.create({
                 originalUserId: user._id,
                 name: user.name,
@@ -112,7 +127,7 @@ const userService = {
                 deletedAt: new Date()
             });
 
-            // 3️⃣ Supprimer l'utilisateur
+            // Supprimer l'utilisateur
             await User.findByIdAndDelete(userId);
 
             return user;

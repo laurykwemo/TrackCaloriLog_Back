@@ -1,6 +1,8 @@
 const User = require('../user/user.model');
 const bcrypt = require('bcrypt');
 const deletedUser = require('../deleteduser/deleteduser.model');
+const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 
 const adminService = {
     getAllUsers: async () => {
@@ -46,8 +48,8 @@ const adminService = {
     },
     getStats: async () => {
         const totalUsers = await User.countDocuments();
-        const admins = await User.countDocuments({ role: 'Admin' });
-        const standardUsers = await User.countDocuments({ role: 'User' });
+        const admins = await User.countDocuments({ role: 'admin' });
+        const standardUsers = await User.countDocuments({ role: 'user' });
 
         return { totalUsers, admins, standardUsers };
     }

@@ -4,18 +4,40 @@
     <meta charset="UTF-8" />
     <title>Admin Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* On cache toute la page au départ */
+        body {
+            display: none;
+        }
+    </style>
 </head>
 <body class="p-4">
 
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between align-items-start mb-3">
         <h2>👨‍💼 Admin Dashboard</h2>
-        <a href="/" class="btn btn-secondary">Retour à l'espace User</a>
+
+        <div class="d-flex flex-column align-items-end gap-2">
+            <a href="/" class="btn btn-secondary">
+                Retour à l'espace User
+            </a>
+            <button onclick="logout()" class="btn btn-danger">
+                Déconnexion
+            </button>
+        </div>
     </div>
 
-    <div class="mb-4">
-        <button onclick="loadStats()" class="btn btn-info">📊 Voir Statistiques</button>
-        <div id="statsContainer" class="mt-3"></div>
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <button onclick="loadStats()" class="btn btn-info">
+            📊 Voir Statistiques
+        </button>
+
+        <button type="button"
+                class="btn-close"
+                aria-label="Close"
+                onclick="closeStats()">
+        </button>
     </div>
+    <div id="statsContainer"></div>
 
     <div class="table-container table-responsive">
         <div class="d-flex justify-content-between mb-3">
@@ -25,8 +47,8 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th onclick="sortTable('name')" style="cursor:pointer">Name ↕️</th>
+                    <th onclick="sortTable('email')" style="cursor:pointer">Email ↕️</th>
                     <th>Birth</th>
                     <th>Sexe</th>
                     <th>Height</th>
@@ -38,9 +60,12 @@
             </thead>
             <tbody id="adminTableBody"></tbody>
         </table>
+        <p class="mt-2 fw-semibold">
+            Le nombre total d'utilisateurs est : <span id="usersCount">0</span>
+        </p>
     </div>
 
-    <div class="table-container table-responsive">
+    <div class="table-container table-responsive mt-5">
         <div class="d-flex justify-content-between mb-3">
             <h4>📋 Gestion des utilisateurs supprimés</h4>
             <input type="text" id="searchd" class="form-control w-25" placeholder="Search users..." />
@@ -48,8 +73,8 @@
         <table class="table table-striped table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
+                    <th onclick="sortTable('name')" style="cursor:pointer">Name ↕️</th>
+                    <th onclick="sortTable('email')" style="cursor:pointer">Email ↕️</th>
                     <th>Birth</th>
                     <th>Sexe</th>
                     <th>Height</th>
@@ -61,46 +86,212 @@
             </thead>
             <tbody id="adminTableBodyd"></tbody>
         </table>
+        <p class="mt-2 fw-semibold">
+            Le nombre total d'utilisateurs supprimés est : <span id="usersDeletedCount">0</span>
+        </p>
     </div>
 
 <script>
     let sexs = [];
     let users = [];
     let usersd = [];
+    let sortAsc = true;
 
+    const container = document.getElementById('statsContainer');
+
+    // --- CONFIGURATION AUTHENTIFICATION ---
+    function getAuthHeaders() {
+        const token = localStorage.getItem('token');
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token ? `Bearer ${token}` : ''
+        };
+    }
+
+    async function handleResponse(response) {
+        if (response.status === 401 || response.status === 403) {
+            alert("Session expirée ou accès refusé. Veuillez vous reconnecter.");
+            window.location.href = "/trackcalorilog/login"; 
+            return null;
+        }
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Erreur serveur");
+        }
+        return response.json();
+    }
+
+    // --- CHARGEMENT DES DONNÉES ---
     async function loadSex() {
-        const response = await fetch('http://localhost:3000/api/AllSexes');
-        sexs = await response.json();
+        try {
+            const response = await fetch('http://localhost:3000/api/AllSexes');
+            sexs = await response.json();
+        } catch (e) { console.error("Erreur sexes:", e); }
     }
 
     async function loadAdminUsers() {
         await loadSex();
-        const response = await fetch('http://localhost:3000/api/AllUsers');
-        users = await response.json();
+        try {
+            const response = await fetch('http://localhost:3000/api/AllUsers', {
+                headers: getAuthHeaders()
+            });
+            const data = await handleResponse(response);
+            if (!data) return;
 
-        // FIX : simplifier sex en ID
-        users = users.map(u => ({
-            ...u,
-            sex: typeof u.sex === "object" ? u.sex._id : u.sex
-        }));
+            users = data.map(u => ({
+                ...u,
+                sex: typeof u.sex === "object" ? u.sex._id : u.sex
+            }));
 
-        const tbodyd = document.getElementById('adminTableBody');
-        tbodyd.innerHTML = users.map(user => `
+            renderUsers(users);
+            updateUsersCount(users);
+        } catch (err) { alert(err.message); }
+    }
+
+    async function loadAdminUsersd() {
+        try {
+            const response = await fetch('http://localhost:3000/api/deletedusers', {
+                headers: getAuthHeaders()
+            });
+            const data = await handleResponse(response);
+            if (!data) return;
+
+            usersd = data.map(u => ({
+                ...u,
+                sex: typeof u.sex === "object" ? u.sex._id : u.sex
+            }));
+
+            renderDeletedUsers(usersd);
+            updateDeletedUsersCount(usersd);
+        } catch (err) { alert(err.message); }
+    }
+
+    // --- ACTIONS ---
+    async function saveRow(userId) {
+        const row = document.querySelector(`tr[data-id="${userId}"]`);
+        const cells = row.querySelectorAll('td');
+        const existingUser = users.find(u => u._id === userId);
+
+        const updatedUser = {
+            name: getCellValue(cells[0]),
+            email: getCellValue(cells[1]),
+            birthDate: getCellValue(cells[2]),
+            sex: cells[3].querySelector('select')?.value || existingUser.sex, 
+            height: getCellValue(cells[4]),
+            weight: getCellValue(cells[5]),
+            role: cells[6].querySelector('select')?.value || cells[6].innerText.trim().toLowerCase(),
+            isActive: getCellValue(cells[7]) 
+        };
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/${userId}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(updatedUser)
+            });
+            if (await handleResponse(response)) {
+                alert('Modifié avec succès !');
+                await loadAdminUsers();
+                loadStats();
+            }
+        } catch (error) { alert(error.message); }
+    }
+
+    async function deleteUser(userId) {
+        if (!confirm("Supprimer cet utilisateur ?")) return;
+        try {
+            const response = await fetch(`http://localhost:3000/api/${userId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+            if (await handleResponse(response)) {
+                alert("Supprimé !");
+                await loadAdminUsers();
+                await loadAdminUsersd();
+                loadStats();
+            }
+        } catch (error) { alert(error.message); }
+    }
+
+    async function deleteUserd(userId) {
+        if (!confirm("Supprimer cet utilisateur ?")) return;
+        try {
+            const response = await fetch(`http://localhost:3000/admin/users/${userId}`, {
+                method: 'DELETE',
+                headers: getAuthHeaders()
+            });
+            if (await handleResponse(response)) {
+                alert("Supprimé !");
+                await loadAdminUsers();
+                await loadAdminUsersd();
+                loadStats();
+            }
+        } catch (error) { alert(error.message); }
+    }
+
+    async function restoreUserd(userId){
+        if(!confirm("Restaurer cet utilisateur ?")) return;
+        try {
+            const response = await fetch(`http://localhost:3000/api/deletedusers/restore/${userId}`, {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
+            if(await handleResponse(response)){
+                alert("Restauré !");
+                await loadAdminUsers();
+                await loadAdminUsersd();
+                loadStats();
+            }
+        } catch (error) { alert(error.message); }
+    }
+
+    // --- UTILITAIRES INTERFACE ---
+    function makeEditable(cell, type = 'text') {
+        const oldValue = cell.innerText.trim();
+        cell.setAttribute('data-old-value', oldValue);
+
+        if (type === 'sex') {
+            const options = sexs.map(s => `<option value="${s._id}">${s.label}</option>`).join('');
+            cell.innerHTML = `<select class="form-select form-select-sm">${options}</select>`;
+        } else if (type === 'role') {
+            cell.innerHTML = `<select class="form-select form-select-sm"><option value="user">user</option><option value="admin">admin</option></select>`;
+        } else if (type === 'isActive') {
+            cell.innerHTML = `<select class="form-select form-select-sm"><option value="true">Active</option><option value="false">Inactive</option></select>`;
+        } else {
+            cell.innerHTML = `<input type="text" class="form-control form-control-sm" value="${oldValue}">`;
+        }
+    }
+
+    function getCellValue(cell) {
+        const input = cell.querySelector('input, select');
+        if (input) {
+            if (cell.getAttribute('ondblclick')?.includes('isActive')) return input.value === "true";
+            return input.value;
+        }
+        const text = cell.innerText.trim();
+        if (cell.cellIndex === 7) return text === 'Active';
+        return text;
+    }
+
+    function getSexLabel(sexField) {
+        if (!sexField) return 'N/A';
+        if (typeof sexField === 'object') return sexField.label;
+        const sex = sexs.find(s => s._id === sexField);
+        return sex ? sex.label : 'N/A';
+    }
+
+    function renderUsers(list) {
+        document.getElementById('adminTableBody').innerHTML = list.map(user => `
             <tr data-id="${user._id}">
                 <td ondblclick="makeEditable(this)">${user.name}</td>
                 <td ondblclick="makeEditable(this)">${user.email}</td>
                 <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
-
-                <!-- FIX : on NE DOIT PAS appeler sex.label -->
-                <td ondblclick="makeEditable(this, 'sex')">
-                    ${getSexLabel(user.sex)}
-                </td>
-
+                <td ondblclick="makeEditable(this, 'sex')">${getSexLabel(user.sex)}</td>
                 <td ondblclick="makeEditable(this)">${user.height}</td>
                 <td ondblclick="makeEditable(this)">${user.weight}</td>
                 <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
                 <td ondblclick="makeEditable(this, 'isActive')">
-                    ${user.isActive ? 'Active' : 'Inactive'}
+                    <span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
                 </td>
                 <td>
                     <button class="btn btn-success btn-sm" onclick="saveRow('${user._id}')">💾 Save</button>
@@ -110,376 +301,176 @@
         `).join('');
     }
 
-    async function loadAdminUsersd() {
-        await loadSex();
-        const response = await fetch('http://localhost:3000/api/deletedusers');
-        usersd = await response.json();
-
-        // FIX : simplifier sex en ID
-        usersd = usersd.map(u => ({
-            ...u,
-            sex: typeof u.sex === "object" ? u.sex._id : u.sex
-        }));
-
-        const tbodyd = document.getElementById('adminTableBodyd');
-        tbodyd.innerHTML = usersd.map(user => `
-            <tr data-id="${user._id}">
-                <td ondblclick="makeEditable(this)">${user.name}</td>
-                <td ondblclick="makeEditable(this)">${user.email}</td>
-                <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
-
-                <!-- FIX : on NE DOIT PAS appeler sex.label -->
-                <td ondblclick="makeEditable(this, 'sex')">
-                    ${getSexLabel(user.sex)}
-                </td>
-
-                <td ondblclick="makeEditable(this)">${user.height}</td>
-                <td ondblclick="makeEditable(this)">${user.weight}</td>
-                <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
-                <td ondblclick="makeEditable(this, 'isActive')">
-                    ${user.isActive ? 'Active' : 'Inactive'}
-                </td>
-                <td>
-                    <button class="btn btn-success btn-sm" onclick="saveRowd('${user._id}')">💾 Save</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteUserd('${user._id}')">🗑 Delete</button>
-                    <button class="btn btn-primary btn-sm" onclick="restoreUserd('${user._id}')">♻️ Restore</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
-    function makeEditable(cell, type = 'text') {
-        const oldValue = cell.innerText.trim();
-        cell.setAttribute('data-old-value', oldValue);
-
-        if (type === 'sex') {
-            const options = sexs.map(s => `<option value="${s._id}">${s.label}</option>`).join('');
-            cell.innerHTML = `<select class="form-select form-select-sm">${options}</select>`;
-        }
-        else if (type === 'role') {
-            cell.innerHTML = `
-                <select class="form-select form-select-sm">
-                    <option value="User">User</option>
-                    <option value="Admin">Admin</option>
-                </select>`;
-        }
-        else if (type === 'isActive') {
-            const userId = cell.closest('tr').dataset.id;
-
-            cell.innerHTML = `
-                <select 
-                    class="form-select form-select-sm"
-                    onchange="updateUserStatus('${userId}', this.value === 'true')"
-                >
-                    <option value="true" ${cell.getAttribute('data-old-value') === 'Active' ? 'selected' : ''}>
-                        Active
-                    </option>
-                    <option value="false" ${cell.getAttribute('data-old-value') === 'Inactive' ? 'selected' : ''}>
-                        Inactive
-                    </option>
-                </select>
-                `;
-        }
-        else {
-            cell.innerHTML = `<input type="text" class="form-control form-control-sm" value="${oldValue}">`;
-        }
-    }
-
-    // Fonction utilitaire pour extraire la valeur d'une cellule
-    function getCellValue(cell) {
-        const input = cell.querySelector('input, select');
-        // Si la cellule est en mode édition, on prend la valeur de l'input/select
-        if (input) {
-            // Pour un select, on s'assure que la valeur est convertie en booléen pour isActive
-            if (cell.getAttribute('data-old-value') === 'Active' || cell.getAttribute('data-old-value') === 'Inactive') {
-                return input.value === "true"; // Retourne un booléen
-            }
-            return input.value; // Retourne la valeur de l'input/select
-        }
-        // Sinon, on prend le texte de la cellule (mode non-édition)
-        const text = cell.innerText.trim();
-        // Gérer les cas où innerText est 'Active'/'Inactive' pour isActive
-        if (cell.cellIndex === 7) { // Colonne Active (index 7)
-            return text === 'Active'; // Retourne un booléen
-        }
-        return text;
-    }
-
-    async function saveRow(userId) {
-        const row = document.querySelector(`tr[data-id="${userId}"]`);
-        if (!row) return;
-
-        // Récupérer les cellules <td> (colonne Actions exclue pour les indices ici, mais incluse dans cells)
-        const cells = row.querySelectorAll('td');
-
-        // Récupérer l'utilisateur existant pour utiliser les valeurs non éditées
-        const existingUser = users.find(u => u._id === userId);
-
-        // Construction de l'objet de mise à jour avec les indices corrigés
-        const updatedUser = {
-            name: getCellValue(cells[0]),
-            email: getCellValue(cells[1]),
-            birthDate: getCellValue(cells[2]),
-            // cells[3] est Sexe. Si c'est un sélecteur, on prend sa value (l'ID du sexe). 
-            // Sinon, on prend l'ID du sexe de l'utilisateur existant (car c'est déjà un ID après le map dans loadAdminUsers)
-            sex: cells[3].querySelector('select') 
-                ? cells[3].querySelector('select').value 
-                : existingUser.sex, 
-                
-            height: getCellValue(cells[4]),
-            weight: getCellValue(cells[5]),
-            // cells[6] est Role.
-            role: cells[6].querySelector('select') 
-                ? cells[6].querySelector('select').value 
-                : cells[6].innerText.trim().toLowerCase(), // Utilise innerText s'il n'y a pas de select
-                
-            // cells[7] est Active. getCellValue gère la conversion en booléen ici.
-            isActive: getCellValue(cells[7]) 
-        };
-
-        await updateUserStatus(userId, updatedUser.isActive);
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedUser)
-            });
-
-            if (response.ok) {
-                alert('Utilisateur modifié avec succès !');
-                // FIX : Vous appeliez loadUser() qui n'existe pas. Il faut appeler loadAdminUsers()
-                await loadAdminUsers(); 
-            } else {
-                const errorData = await response.json();
-                alert('Erreur lors de la modification : ' + (errorData.message || response.statusText));
-            }
-        } catch (error) {
-            alert("Une erreur de communication est survenue.");
-        }
-    }
-
-    async function saveRowd(userId) {
-        const row = document.querySelector(`tr[data-id="${userId}"]`);
-        if (!row) return;
-
-        // Récupérer les cellules <td> (colonne Actions exclue pour les indices ici, mais incluse dans cells)
-        const cells = row.querySelectorAll('td');
-
-        // Récupérer l'utilisateur existant pour utiliser les valeurs non éditées
-        const existingUser = usersd.find(u => u._id === userId);
-
-        // Construction de l'objet de mise à jour avec les indices corrigés
-        const updatedUser = {
-            name: getCellValue(cells[0]),
-            email: getCellValue(cells[1]),
-            birthDate: getCellValue(cells[2]),
-            // cells[3] est Sexe. Si c'est un sélecteur, on prend sa value (l'ID du sexe). 
-            // Sinon, on prend l'ID du sexe de l'utilisateur existant (car c'est déjà un ID après le map dans loadAdminUsers)
-            sex: cells[3].querySelector('select') 
-                ? cells[3].querySelector('select').value 
-                : existingUser.sex, 
-                
-            height: getCellValue(cells[4]),
-            weight: getCellValue(cells[5]),
-            // cells[6] est Role.
-            role: cells[6].querySelector('select') 
-                ? cells[6].querySelector('select').value 
-                : cells[6].innerText.trim().toLowerCase(), // Utilise innerText s'il n'y a pas de select
-                
-            // cells[7] est Active. getCellValue gère la conversion en booléen ici.
-            isActive: getCellValue(cells[7]) 
-        };
-
-        await updateUserStatus(userId, updatedUser.isActive);
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/deletedusers/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedUser)
-            });
-
-            if (response.ok) {
-                alert('Utilisateur modifié avec succès !');
-                // FIX : Vous appeliez loadUser() qui n'existe pas. Il faut appeler loadAdminUsers()
-                await loadAdminUsersd(); 
-            } else {
-                const errorData = await response.json();
-                alert('Erreur lors de la modification : ' + (errorData.message || response.statusText));
-            }
-        } catch (error) {
-            alert("Une erreur de communication est survenue.");
-        }
-    }
-
-    function getValue(cell) {
-        const input = cell.querySelector('input, select');
-        return input ? input.value : cell.innerText.trim();
-    }
-
-    async function deleteUser(userId) {
-        if (!confirm("Supprimer cet utilisateur ?")) return;
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/${userId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert("Utilisateur supprimé avec succès !");
-                await loadAdminUsers();
-                await loadAdminUsersd();
-            } else {
-                alert("Erreur lors de la suppression.");
-            }
-        } catch (error) {
-            alert("Erreur lors de la suppression.");
-        }
-    }
-
-    async function deleteUserd(userId) {
-        if (!confirm("Supprimer cet utilisateur ?")) return;
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/deletedusers/${userId}`, {
-                method: 'DELETE'
-            });
-
-            if (response.ok) {
-                alert("Utilisateur supprimé avec succès !");
-                await loadAdminUsersd();
-            } else {
-                alert("Erreur lors de la suppression.");
-            }
-        } catch (error) {
-            alert("Erreur lors de la suppression.");
-        }
-    }
-
-    async function restoreUserd(userId){
-        if(confirm("Voulez-vous VRAIMENT restaurer cet utilisateur ?")){
-            const response = await fetch(
-                `http://localhost:3000/api/deletedusers/restore/${userId}`,
-                { method: 'POST' }
-            );
-
-            if(response.ok){
-                alert("Utilisateur restauré !");
-                await loadAdminUsers();
-                await loadAdminUsersd();
-            } else {
-                alert("Erreur restauration.");
-            }
-        }
-    }
-
-    function getSexLabel(sexField) {
-        if (!sexField) return 'N/A';
-        if (typeof sexField === 'object') return sexField.label; // populate actif
-        const sex = sexs.find(s => s._id === sexField); // sinon ID
-        return sex ? sex.label : 'N/A';
-    }
-
-    document.getElementById('search').addEventListener('input', function () {
-        const value = this.value.toLowerCase();
-        const filteredUsers = users.filter(user =>
-            JSON.stringify(user).toLowerCase().includes(value)
-        );
-        renderUsers(filteredUsers);
-    });
-
-    document.getElementById('searchd').addEventListener('input', function () {
-        const value = this.value.toLowerCase();
-        const filteredUsers = usersd.filter(user =>
-            JSON.stringify(user).toLowerCase().includes(value)
-        );
-        renderDeletedUsers(filteredUsers);
-    });
-
-    function renderUsers(list) {
-        const tbody = document.getElementById('adminTableBody');
-        tbody.innerHTML = list.map(user => `
-            <tr data-id="${user._id}">
-                <td ondblclick="makeEditable(this)">${user.name}</td>
-                <td ondblclick="makeEditable(this)">${user.email}</td>
-                <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
-
-                <!-- FIX : on NE DOIT PAS appeler sex.label -->
-                <td ondblclick="makeEditable(this, 'sex')">
-                    ${getSexLabel(user.sex)}
-                </td>
-
-                <td ondblclick="makeEditable(this)">${user.height}</td>
-                <td ondblclick="makeEditable(this)">${user.weight}</td>
-                <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
-                <td ondblclick="makeEditable(this, 'isActive')">
-                    ${user.isActive ? 'Active' : 'Inactive'}
-                </td>
-                <td>
-                    <button class="btn btn-success btn-sm" onclick="saveRowd('${user._id}')">💾 Save</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteUserd('${user._id}')">🗑 Delete</button>
-                    <button class="btn btn-primary btn-sm" onclick="restoreUserd('${user._id}')">♻️ Restore</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-
     function renderDeletedUsers(list) {
-        const tbody = document.getElementById('adminTableBodyd');
-        tbody.innerHTML = list.map(user => `
+        document.getElementById('adminTableBodyd').innerHTML = list.map(user => `
             <tr data-id="${user._id}">
                 <td ondblclick="makeEditable(this)">${user.name}</td>
                 <td ondblclick="makeEditable(this)">${user.email}</td>
                 <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
-
-                <!-- FIX : on NE DOIT PAS appeler sex.label -->
-                <td ondblclick="makeEditable(this, 'sex')">
-                    ${getSexLabel(user.sex)}
-                </td>
-
+                <td ondblclick="makeEditable(this)">${getSexLabel(user.sex)}</td>
                 <td ondblclick="makeEditable(this)">${user.height}</td>
                 <td ondblclick="makeEditable(this)">${user.weight}</td>
-                <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
+                <td ondblclick="makeEditable(this)">${user.role}</td>
                 <td ondblclick="makeEditable(this, 'isActive')">
-                    ${user.isActive ? 'Active' : 'Inactive'}
+                    <span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
                 </td>
                 <td>
-                    <button class="btn btn-success btn-sm" onclick="saveRowd('${user._id}')">💾 Save</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteUserd('${user._id}')">🗑 Delete</button>
                     <button class="btn btn-primary btn-sm" onclick="restoreUserd('${user._id}')">♻️ Restore</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteUserd('${user._id}')">🗑 Delete</button>
                 </td>
             </tr>
         `).join('');
     }
 
-    async function updateUserStatus(userId, isActive) {
-        try {
-            const response = await fetch(
-                `http://localhost:3000/api/${userId}/status`,
-                {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ isActive })
-                }
-            );
+    // Filtre pour le tableau des utilisateurs actifs
+    document.getElementById('search').addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        const filtered = users.filter(u => 
+            u.name.toLowerCase().includes(term) || 
+            u.email.toLowerCase().includes(term)
+        );
+        renderUsers(filtered);
+        updateUsersCount(filtered);
+    });
 
-            if (!response.ok) {
-                throw new Error("Erreur mise à jour statut");
-            }
+    // Filtre pour le tableau des utilisateurs supprimés
+    document.getElementById('searchd').addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        const filtered = usersd.filter(u => 
+            u.name.toLowerCase().includes(term) || 
+            u.email.toLowerCase().includes(term)
+        );
+        renderDeletedUsers(filtered);
+        updateDeletedUsersCount(filtered);
+    });
 
-        } catch (error) {
-            console.error(error);
-            alert("Erreur lors de la mise à jour du statut");
+    function sortTable(field) {
+        sortAsc = !sortAsc; // On inverse l'ordre à chaque clic
+
+        users.sort((a, b) => {
+            let valA = a[field].toLowerCase();
+            let valB = b[field].toLowerCase();
+            
+            if (valA < valB) return sortAsc ? -1 : 1;
+            if (valA > valB) return sortAsc ? 1 : -1;
+            return 0;
+        });
+
+        renderUsers(users); // On réaffiche le tableau trié
+    }
+
+    function loadStats() {
+        if (!users || users.length === 0) {
+            alert("Aucune donnée disponible pour les statistiques.");
+            return;
+        }
+
+        const total = users.length;
+        const active = users.filter(u => u.isActive).length;
+        
+        // Calcul par genre (en utilisant les labels de ton tableau sexs)
+        const hommes = users.filter(u => getSexLabel(u.sex).toLowerCase() === 'male').length;
+        const femmes = users.filter(u => getSexLabel(u.sex).toLowerCase() === 'female').length;
+
+        const container = document.getElementById('statsContainer');
+
+        if (!container) {
+            console.error("statsContainer introuvable dans le DOM");
+            return;
+        }
+        
+        // On vide et on remplit avec un design propre
+        container.innerHTML = `
+            <div class="card shadow-sm mb-4 p-3 bg-white position-relative">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted small">Total</h6>
+                                <h4 class="text-primary mb-0">${total}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted small">Actifs</h6>
+                                <h4 class="text-success mb-0">${active}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-info">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted small">Mélange F/H</h6>
+                                <h4 class="text-info mb-0">${femmes} ♀ / ${hommes} ♂</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-warning">
+                            <div class="card-body text-center">
+                                <h6 class="text-muted small">% Activité</h6>
+                                <h4 class="text-warning mb-0">${((active / total) * 100).toFixed(1)}%</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateUsersCount(list) { document.getElementById('usersCount').innerText = list.length; }
+    function updateDeletedUsersCount(list) { document.getElementById('usersDeletedCount').innerText = list.length; }
+
+    function closeStats() {
+        document.getElementById('statsContainer').innerHTML = '';
+    }
+
+    function logout() {
+        // On demande confirmation avant d'agir
+        const confirmation = confirm("Es-tu sûr de vouloir te déconnecter ?");
+
+        if (confirmation) {
+            // 1. On vide le localStorage uniquement si l'utilisateur a confirmé
+            localStorage.clear(); 
+            
+            // 2. Redirection vers la page de login
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = "/trackcalorilog/login";
+        } else {
+            // Si l'utilisateur annule, on affiche un petit message en console (optionnel)
+            console.log("Déconnexion annulée");
         }
     }
 
     window.onload = () => {
-        loadSex();
-        loadAdminUsers();
-        loadAdminUsersd();
+        const userStr = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+        const user = userStr ? JSON.parse(userStr) : null;
+
+        console.log("Vérification accès Admin pour :", user?.email);
+
+        // 1. Si pas de token ou pas d'user -> Retour Login
+        try {
+            const user = userStr ? JSON.parse(userStr) : null;
+
+            if (!token || !user || user.role.toLowerCase() !== 'admin') {
+                console.error("Accès refusé ou session invalide");
+                localStorage.clear(); // ON NETTOIE TOUT ICI pour éviter la boucle
+                window.location.replace("/trackcalorilog/login"); // .replace est mieux que .href pour les redirections d'erreur
+                return;
+            }
+
+            document.body.style.display = 'block';
+            loadAdminUsers();
+            loadAdminUsersd();
+        } catch (e) {
+            localStorage.clear();
+            window.location.replace("/trackcalorilog/login");
+        }
     };
 </script>
-
 </body>
 </html>
