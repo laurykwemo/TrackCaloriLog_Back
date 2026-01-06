@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.75% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/16</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">18.75% </span>
+                <span class="strong">86.66% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/16</span>
+                <span class='fraction'>13/15</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -95,69 +95,75 @@
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
 <a name='L32'></a><a href='#L32'>32</a>
-<a name='L33'></a><a href='#L33'>33</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span></td><td class="text"><pre class="prettyprint lang-js">const UserSex = require("./usersex.model");
+<span class="cline-any cline-yes">7x</span></td><td class="text"><pre class="prettyprint lang-js">const UserSex = require("./usersex.model");
 &nbsp;
 const usersexService = {
-    createSex: <span class="fstat-no" title="function not covered" >as</span>ync (data) =&gt; {
-<span class="cstat-no" title="statement not covered" >        try{</span>
-            const lastSex = <span class="cstat-no" title="statement not covered" >await UserSex.findOne({}, {}, { sort: { '_id': -1 } });</span>
-            const nextId = <span class="cstat-no" title="statement not covered" >lastSex ? lastSex._id + 1 : 1;</span>
+    createSex: async (data) =&gt; {
+        try {
+            // Utilise .lean() pour être sûr de récupérer un objet JS simple pour le calcul
+            const lastSex = await UserSex.findOne().sort({ _id: -1 }).lean();
+            const nextId = (lastSex &amp;&amp; lastSex._id) ? lastSex._id + 1 : 1;
 &nbsp;
-            const newUserSex = <span class="cstat-no" title="statement not covered" >await UserSex.create({</span>
+            const newUserSex = new UserSex({
                 _id: nextId,
                 label: data.label,
                 bmrCoef: data.bmrCoef,
                 description: data.description
             });
-            const usersexObject = <span class="cstat-no" title="statement not covered" >newUserSex.toObject();</span>
-<span class="cstat-no" title="statement not covered" >            return usersexObject;</span>
-        }catch(error){
-<span class="cstat-no" title="statement not covered" >            console.error("Erreur lors de la création de l'utilisateur dans la BD :", error);</span>
-<span class="cstat-no" title="statement not covered" >            throw error;</span>
+&nbsp;
+            const savedSex = await newUserSex.save();
+            return savedSex.toObject();
+        } catch (error) {
+<span class="cstat-no" title="statement not covered" >            console.error("Erreur service createSex:", error.message);</span>
+<span class="cstat-no" title="statement not covered" >            throw error; </span>
         }
     },
-    getAllSexes: <span class="fstat-no" title="function not covered" >as</span>ync () =&gt; {
-<span class="cstat-no" title="statement not covered" >        try {</span>
-            const sexes = <span class="cstat-no" title="statement not covered" >await UserSex.find();</span>
-<span class="cstat-no" title="statement not covered" >            return sexes;</span>
-        } catch (error){
-<span class="cstat-no" title="statement not covered" >            console.error("Erreur lors de la récupération des sexes :", error);</span>
-<span class="cstat-no" title="statement not covered" >            throw error;</span>
+&nbsp;
+    getAllSexes: async () =&gt; {
+        try {
+            return await UserSex.find();
+        } catch (error) {
+            console.error("Erreur service getAllSexes:", error.message);
+            throw error;
         }
     }
-}
+};
 &nbsp;
 module.exports = usersexService;</pre></td></tr></table></pre>
 
@@ -166,7 +172,7 @@ module.exports = usersexService;</pre></td></tr></table></pre>
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-12-30T23:37:50.219Z
+                at 2026-01-04T14:15:09.208Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

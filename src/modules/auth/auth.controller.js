@@ -57,8 +57,38 @@ const authController = {
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
+            
+            // 1. Appeler le service login pour récupérer l'utilisateur (et valider mdp/email)
             const result = await authService.login(email, password);
+            const user = result.user; // On suppose que ton service retourne { user, token }
+
+            // 2. Vérification du bannissement
+            if (user.isBanned) {
+                const now = new Date();
+
+                // Si une date d'expiration existe et qu'elle est dépassée
+                if (user.banExpires && user.banExpires < now) {
+                    // AUTO-DÉBANNISSEMENT
+                    user.isBanned = false;
+                    user.banExpires = null;
+                    await user.save(); 
+                    // Le code continue et l'utilisateur est connecté
+                } else {
+                    // TOUJOURS BANNI
+                    const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                    const dateFr = user.banExpires 
+                        ? user.banExpires.toLocaleDateString('fr-FR', dateOptions) 
+                        : "définitivement";
+
+                    return res.status(403).json({ 
+                        message: `Accès refusé. Votre compte est banni jusqu'au : ${dateFr}.` 
+                    });
+                }
+            }
+
+            // 3. Si tout est OK, on renvoie le résultat (token + user)
             res.status(200).json(result);
+
         } catch (error) {
             // Déclenchement automatique du renvoi si mail non vérifié
             if (error.message === "Veuillez vérifier votre boîte mail pour valider votre compte.") {

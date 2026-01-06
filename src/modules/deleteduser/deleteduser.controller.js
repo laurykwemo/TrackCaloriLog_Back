@@ -41,6 +41,9 @@ const deleteduserController = {
             if (!restoredUser) return res.status(404).json({ message: "Utilisateur non trouvé" });
             res.status(200).json({ message: "Utilisateur restauré", user: restoredUser });
         } catch (error) {
+            if (error.message === "Utilisateur introuvable dans les supprimés.") {
+                return res.status(404).json({ message: error.message });
+            }
             res.status(500).json({ error: "Erreur lors de la restauration" });
         }
     },
@@ -52,7 +55,9 @@ const deleteduserController = {
                 return res.status(404).json({ message: "Utilisateur non trouvé" });
             }
 
-            res.json(updatedUser);
+            // Si le test attend res.body.name, renvoyez updatedUser directement
+            // Si le test attend res.body.user.name, renvoyez { user: updatedUser }
+            res.status(200).json(updatedUser); 
         } catch (error) {
             res.status(500).json({ message: "Erreur lors de la modification", error });
         }

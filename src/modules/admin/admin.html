@@ -90,6 +90,35 @@
             Le nombre total d'utilisateurs supprimés est : <span id="usersDeletedCount">0</span>
         </p>
     </div>
+    <div class="modal fade" id="banModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Bannir l'utilisateur</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="banUserId">
+            <label for="banEndDate" class="form-label">Date de fin de bannissement :</label>
+            <input type="date" id="banEndDate" class="form-control">
+            <p class="text-muted mt-2 small">L'utilisateur ne pourra plus se connecter jusqu'à cette date.</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+            <button type="button" class="btn btn-warning" onclick="confirmBan()">Confirmer le Ban</button>
+        </div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="detailsOffcanvas" aria-labelledby="detailsOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 id="detailsOffcanvasLabel">🔍 Détails de l'utilisateur</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" id="detailsContent">
+            </div>
+    </div>
 
 <script>
     let sexs = [];
@@ -102,6 +131,7 @@
     // --- CONFIGURATION AUTHENTIFICATION ---
     function getAuthHeaders() {
         const token = localStorage.getItem('token');
+        console.log("Tentative d'envoi du Token :", token);
         return {
             'Content-Type': 'application/json',
             'Authorization': token ? `Bearer ${token}` : ''
@@ -125,14 +155,14 @@
     async function loadSex() {
         try {
             const response = await fetch('http://localhost:3000/api/AllSexes');
-            sexs = await response.json();
+            sexs = await handleResponse(response);
         } catch (e) { console.error("Erreur sexes:", e); }
     }
 
     async function loadAdminUsers() {
         await loadSex();
         try {
-            const response = await fetch('http://localhost:3000/api/AllUsers', {
+            const response = await fetch('http://localhost:3000/api/admin/users', {
                 headers: getAuthHeaders()
             });
             const data = await handleResponse(response);
@@ -216,7 +246,7 @@
     async function deleteUserd(userId) {
         if (!confirm("Supprimer cet utilisateur ?")) return;
         try {
-            const response = await fetch(`http://localhost:3000/admin/users/${userId}`, {
+            const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
@@ -281,24 +311,40 @@
     }
 
     function renderUsers(list) {
-        document.getElementById('adminTableBody').innerHTML = list.map(user => `
-            <tr data-id="${user._id}">
-                <td ondblclick="makeEditable(this)">${user.name}</td>
-                <td ondblclick="makeEditable(this)">${user.email}</td>
-                <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
-                <td ondblclick="makeEditable(this, 'sex')">${getSexLabel(user.sex)}</td>
-                <td ondblclick="makeEditable(this)">${user.height}</td>
-                <td ondblclick="makeEditable(this)">${user.weight}</td>
-                <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
-                <td ondblclick="makeEditable(this, 'isActive')">
-                    <span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
-                </td>
-                <td>
-                    <button class="btn btn-success btn-sm" onclick="saveRow('${user._id}')">💾 Save</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}')">🗑 Delete</button>
-                </td>
-            </tr>
-        `).join('');
+        document.getElementById('adminTableBody').innerHTML = list.map(user => {
+            // 1. On calcule le statut pour CHAQUE utilisateur ici
+            const isCurrentlyBanned = user.isBanned || (user.banExpires && new Date(user.banExpires) > new Date());
+
+            // 2. On retourne le template HTML
+            return `
+                <tr data-id="${user._id}">
+                    <td ondblclick="makeEditable(this)">${user.name}</td>
+                    <td ondblclick="makeEditable(this)">${user.email}</td>
+                    <td ondblclick="makeEditable(this)">${user.birthDate?.substring(0,10) || ''}</td>
+                    <td ondblclick="makeEditable(this, 'sex')">${getSexLabel(user.sex)}</td>
+                    <td ondblclick="makeEditable(this)">${user.height}</td>
+                    <td ondblclick="makeEditable(this)">${user.weight}</td>
+                    <td ondblclick="makeEditable(this, 'role')">${user.role}</td>
+                    <td ondblclick="makeEditable(this, 'isActive')">
+                        <span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-success btn-sm" onclick="saveRow('${user._id}')">💾 Save</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser('${user._id}')">🗑 Delete</button>
+                            <button onclick="toggleUserStatus('${user._id}')" class="btn btn-secondary btn-sm">
+                                ${user.isActive ? '🔴 Désactiver' : '🟢 Activer'}
+                            </button>
+                            ${isCurrentlyBanned 
+                                ? `<button class="btn btn-outline-primary btn-sm" onclick="unbanUser('${user._id}')">✅ Unban</button>`
+                                : `<button class="btn btn-warning btn-sm" onclick="openBanModal('${user._id}')">🚫 Ban</button>`
+                            }
+                            <button class="btn btn-outline-info btn-sm ms-auto" onclick="showUserDetails('${user._id}', 'active')">ℹ️ Info</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 
     function renderDeletedUsers(list) {
@@ -314,9 +360,10 @@
                 <td ondblclick="makeEditable(this, 'isActive')">
                     <span class="badge ${user.isActive ? 'bg-success' : 'bg-secondary'}">${user.isActive ? 'Active' : 'Inactive'}</span>
                 </td>
-                <td>
+                <td class="d-flex gap-1">
                     <button class="btn btn-primary btn-sm" onclick="restoreUserd('${user._id}')">♻️ Restore</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteUserd('${user._id}')">🗑 Delete</button>
+                    <button class="btn btn-outline-info btn-sm ms-auto" onclick="showUserDetails('${user._id}', 'deleted')">ℹ️ Info</button>
                 </td>
             </tr>
         `).join('');
@@ -427,13 +474,124 @@
         document.getElementById('statsContainer').innerHTML = '';
     }
 
+    // Ouvre la modal et stocke l'ID de l'utilisateur
+    function openBanModal(userId) {
+        document.getElementById('banUserId').value = userId;
+        const modal = new bootstrap.Modal(document.getElementById('banModal'));
+        modal.show();
+    }
+
+    // Envoie la requête au back-end
+    async function confirmBan() {
+        const userId = document.getElementById('banUserId').value;
+        const endDate = document.getElementById('banEndDate').value;
+
+        if (!endDate) {
+            alert("Veuillez sélectionner une date !");
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/admin/users/ban/${userId}`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ banUntil: endDate })
+            });
+
+            if (await handleResponse(response)) {
+                alert("Utilisateur banni !");
+                // On ferme la modal (via l'instance Bootstrap)
+                const modalEl = document.getElementById('banModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                
+                await loadAdminUsers(); // Rafraîchir la liste
+            }
+        } catch (error) {
+            alert("Erreur lors du ban : " + error.message);
+        }
+    }
+
+    async function unbanUser(userId) {
+        if (!confirm("Voulez-vous vraiment débannir cet utilisateur ?")) return;
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/admin/users/unban/${userId}`, {
+                method: 'POST',
+                headers: getAuthHeaders()
+            });
+
+            if (await handleResponse(response)) {
+                alert("Utilisateur débanni !");
+                await loadAdminUsers(); // On rafraîchit le tableau
+            }
+        } catch (error) {
+            alert("Erreur lors du déban : " + error.message);
+        }
+    }
+
+    async function toggleUserStatus(userId) {
+        // Ici on appelle la route PATCH /api/admin/toggleActive/:id
+        await fetch(`http://localhost:3000/api/admin/toggleActive/${userId}`, {
+            method: 'PATCH',
+            headers: getAuthHeaders()
+        });
+        loadStats()
+        loadAdminUsers(); // On rafraîchit
+    }
+
+    function showUserDetails(userId, type) {
+        // On cherche l'utilisateur dans la bonne liste
+        const user = type === 'active' 
+            ? users.find(u => u._id === userId) 
+            : usersd.find(u => u._id === userId);
+
+        if (!user) return;
+
+        let specificInfo = '';
+
+        if (type === 'active') {
+            if (user.isBanned) {
+                specificInfo = `
+                    <div class="alert alert-warning mt-3">
+                        <strong>Statut : Banni 🚫</strong><br>
+                        Fin du ban : ${user.banExpires ? new Date(user.banExpires).toLocaleDateString('fr-FR') : 'Permanente'}
+                    </div>`;
+            } else {
+                specificInfo = `<div class="alert alert-success mt-3">Statut : Actif ✅</div>`;
+            }
+        } else {
+            // Pour les supprimés
+            specificInfo = `
+                <div class="alert alert-danger mt-3">
+                    <strong>Supprimé le :</strong> ${user.deletedAt ? new Date(user.deletedAt).toLocaleString('fr-FR') : 'Date inconnue'}
+                </div>`;
+        }
+
+        document.getElementById('detailsContent').innerHTML = `
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><strong>Nom :</strong> ${user.name}</li>
+                <li class="list-group-item"><strong>Email :</strong> ${user.email}</li>
+                <li class="list-group-item"><strong>Rôle :</strong> ${user.role}</li>
+                <li class="list-group-item"><strong>Taille :</strong> ${user.height} cm</li>
+                <li class="list-group-item"><strong>Poids :</strong> ${user.weight} kg</li>
+                <li class="list-group-item"><strong>Genre :</strong> ${getSexLabel(user.sex)}</li>
+            </ul>
+            ${specificInfo}
+        `;
+
+        // On affiche l'Offcanvas
+        const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailsOffcanvas'));
+        offcanvas.show();
+    }
+
     function logout() {
         // On demande confirmation avant d'agir
         const confirmation = confirm("Es-tu sûr de vouloir te déconnecter ?");
 
         if (confirmation) {
             // 1. On vide le localStorage uniquement si l'utilisateur a confirmé
-            localStorage.clear(); 
+            //localStorage.clear(); 
             
             // 2. Redirection vers la page de login
             localStorage.removeItem('token');

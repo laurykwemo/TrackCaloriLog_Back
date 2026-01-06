@@ -14,14 +14,14 @@ jest.mock('nodemailer', () => ({
 describe('Série de tests pour l\'authentification', () => {
   
   beforeAll(async () => {
-    const DB_URI = 'mongodb://localhost:27017/trackcalorilog_test';
-    if (mongoose.connection.readyState === 0) {
-        await mongoose.connect(DB_URI);
-    }
+    // On se connecte à une DB de test (différente de la prod !)
+    const url = process.env.MONGO_URL_TEST || 'mongodb://127.0.0.1/trackcalorilog_test';
+    await mongoose.connect(url);
   });
 
   afterAll(async () => {
-    await mongoose.connection.close();
+      await mongoose.connection.dropDatabase(); // Optionnel : nettoie après passage
+      await mongoose.connection.close();
   });
 
   // --- LOGIN AVEC SUCCÈS (JWT) ---
@@ -143,5 +143,27 @@ describe('Série de tests pour l\'authentification', () => {
       .send({ email, password: 'BAD' });
 
     expect(res.body.message).toMatch(/Compte bloqué/i);
+  });
+  it('should return 400 for a malformed or invalid token', async () => {
+      const res = await request(app)
+          .post('/trackcalorilog/reset-password')
+          .send({
+              token: 'token-completement-invalide',
+              newPassword: 'NewPassword123!'
+          });
+
+      expect(res.status).toBe(400);
+      // Vérifie que le message correspond à ta logique (ex: "Token invalide ou expiré")
+  });
+
+  it('should return 400 when password field is missing', async () => {
+      const res = await request(app)
+          .post('/trackcalorilog/reset-password')
+          .send({
+              token: 'un-token-de-test-valide'
+              // newPassword manquant
+          });
+
+      expect(res.status).toBe(400);
   });
 });

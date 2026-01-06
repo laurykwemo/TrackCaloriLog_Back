@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         required: true 
     },
     height: {type: Number, required: true},
-    weight: {type: Number, required: true},
+    weight: {type: Number, min: [0, "Le poids ne peut pas être inférieur à 0"], required: true},
     role: {
         type: String,
         enum: ['user', 'admin'],
@@ -42,7 +42,15 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    lockUntil: Date
+    lockUntil: Date,
+    isBanned: {
+        type: Boolean,
+        default: false
+    },
+    banExpires: {
+        type: Date,
+        default: null
+    }
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);

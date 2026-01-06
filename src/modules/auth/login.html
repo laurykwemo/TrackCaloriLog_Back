@@ -299,7 +299,7 @@
                         alert('Connexion réussie !');
                         // REDIRECTION SELON LE RÔLE
                         if (data.user.role.toLowerCase() === 'admin') {
-                            window.location.href = "/admin"; // Vers le dashboard
+                            window.location.href = `/admin?token=${data.token}`; // Vers le dashboard
                         } else {
                             window.location.href = "/";  // Vers la page user.html
                         }

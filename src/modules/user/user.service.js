@@ -1,6 +1,5 @@
 const User = require('./user.model');
 const bcrypt = require('bcrypt');
-const deletedUser = require('../deleteduser/deleteduser.model');
 const crypto = require('crypto');
 
 const userService = {
@@ -8,6 +7,7 @@ const userService = {
         try {
             const today = new Date();
             const userBirthDate = new Date(data.birthDate); 
+            if (isNaN(userBirthDate.getTime())) return 0;
             let age = today.getFullYear() - userBirthDate.getFullYear();
             const mois = today.getMonth() - userBirthDate.getMonth();
             if(mois < 0 || (mois ===0 && today.getDate() < userBirthDate.getDate())){
@@ -88,36 +88,70 @@ const userService = {
         try {
             const user = await User.findById(userId).populate('sex', 'label').select('-password -__v -deletedAt -updatedAt');
             return user;
-        } catch {
+        } catch (error){
             console.error("Erreur lors de la récupération du user :", error);
             throw error;
         }
     },
-    editUser: async (userId, userData) => {
+    editUser: async (userId, userData, isAdminAction = false) => {
         try {
+            // Liste des champs que même un utilisateur peut modifier
+            const allowedFields = ['name', 'email', 'birthDate', 'sex', 'height', 'weight'];
+            
+            // On crée un nouvel objet de mise à jour propre
+            let updateData = {};
+
+            // 1. On ne prend que les champs autorisés par défaut
+            allowedFields.forEach(field => { 
+                if (userData[field] !== undefined) {
+                    updateData[field] = userData[field];
+                }
+            });
+
+            // 2. Si (et seulement si) c'est une action explicitement marquée comme Admin
+            // on autorise la modification des champs sensibles
+            if (isAdminAction) {
+                const sensitiveFields = ['role', 'isActive', 'isBanned', 'banUntil'];
+                sensitiveFields.forEach(field => {
+                    if (userData[field] !== undefined) {
+                        updateData[field] = userData[field];
+                    }
+                });
+            }
+
             const updatedUser = await User.findByIdAndUpdate(
                 userId,
-                userData,
-                { new: true }
+                updateData, // On utilise l'objet filtré ici !
+                { new: true, runValidators: true }
             );
+
             return updatedUser;
-        } catch (error) {   // <-- CORRECTION
+        } catch (error) {
             console.error("Erreur lors de la modification :", error);
             throw error;
         }
     },
     deleteUser: async (userId) => {
         try {
-            // Récupérer l'utilisateur AVEC le password
+            // 1. Récupérer l'utilisateur avec le password
             const user = await User.findById(userId).select('+password');
-            if (!user) return null;
+            
+            // 2. Si pas d'utilisateur, on jette une erreur pour que le test .rejects.toThrow() réussisse
+            if (!user) {
+                const err = new Error("Utilisateur introuvable");
+                err.status = 404;
+                throw err;
+            }
 
-            // Sauvegarder une copie dans DeletedUser
-            await deletedUser.create({
+            // 3. Sauvegarder dans la collection des supprimés
+            // ATTENTION : Utilise bien le Modèle DeletedUser (avec une majuscule si c'est ton require)
+            const DeletedUserModel = require('../deleteduser/deleteduser.model'); 
+            
+            await DeletedUserModel.create({
                 originalUserId: user._id,
                 name: user.name,
                 email: user.email,
-                password: user.password,      // 👈 on le met explicitement
+                password: user.password,      
                 birthDate: user.birthDate,
                 sex: user.sex,
                 height: user.height,
@@ -127,13 +161,13 @@ const userService = {
                 deletedAt: new Date()
             });
 
-            // Supprimer l'utilisateur
+            // 4. Supprimer l'original
             await User.findByIdAndDelete(userId);
 
             return user;
         } catch (error) {
-            console.error("Erreur lors de la suppression :", error);
-            throw error;
+            console.error("Erreur lors de la suppression :", error.message);
+            throw error; // Rejette l'erreur pour que Jest la capture
         }
     },
     updateStatus: async (userId, isActive) => {

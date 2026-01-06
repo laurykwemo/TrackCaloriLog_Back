@@ -428,6 +428,8 @@
                 body: JSON.stringify(user)
             });
 
+            const result = await response.json();
+
             if (response.ok) { 
                 alert('Utilisateur ajouté avec succès!');
                 window.location.href = '/trackcalorilog/login';
@@ -489,21 +491,41 @@
         });
         loadSex();
     });
-    async function loadSex(){
-        try{
+    async function loadSex() {
+        try {
             const response = await fetch('/api/AllSexes');
-            sexs = await response.json();
-            renderCombobox();
-        }catch(error){
+            
+            // Si le serveur répond 401 ou autre erreur
+            if (!response.ok) {
+                throw new Error("Erreur serveur lors de la récupération des sexes");
+            }
+
+            const data = await response.json();
+
+            // On vérifie que c'est bien un tableau avant d'assigner
+            if (Array.isArray(data)) {
+                sexs = data;
+                renderCombobox(sexs);
+            } else {
+                console.error("Format de données invalide, attendu un Array:", data);
+            }
+        } catch (error) {
             console.error("Erreur lors du chargement des sexes :", error);
         }
     }
-    function renderCombobox(){
+
+    function renderCombobox(dataToRender) {
         const cmb = document.getElementById('sex');
-        cmb.innerHTML = '<option value="" disabled selected>Select sex</option>';
-        sexs.forEach((sex, index) => {
-            cmb.innerHTML += `<option value="${sex._id}">${sex.label}</option>`;
+        if (!cmb) return;
+
+        // Utilisation des données passées en paramètre
+        let options = '<option value="" disabled selected>Select sex</option>';
+        
+        dataToRender.forEach((sex) => {
+            options += `<option value="${sex._id}">${sex.label}</option>`;
         });
+        
+        cmb.innerHTML = options;
     }
     function getSexLabel(sexField) {
         if (!sexField) return 'N/A';

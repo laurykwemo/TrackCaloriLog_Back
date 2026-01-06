@@ -31,6 +31,21 @@ const authService = {
                 throw new Error("Votre compte a été suspendu. Contactez le support.");
             }
 
+            if (user.isBanned) {
+                if (user.banExpires && new Date() > user.banExpires) {
+                    // Le ban temporaire est expiré, on réactive auto
+                    user.isBanned = false;
+                    user.banExpires = null;
+                    user.isActive = true;
+                    await user.save();
+                } else {
+                    const message = user.banExpires 
+                        ? `Votre compte est banni jusqu'au ${user.banExpires.toLocaleDateString()}`
+                        : "Votre compte est banni définitivement.";
+                    throw new Error(message);
+                }
+            }
+
             // 4. Comparer le mot de passe
             const isValid = await bcrypt.compare(password, user.password);
 
