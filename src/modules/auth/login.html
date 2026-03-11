@@ -321,6 +321,21 @@
         alert("Votre compte a été activé avec succès ! Vous pouvez maintenant vous connecter.");
     }
 
+    // Exemple de logique dans ta route de Login ou un Middleware d'authentification
+    const checkBanStatus = async (user) => {
+        if (user.isBanned) {
+            // Si une date d'expiration existe et qu'elle est passée
+            if (user.banExpires && user.banExpires <= new Date()) {
+                user.isBanned = false;
+                user.banExpires = null;
+                await user.save();
+                return { banned: false };
+            }
+            return { banned: true, reason: user.banReason, expires: user.banExpires };
+        }
+        return { banned: false };
+    };
+
     // SUPPRIMÉ : l'écouteur sur 'login-password' pour la strength-bar 
     // car l'élément 'strength-bar' n'existe pas dans ce HTML.
 

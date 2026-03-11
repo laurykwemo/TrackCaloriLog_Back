@@ -9,16 +9,42 @@
         body {
             display: none;
         }
+        #toast-container {
+            position: fixed;
+            top: 70px; /* Légèrement plus bas si tu as une navbar Bootstrap fixe */
+            right: 20px;
+            z-index: 1060; /* Juste au-dessus des modals Bootstrap qui sont à 1050 */
+        }
+
+        .toast-alert {
+            background: #dc3545; /* On utilise le rouge standard 'danger' de Bootstrap */
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.5s ease-out;
+            min-width: 300px;
+            border-left: 5px solid #a71d2a; /* Une petite bordure pour le style */
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
     </style>
 </head>
 <body class="p-4">
 
+    <div id="toast-container"></div>
     <div class="d-flex justify-content-between align-items-start mb-3">
         <h2>👨‍💼 Admin Dashboard</h2>
 
         <div class="d-flex flex-column align-items-end gap-2">
             <a href="/" class="btn btn-secondary">
                 Retour à l'espace User
+            </a>
+            <a href="/trackcalorilog/register" class="btn btn-success">
+                Ajouter un User
             </a>
             <button onclick="logout()" class="btn btn-danger">
                 Déconnexion
@@ -93,20 +119,27 @@
     <div class="modal fade" id="banModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Bannir l'utilisateur</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <input type="hidden" id="banUserId">
-            <label for="banEndDate" class="form-label">Date de fin de bannissement :</label>
-            <input type="date" id="banEndDate" class="form-control">
-            <p class="text-muted mt-2 small">L'utilisateur ne pourra plus se connecter jusqu'à cette date.</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-            <button type="button" class="btn btn-warning" onclick="confirmBan()">Confirmer le Ban</button>
-        </div>
+            <div class="modal-header">
+                <h5 class="modal-title">🚫 Bannir l'utilisateur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="banUserId">
+                
+                <div class="mb-3">
+                    <label for="banEndDate" class="form-label">Date et heure de fin :</label>
+                    <input type="datetime-local" id="banEndDate" class="form-control">
+                </div>
+
+                <div class="mb-3">
+                    <label for="banReasonInput" class="form-label">Raison du bannissement :</label>
+                    <textarea id="banReasonInput" class="form-control" rows="3" placeholder="Ex: Comportement inapproprié..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-warning" onclick="confirmBan()">Confirmer le Ban</button>
+            </div>
         </div>
     </div>
     </div>
@@ -119,15 +152,54 @@
         <div class="offcanvas-body" id="detailsContent">
             </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <div class="card shadow-sm mt-5 p-4 bg-white">
+        <h4>📈 Statistiques de croissance</h4>
+        <div style="height: 300px;">
+            <canvas id="registrationChart"></canvas>
+        </div>
+    </div>
 
 <script>
     let sexs = [];
     let users = [];
     let usersd = [];
     let sortAsc = true;
+    let myChart;
+    let isRedirecting = false;
+    const socket = io();
 
     const container = document.getElementById('statsContainer');
 
+
+    // On retire l'ancien écouteur avant d'en créer un nouveau
+    socket.off('new_security_alert');
+
+    socket.on('new_security_alert', (data) => {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        // On vérifie si une alerte identique n'est pas déjà affichée 
+        // (Optionnel : évite le spam si l'utilisateur clique 10 fois)
+        const isDuplicate = Array.from(container.children).some(t => t.innerText.includes(data.userEmail));
+        if (isDuplicate) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast-alert';
+        toast.innerHTML = `
+            <strong>⚠️ ALERTE SÉCURITÉ</strong><br>
+            ${data.userEmail} a tenté une action interdite.<br>
+            <small>${new Date().toLocaleTimeString()}</small>
+        `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 10000);
+    });
     // --- CONFIGURATION AUTHENTIFICATION ---
     function getAuthHeaders() {
         const token = localStorage.getItem('token');
@@ -140,10 +212,15 @@
 
     async function handleResponse(response) {
         if (response.status === 401 || response.status === 403) {
-            alert("Session expirée ou accès refusé. Veuillez vous reconnecter.");
-            window.location.href = "/trackcalorilog/login"; 
-            return null;
+            if (!isRedirecting) {
+                isRedirecting = true; // On verrouille
+                alert("Session expirée ou accès refusé. Veuillez vous reconnecter.");
+                window.location.href = "/trackcalorilog/login";
+            }
+            // On retourne une promesse qui ne se résout jamais pour stopper le code suivant
+            return new Promise(() => {}); 
         }
+        
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.message || "Erreur serveur");
@@ -154,7 +231,7 @@
     // --- CHARGEMENT DES DONNÉES ---
     async function loadSex() {
         try {
-            const response = await fetch('http://localhost:3000/api/AllSexes');
+            const response = await fetch('/api/AllSexes');
             sexs = await handleResponse(response);
         } catch (e) { console.error("Erreur sexes:", e); }
     }
@@ -162,7 +239,7 @@
     async function loadAdminUsers() {
         await loadSex();
         try {
-            const response = await fetch('http://localhost:3000/api/admin/users', {
+            const response = await fetch('/api/admin/users', {
                 headers: getAuthHeaders()
             });
             const data = await handleResponse(response);
@@ -174,13 +251,14 @@
             }));
 
             renderUsers(users);
+            renderGrowthChart();
             updateUsersCount(users);
         } catch (err) { alert(err.message); }
     }
 
     async function loadAdminUsersd() {
         try {
-            const response = await fetch('http://localhost:3000/api/deletedusers', {
+            const response = await fetch('/api/deletedusers', {
                 headers: getAuthHeaders()
             });
             const data = await handleResponse(response);
@@ -214,7 +292,7 @@
         };
 
         try {
-            const response = await fetch(`http://localhost:3000/api/${userId}`, {
+            const response = await fetch(`/api/users/${userId}`, {
                 method: 'PUT',
                 headers: getAuthHeaders(),
                 body: JSON.stringify(updatedUser)
@@ -228,41 +306,51 @@
     }
 
     async function deleteUser(userId) {
-        if (!confirm("Supprimer cet utilisateur ?")) return;
+        if (!confirm("Voulez-vous supprimer cet utilisateur ?")) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/${userId}`, {
+            // On s'assure que la route correspond à ton app.use('/api', userRoutes)
+            const response = await fetch(`/api/users/${userId}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
-            if (await handleResponse(response)) {
-                alert("Supprimé !");
-                await loadAdminUsers();
-                await loadAdminUsersd();
+
+            const data = await handleResponse(response);
+            if (data) {
+                alert("Utilisateur déplacé dans les supprimés !");
+                // On attend que les deux listes soient à jour avant de recalculer les stats
+                await Promise.all([loadAdminUsers(), loadAdminUsersd()]);
                 loadStats();
             }
-        } catch (error) { alert(error.message); }
+        } catch (error) { 
+            console.error("Erreur deleteUser:", error);
+        }
     }
 
     async function deleteUserd(userId) {
-        if (!confirm("Supprimer cet utilisateur ?")) return;
+        if (!confirm("ATTENTION : Cette action est irréversible. Supprimer définitivement ?")) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`, {
+            // On utilise la route définie dans deleteduser.routes.js
+            // Si tu as suivi mon conseil de préfixe : /api/deleted-users/:id
+            const response = await fetch(`/api/deletedusers/${userId}`, {
                 method: 'DELETE',
                 headers: getAuthHeaders()
             });
-            if (await handleResponse(response)) {
-                alert("Supprimé !");
-                await loadAdminUsers();
+
+            const data = await handleResponse(response);
+            if (data) {
+                alert("Utilisateur supprimé de la base de données !");
                 await loadAdminUsersd();
                 loadStats();
             }
-        } catch (error) { alert(error.message); }
+        } catch (error) {
+            console.error("Erreur deleteUserd:", error);
+        }
     }
 
     async function restoreUserd(userId){
         if(!confirm("Restaurer cet utilisateur ?")) return;
         try {
-            const response = await fetch(`http://localhost:3000/api/deletedusers/restore/${userId}`, {
+            const response = await fetch(`/api/deletedusers/restore/${userId}`, {
                 method: 'POST',
                 headers: getAuthHeaders()
             });
@@ -485,27 +573,52 @@
     async function confirmBan() {
         const userId = document.getElementById('banUserId').value;
         const endDate = document.getElementById('banEndDate').value;
+        const reason = document.getElementById('banReasonInput').value.trim();
 
+        console.log("DEBUG FRONT - Raison saisie :", reason);
         if (!endDate) {
             alert("Veuillez sélectionner une date !");
             return;
         }
 
+        if (!reason) {
+            alert("Veuillez saisir une raison pour le bannissement !");
+            document.getElementById('banReasonInput').focus();
+            return;
+        }
+
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/users/ban/${userId}`, {
+            const response = await fetch(`/api/admin/users/ban/${userId}`, {
                 method: 'POST',
-                headers: getAuthHeaders(),
-                body: JSON.stringify({ banUntil: endDate })
+                headers: { ...getAuthHeaders(),
+                'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    banUntil: endDate,
+                    reason: reason 
+                })
             });
 
-            if (await handleResponse(response)) {
-                alert("Utilisateur banni !");
-                // On ferme la modal (via l'instance Bootstrap)
+            const data = await handleResponse(response);
+            console.log("DEBUG FRONT - Réponse serveur :", data);
+            if (data) {
+                alert(data.message); // Affiche le message de succès du serveur
+                
+                // --- MISE À JOUR LOCALE ---
+                // On remplace l'ancien utilisateur par celui mis à jour renvoyé par le serveur
+                const index = users.findIndex(u => u._id === userId);
+                if (index !== -1) {
+                    users[index] = data.user; 
+                }
+
                 const modalEl = document.getElementById('banModal');
                 const modal = bootstrap.Modal.getInstance(modalEl);
                 modal.hide();
                 
-                await loadAdminUsers(); // Rafraîchir la liste
+                document.getElementById('banReasonInput').value = '';
+                document.getElementById('banEndDate').value = '';
+
+                // On recharge tout pour être sûr que le tableau et les infos soient synchronisés
+                await loadAdminUsers(); 
             }
         } catch (error) {
             alert("Erreur lors du ban : " + error.message);
@@ -516,7 +629,7 @@
         if (!confirm("Voulez-vous vraiment débannir cet utilisateur ?")) return;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/admin/users/unban/${userId}`, {
+            const response = await fetch(`/api/admin/users/unban/${userId}`, {
                 method: 'POST',
                 headers: getAuthHeaders()
             });
@@ -532,7 +645,7 @@
 
     async function toggleUserStatus(userId) {
         // Ici on appelle la route PATCH /api/admin/toggleActive/:id
-        await fetch(`http://localhost:3000/api/admin/toggleActive/${userId}`, {
+        await fetch(`/api/admin/toggleActive/${userId}`, {
             method: 'PATCH',
             headers: getAuthHeaders()
         });
@@ -546,25 +659,43 @@
             ? users.find(u => u._id === userId) 
             : usersd.find(u => u._id === userId);
 
+        console.log("Données reçues pour le détail :", user)
+
         if (!user) return;
 
         let specificInfo = '';
 
         if (type === 'active') {
             if (user.isBanned) {
+                // Formatage de la date avec heure et minutes
+                const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                const expiryDate = user.banExpires 
+                    ? new Date(user.banExpires).toLocaleString('fr-FR', dateOptions) 
+                    : 'Permanente';
+
                 specificInfo = `
                     <div class="alert alert-warning mt-3">
-                        <strong>Statut : Banni 🚫</strong><br>
-                        Fin du ban : ${user.banExpires ? new Date(user.banExpires).toLocaleDateString('fr-FR') : 'Permanente'}
+                        <h6 class="alert-heading"><strong>Statut : Banni 🚫</strong></h6>
+                        <hr>
+                        <p class="mb-1"><strong>Fin du ban :</strong> ${expiryDate}</p>
+                        <p class="mb-0"><strong>Raison :</strong> ${user.banReason ? user.banReason : '<span class="text-muted">Aucune raison spécifiée</span>'}</p>
                     </div>`;
             } else {
-                specificInfo = `<div class="alert alert-success mt-3">Statut : Actif ✅</div>`;
+                specificInfo = `
+                    <div class="alert alert-success mt-3 d-flex align-items-center">
+                        <span class="fs-5 me-2">✅</span>
+                        <div><strong>Statut :</strong> Compte Actif</div>
+                    </div>`;
             }
         } else {
-            // Pour les supprimés
+            // Pour les utilisateurs dans la corbeille (supprimés)
+            const deletionDate = user.deletedAt 
+                ? new Date(user.deletedAt).toLocaleString('fr-FR') 
+                : 'Date inconnue';
+
             specificInfo = `
                 <div class="alert alert-danger mt-3">
-                    <strong>Supprimé le :</strong> ${user.deletedAt ? new Date(user.deletedAt).toLocaleString('fr-FR') : 'Date inconnue'}
+                    <strong>🗑️ Supprimé le :</strong> ${deletionDate}
                 </div>`;
         }
 
@@ -583,6 +714,65 @@
         // On affiche l'Offcanvas
         const offcanvas = new bootstrap.Offcanvas(document.getElementById('detailsOffcanvas'));
         offcanvas.show();
+    }
+
+    function renderGrowthChart() {
+        const ctx = document.getElementById('registrationChart').getContext('2d');
+        if (myChart) {
+            myChart.destroy();
+        }
+        // 1. Préparer les données (Ex: "Jan", "Fév"...)
+        const months = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+        const activecounts = new Array(12).fill(0);
+        const deletedCounts = new Array(12).fill(0);
+
+        users.forEach(u => {
+            // IMPORTANT : Vérifie que ton backend renvoie bien 'createdAt'
+            // Sinon, utilise une autre date ou ajoute 'timestamps: true' à ton schéma Mongoose
+            const date = u.createdAt ? new Date(u.createdAt) : new Date(); 
+            const month = date.getMonth();
+            activecounts[month]++;
+        });
+
+        usersd.forEach(u => {
+            const date = u.deletedAt ? new Date(u.deletedAt) : new Date();
+            deletedCounts[date.getMonth()]++;
+        });
+
+        // 2. Créer le graphique
+        myChart = new Chart(ctx, {
+            type: 'line', // Ou 'bar'
+            data: {
+                labels: months,
+                datasets: [{
+                    label: 'Inscriptions par mois',
+                    data: activecounts,
+                    borderColor: '#0d6efd',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Supprimés (Temporaire)',
+                    data: deletedCounts,
+                    borderColor: '#eb0000ff', // Rouge
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5], // Ligne pointillée
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                scales: {
+                    y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                }
+            }
+        });
     }
 
     function logout() {

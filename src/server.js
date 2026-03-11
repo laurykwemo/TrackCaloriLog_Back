@@ -1,17 +1,23 @@
 require('dotenv').config();
-const PORT = process.env.PORT || 3000;
-const DB_URI = 'mongodb://localhost:27017/trackcalorilog_db';
 const mongoose = require('mongoose');
-const app = require('./app'); // On importe l'application déjà configurée depuis app.js
+const cron = require('node-cron');
+const User = require('./modules/user/user.model');
+const { app, server } = require('./app'); // On récupère l'app et le serveur http
+
+const PORT = process.env.PORT || 3000;
+const DB_URI = process.env.MONGO_URI; // Utilise bien le lien Atlas du .env
 
 mongoose.connect(DB_URI)
     .then(() => {
-        console.log('Connexion à MongoDB réussie');
-        app.listen(PORT, () => {
-            console.log(`Serveur démarré sur http://localhost:${PORT}`);
+        console.log('✅ Connexion à MongoDB Atlas réussie !');
+        // On lance le serveur HTTP (qui contient Socket.io) et NON app.listen
+        server.listen(PORT, () => {
+            console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
         });
     })
     .catch(err => {
-        console.error('Erreur de connexion à la base de données :', err);
+        console.error('❌ Erreur de connexion Atlas :', err);
         process.exit(1);
     });
+
+// Ton code CRON reste ici inchangé...

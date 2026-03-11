@@ -68,6 +68,17 @@
             transform: translateY(0);
         }
 
+        #nutritionBtn {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            margin-bottom: 10px;
+            width: 100%; /* Optionnel : pour qu'ils fassent la même largeur */
+        }
+        #nutritionBtn:hover {
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
+        }
+        
+        .gap-3 { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -102,10 +113,14 @@
             Prenez le contrôle de votre santé, un pas à la fois.
         </p>
         <div class="d-flex flex-column align-items-center gap-3">
-            <button onclick="window.location.href='/admin'"
+            <button onclick="goToAdmin()"
             id="adminBtn"
             style="display:none;">
                 ⚙️ Dashboard Admin
+            </button>
+
+            <button onclick="goToNutrition()" id="nutritionBtn">
+                🥗 Mon Espace Nutrition
             </button>
 
             <button onclick="logout()" class="btn btn-danger px-4">
@@ -141,6 +156,27 @@
             console.log("Déconnexion annulée");
         }
     }
+    // Dans ton fichier user.html
+    function goToAdmin() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // On passe le token dans l'URL pour que le middleware isAdmin de app.js soit content
+            window.location.href = `/admin?token=${token}`;
+        } else {
+            window.location.href = '/trackcalorilog/login';
+        }
+    }
+
+    function goToNutrition() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // On redirige vers la nouvelle route qu'on a créée dans app.js
+            window.location.href = `/nutrition?token=${token}`;
+        } else {
+            window.location.href = '/trackcalorilog/login';
+        }
+    }
+
     window.onload = () => {
         const userStr = localStorage.getItem('user');
         const token = localStorage.getItem('token');

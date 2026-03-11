@@ -50,6 +50,18 @@ const userSchema = new mongoose.Schema({
     banExpires: {
         type: Date,
         default: null
+    },
+    banReason: {
+        type: String, 
+        default: ""
+    },
+    dailyCalorieGoal: { 
+        type: Number, 
+        default: 2000 
+    },
+    dailyProteinGoal: { 
+        type: Number, 
+        default: 160 
     }
 }, { timestamps: true });
 

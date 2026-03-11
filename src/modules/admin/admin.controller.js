@@ -16,13 +16,37 @@ const adminController = {
             const { id } = req.params;
             const { role } = req.body;
 
-            if (!['admin', 'user'].includes(role)) {
-                return res.status(400).json({ message: "Rôle invalide" });
+            // 1. Validation des rôles autorisés
+            const allowedRoles = ['admin', 'user'];
+            if (!allowedRoles.includes(role)) {
+                return res.status(400).json({ message: "Rôle invalide." });
             }
 
+            // 2. SÉCURITÉ : Empêcher un admin de modifier son propre rôle 
+            // (pour éviter de se bloquer l'accès au panel)
+            if (req.user.id === id) {
+                return res.status(403).json({ message: "Vous ne pouvez pas modifier votre propre rôle." });
+            }
+
+            // 3. Appel au service avec uniquement la donnée filtrée
             const updatedUser = await adminService.updateUserRole(id, role);
-            res.json(updatedUser);
+            
+            if (!updatedUser) {
+                return res.status(404).json({ message: "Utilisateur introuvable." });
+            }
+
+            // 4. On renvoie une réponse propre (sans mot de passe)
+            res.json({
+                message: "Rôle mis à jour avec succès",
+                user: {
+                    id: updatedUser._id,
+                    name: updatedUser.name,
+                    role: updatedUser.role
+                }
+            });
+
         } catch (error) {
+            console.error("Erreur updateUserRole:", error);
             const statusCode = error.status || 500;
             res.status(statusCode).json({ message: error.message || "Erreur serveur" });
         }
@@ -54,35 +78,41 @@ const adminController = {
     },
 
     banUser: async (req, res) => {
+        // 1. Log immédiat pour voir si on entre dans la fonction
+        console.log("--- DEBUG COMPLET ---");
+        console.log("Headers:", req.headers['content-type']);
+        console.log("Param ID:", req.params.id);
+        console.log("Raw Body:", req.body);
         try {
             const { id } = req.params;
-            const { durationInDays, endDate } = req.body;
+            // On récupère 'reason' et on vérifie 'banUntil' (le nom envoyé par le fetch)
+            const { durationInDays, endDate, banUntil, reason } = req.body; 
 
-            // Vérification de l'ID MongoDB valide
+            // 1. Sécurité : Vérifier si la raison est présente
+            if (!reason || reason.trim().length === 0) {
+                return res.status(400).json({ message: "La raison du bannissement est obligatoire." });
+            }
+
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 return res.status(400).json({ message: "ID utilisateur invalide." });
             }
 
-            // CORRECTION ICI : req.user._id au lieu de req.user.userId
-            if (id === req.user._id.toString()) {
-                return res.status(400).json({ message: "Vous ne pouvez pas vous bannir vous-même." });
-            }
-
+            // ... (ton code de vérification admin et calcul de date) ...
             let banExpiry = null;
-            if (endDate) {
-                banExpiry = new Date(endDate);
-                if (isNaN(banExpiry.getTime())) return res.status(400).json({ message: "Date invalide." });
+            const finalDate = banUntil || endDate;
+
+            if (finalDate) {
+                banExpiry = new Date(finalDate);
             } else if (durationInDays) {
                 banExpiry = new Date();
                 banExpiry.setDate(banExpiry.getDate() + parseInt(durationInDays));
             }
 
-            const user = await adminService.banUser(id, banExpiry);
+            // 2. IMPORTANT : On passe bien les 3 arguments au service
+            const user = await adminService.banUser(id, banExpiry, reason);
 
             res.status(200).json({
-                message: banExpiry 
-                    ? `Utilisateur banni jusqu'au ${banExpiry.toLocaleDateString('fr-FR')}` 
-                    : "Utilisateur banni définitivement.",
+                message: `Utilisateur banni jusqu'au ${banExpiry ? banExpiry.toLocaleString() : 'définitivement'}.`,
                 user
             });
         } catch (error) {

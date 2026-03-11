@@ -1,6 +1,7 @@
 const User = require('./user.model');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const mongoose = require('mongoose');
 
 const userService = {
     calculAge: (data) => {
@@ -51,7 +52,8 @@ const userService = {
                 role: data.role || 'user',
                 isActive: data.isActive ?? true,
                 emailVerificationToken: verificationToken,
-                emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000 // Expire dans 24h
+                emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000, // Expire dans 24h
+                dailyCalorieGoal: data.dailyCalorieGoal || 2000
             });
             const userObject = newUser.toObject();
             delete userObject.password; //Supprimes le champ password de l'objet retouné
@@ -86,6 +88,11 @@ const userService = {
     },
     getUser: async (userId) => {
         try {
+            // 1. Vérifier si l'ID est un format MongoDB valide (24 caractères hex)
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                // Si c'est "AllSexes" ou n'importe quoi d'autre, on renvoie null proprement
+                return null; 
+            }
             const user = await User.findById(userId).populate('sex', 'label').select('-password -__v -deletedAt -updatedAt');
             return user;
         } catch (error){
@@ -181,6 +188,31 @@ const userService = {
             return user;
         } catch (error) {
             console.error("Erreur updateStatus :", error);
+            throw error;
+        }
+    },
+
+    // AJOUTER CETTE MÉTHODE pour la mise à jour
+    updateDailyGoal: async (userId, newGoal) => {
+        try {
+            return await User.findByIdAndUpdate(
+                userId,
+                { dailyCalorieGoal: newGoal },
+                { new: true, runValidators: true }
+            ).select('-password');
+        } catch (error) {
+            throw error;
+        }
+    },
+    
+    updateDailyProtGoal: async (userId, newGoal) => {
+        try {
+            return await User.findByIdAndUpdate(
+                userId,
+                { dailyProteinGoal: newGoal },
+                { new: true, runValidators: true }
+            ).select('-password');
+        } catch (error) {
             throw error;
         }
     }

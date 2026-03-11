@@ -1,5 +1,6 @@
 const authService = require('./auth.service');
 const nodemailer = require('nodemailer');
+const User = require('../user/user.model');
 
 // 1. On définit la config du transporteur une seule fois en haut
 const transporter = nodemailer.createTransport({
@@ -61,23 +62,30 @@ const authController = {
             // 1. Appeler le service login pour récupérer l'utilisateur (et valider mdp/email)
             const result = await authService.login(email, password);
             const user = result.user; // On suppose que ton service retourne { user, token }
-
+            
             // 2. Vérification du bannissement
             if (user.isBanned) {
                 const now = new Date();
+                // On s'assure que banExpires est bien un objet Date
+                const expiryDate = user.banExpires ? new Date(user.banExpires) : null;
 
-                // Si une date d'expiration existe et qu'elle est dépassée
-                if (user.banExpires && user.banExpires < now) {
+                console.log(`Vérification Ban pour ${user.email}: Expire le ${expiryDate}, Il est actuellement ${now}`);
+
+                if (expiryDate && expiryDate <= now) {
                     // AUTO-DÉBANNISSEMENT
+                    console.log("Date dépassée ! Débannissement automatique en cours...");
                     user.isBanned = false;
                     user.banExpires = null;
                     await user.save(); 
-                    // Le code continue et l'utilisateur est connecté
+                    // Note: Ici, l'utilisateur continue vers l'étape 3 et se connecte.
                 } else {
                     // TOUJOURS BANNI
-                    const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
-                    const dateFr = user.banExpires 
-                        ? user.banExpires.toLocaleDateString('fr-FR', dateOptions) 
+                    const dateOptions = { 
+                        day: '2-digit', month: '2-digit', year: 'numeric', 
+                        hour: '2-digit', minute: '2-digit' 
+                    };
+                    const dateFr = expiryDate 
+                        ? expiryDate.toLocaleDateString('fr-FR', dateOptions) 
                         : "définitivement";
 
                     return res.status(403).json({ 
@@ -136,7 +144,28 @@ const authController = {
         }
     },
     me: async (req, res) => {
-        res.status(200).json({ user: req.user });
+        try {
+            // 2. Vérifie ce que contient req.user (rempli par ton middleware isAuthenticated)
+            // Dans ton token, la clé semble être "userId" d'après ton log console
+            const idToFind = req.user.userId || req.user.id;
+
+            if (!idToFind) {
+                return res.status(401).json({ message: "ID utilisateur absent du token" });
+            }
+
+            const user = await User.findById(idToFind).select('-password');
+            
+            if (!user) {
+                return res.status(404).json({ message: "Utilisateur non trouvé en base" });
+            }
+
+            // On renvoie l'objet user DIRECTEMENT (sans l'envelopper)
+            res.status(200).json(user); 
+
+        } catch (error) {
+            console.error("Erreur détaillée :", error); // Cela s'affichera dans ton terminal VS Code
+            res.status(500).json({ message: "Erreur serveur lors de la récupération du profil" });
+        }
     },
         // Demander la réinitialisation
     requestPasswordReset: async (req, res) => {

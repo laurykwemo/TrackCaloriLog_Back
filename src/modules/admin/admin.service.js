@@ -54,18 +54,18 @@ const adminService = {
         return { totalUsers, admins, standardUsers };
     },
 
-    banUser: async (userId, banExpiry) => {
+    banUser: async (userId, banExpiry, reason) => { // Ajout de reason
         try {
             const userToBan = await User.findById(userId);
             if (!userToBan) throw new Error("Utilisateur introuvable");
 
-            // Protection : Un admin ne peut pas être banni
             if (userToBan.role === 'admin') {
                 throw new Error("Impossible de bannir un compte administrateur.");
             }
 
             userToBan.isBanned = true;
-            userToBan.banExpires = banExpiry; // Reçoit la date calculée ou null
+            userToBan.banExpires = banExpiry;
+            userToBan.banReason = reason; // Sauvegarde de la raison
             userToBan.isActive = false;
 
             return await userToBan.save();
@@ -80,6 +80,7 @@ const adminService = {
             const user = await User.findByIdAndUpdate(userId, {
                 isBanned: false,
                 banExpires: null,
+                banReason: "",
                 isActive: true
             }, { new: true });
             

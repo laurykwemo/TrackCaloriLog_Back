@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Journal - TrackCaloriLog</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        :root {
+            --primary: #667eea; --success: #48bb78; --warning: #ed8936;
+            --danger: #f56565; --bg: #f7fafc; --dark: #2d3748; --white: #ffffff;
+        }
+
+        /* 1. Reset global pour éviter les débordements */
+        * {
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            color: var(--dark); 
+            overflow-x: hidden; /* Empêche le scroll horizontal */
+        }
+
+        header { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 1rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            width: 100%;
+        }
+
+        main { 
+            max-width: 1200px; 
+            margin: 2rem auto; 
+            padding: 0 1.5rem; /* Augmenté pour plus de confort sur mobile */
+            width: 100%;
+        }
+
+        .period-selector {
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 2rem; 
+            background: #edf2f7; 
+            padding: 5px; 
+            border-radius: 12px; 
+            width: fit-content;
+            max-width: 100%; /* S'adapte si l'écran est minuscule */
+        }
+
+        .period-btn {
+            border: none; padding: 0.5rem 1.2rem; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s;
+        }
+
+        .period-btn.active { background: var(--white); color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        /* 2. Grid plus robuste */
+        .dashboard-grid { 
+            display: grid; 
+            grid-template-columns: 2fr 1fr; 
+            gap: 1.5rem; 
+            width: 100%;
+        }
+
+        .card { 
+            background: var(--white); 
+            border-radius: 15px; 
+            padding: 1.5rem; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            margin-bottom: 1.5rem; 
+            width: 100%;
+            overflow: hidden; /* Évite que les graphiques dépassent de la carte */
+        }
+
+        .stats-row { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+            gap: 1rem; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .stat-item { text-align: center; border-right: 1px solid #edf2f7; padding: 0 5px; }
+        .stat-item:last-child { border: none; }
+        
+        /* Ajustement taille texte pour éviter les sauts de ligne */
+        .stat-value { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.75rem; color: #718096; text-transform: uppercase; }
+
+        .group-header { 
+            background: #f8fafc; padding: 0.8rem 1rem; border-radius: 8px; 
+            font-weight: bold; color: var(--primary); margin: 1.5rem 0 0.5rem 0;
+            display: flex; justify-content: space-between; align-items: center;
+            border-left: 4px solid var(--primary);
+            flex-wrap: wrap; /* Pour mobile */
+            gap: 10px;
+        }
+
+        .group-totals { font-size: 0.85rem; color: var(--dark); }
+        .group-totals span { margin-left: 5px; padding: 2px 8px; background: #e2e8f0; border-radius: 5px; display: inline-block; }
+
+        .meal-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; border-bottom: 1px solid #edf2f7; gap: 10px; }
+        .meal-info { flex: 1; }
+        .meal-info strong { display: block; word-break: break-word; }
+        .meal-info span { font-size: 0.8rem; color: #a0aec0; }
+
+        @media (max-width: 900px) { 
+            .dashboard-grid { grid-template-columns: 1fr; } 
+        }
+
+        @media (max-width: 480px) {
+            header { padding: 1rem; flex-direction: column; gap: 10px; text-align: center; }
+            .stat-item { border-right: none; border-bottom: 1px solid #edf2f7; padding-bottom: 10px; }
+            .stat-item:last-child { border-bottom: none; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h2>TrackCaloriLog</h2>
+    <nav>
+        <a href="/nutrition" style="color:white; text-decoration:none; font-weight:bold;">Journal</a>
+        <a href="/repas" style="color:rgba(255,255,255,0.7); margin-left:15px; text-decoration:none;">+ Ajouter</a>
+    </nav>
+</header>
+
+<main>
+    <div class="period-selector">
+        <button class="period-btn active" onclick="changePeriod('day', this)">Jour</button>
+        <button class="period-btn" onclick="changePeriod('week', this)">Semaine</button>
+        <button class="period-btn" onclick="changePeriod('month', this)">Mois</button>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="left-col">
+            <section class="card">
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span id="avgCal">0</span> / <span id="goalValue" style="color: #a0aec0; font-size: 1.1rem; cursor: pointer;" onclick="editGoal()" title="Modifier l'objectif">2000</span>
+                            <small onclick="editGoal()" style="cursor:pointer; font-size: 0.8rem; color: var(--primary);">✏️</small>
+                        </div>
+                        <div class="stat-label">Calories (kcal)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">
+                            <span id="avgProt">0</span> / <span id="goalProtValue" style="color: #a0aec0; font-size: 1.1rem; cursor: pointer;" onclick="editProtGoal()" title="Modifier l'objectif">160</span>
+                            <small onclick="editProtGoal()" style="cursor:pointer; font-size: 0.8rem; color: var(--primary);">✏️</small>
+                        </div>
+                        <div class="stat-label">Protéines (g)</div>
+                    </div>
+                    <div class="stat-item"><div class="stat-value" id="totalMeals">0</div><div class="stat-label">Repas</div></div>
+                </div>
+                <div style="height: 350px;">
+                    <canvas id="evolutionChart"></canvas>
+                </div>
+            </section>
+            <section class="card">
+                <h3>📜 Historique détaillé</h3>
+                <div id="historyContainer"></div>
+            </section>
+        </div>
+        <div class="right-col">
+            <section class="card">
+                <h3>Macros (%)</h3>
+                <canvas id="macroChart"></canvas>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+    let evolutionChart, macroChart;
+    const cleanToken = localStorage.getItem('token')?.replace(/"/g, '');
+    let DAILY_CAL_GOAL = 2000;
+    let DAILY_PROT_GOAL = 160;
+    let USER_ID = null;
+
+    function initCharts() {
+        const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
+        evolutionChart = new Chart(ctxEvo, {
+            type: 'line',
+            data: { 
+                labels: [], 
+                datasets: [
+                    { 
+                        label: 'Calories (kcal)', 
+                        borderColor: '#667eea', 
+                        data: [], 
+                        tension: 0.4, 
+                        yAxisID: 'y',
+                        fill: false 
+                    },
+                    { 
+                        label: 'Protéines (g)', 
+                        borderColor: '#48bb78', 
+                        data: [], 
+                        tension: 0.4, 
+                        yAxisID: 'y1', 
+                        fill: false 
+                    }
+                ] 
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: {
+                    y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Calories (kcal)' } },
+                    y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Protéines (g)' } }
+                }
+            }
+        });
+
+        const ctxMacro = document.getElementById('macroChart').getContext('2d');
+        macroChart = new Chart(ctxMacro, {
+            type: 'doughnut',
+            data: { labels: ['Prot (g)', 'Gluc (g)', 'Lip (g)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#48bb78', '#667eea', '#ed8936'] }] }
+        });
+    }
+
+    async function loadData(view = 'day') {
+        try {
+            const res = await fetch('/api/nutrition/meals/log/all', { 
+                headers: { 'Authorization': `Bearer ${cleanToken}` } 
+            });
+            if (!res.ok) throw new Error("Erreur serveur");
+            const allMeals = await res.json();
+            
+            if (Array.isArray(allMeals)) {
+                const now = new Date();
+                const filteredMeals = allMeals.filter(m => {
+                    const mealDate = new Date(m.date);
+                    if (view === 'day') return mealDate.toDateString() === now.toDateString();
+                    if (view === 'week') {
+                        const sevenDaysAgo = new Date();
+                        sevenDaysAgo.setDate(now.getDate() - 7);
+                        return mealDate >= sevenDaysAgo;
+                    }
+                    if (view === 'month') return mealDate.getMonth() === now.getMonth() && mealDate.getFullYear() === now.getFullYear();
+                    return true;
+                });
+
+                updateUI(filteredMeals, view); 
+            }
+        } catch (e) { 
+            console.error("Erreur", e);
+            document.getElementById('historyContainer').innerHTML = "Erreur de chargement.";
+        }
+    }
+
+    function updateUI(meals, view) {
+        const groups = groupMeals(meals, view);
+        renderHistory(groups);
+        renderCharts(meals, view);
+    }
+
+    function groupMeals(meals, view) {
+        const groups = {};
+        meals.forEach(m => {
+            const d = new Date(m.date);
+            let key;
+            if (view === 'day') {
+                key = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+            } else if (view === 'week') {
+                key = getWeekRange(d); 
+            } else {
+                key = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            }
+
+            if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0 };
+            groups[key].meals.push(m);
+            groups[key].totalCal += m.totals.calories;
+            groups[key].totalProt += m.totals.proteins;
+        });
+        return groups;
+    }
+
+    function getWeekRange(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diffToMonday));
+        const sunday = new Date(d.setDate(monday.getDate() + 6));
+        const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        return `Semaine du ${monday.toLocaleDateString('fr-FR', options)} au ${sunday.toLocaleDateString('fr-FR', options)}`;
+    }
+
+    function renderHistory(groups) {
+        const container = document.getElementById('historyContainer');
+        container.innerHTML = Object.keys(groups).length ? "" : "Aucun repas sur cette période.";
+        
+        for (const [title, data] of Object.entries(groups)) {
+            // Logique de couleur pour le titre du groupe (si c'est par jour)
+            let calColor = data.totalCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
+            let protColor = data.totalProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
+
+            let groupHtml = `
+                <div class="history-group">
+                    <div class="group-header">
+                        <span>${title}</span>
+                        <div class="group-totals">
+                            <span style="color:${calColor}">🔥 ${Math.round(data.totalCal)} kcal</span>
+                            <span style="color:${protColor}">🥩 ${data.totalProt.toFixed(1)}g prot</span>
+                        </div>
+                    </div>`;
+            
+            data.meals.forEach(m => {
+                groupHtml += `
+                    <div class="meal-item">
+                        <div class="meal-info">
+                            <strong>${m.title}</strong><br>
+                            <span>${new Date(m.date).toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} • ${m.type}</span>
+                        </div>
+                        <div style="text-align:right">
+                            <span style="color:var(--primary); font-weight:bold">${m.totals.calories} kcal</span><br>
+                            <small>${m.totals.proteins}g Prot</small>
+                        </div>
+                    </div>`;
+            });
+            container.innerHTML += groupHtml + `</div>`;
+        }
+    }
+
+    function renderCharts(meals, view) {
+        const dailyData = {};
+        meals.forEach(m => {
+            const d = new Date(m.date).toLocaleDateString('fr-FR');
+            if(!dailyData[d]) dailyData[d] = { cal: 0, prot: 0 };
+            dailyData[d].cal += m.totals.calories;
+            dailyData[d].prot += m.totals.proteins;
+        });
+
+        const labels = Object.keys(dailyData);
+        const dataCals = labels.map(l => dailyData[l].cal);
+        const dataProts = labels.map(l => dailyData[l].prot);
+
+        evolutionChart.data.labels = labels;
+        evolutionChart.data.datasets[0].data = dataCals;
+        evolutionChart.data.datasets[1].data = dataProts;
+        evolutionChart.update();
+
+        const tProt = meals.reduce((s, c) => s + (c.totals.proteins || 0), 0);
+        const tCarb = meals.reduce((s, c) => s + (c.totals.carbs || 0), 0);
+        const tFat = meals.reduce((s, c) => s + (c.totals.fats || 0), 0);
+        macroChart.data.datasets[0].data = [tProt, tCarb, tFat];
+        macroChart.update();
+
+        const nbJours = labels.length || 1;
+        const avgCal = Math.round(dataCals.reduce((a, b) => a + b, 0) / nbJours);
+        const avgProt = Math.round(dataProts.reduce((a, b) => a + b, 0) / nbJours);
+        
+        // --- LOGIQUE DE COULEUR STATS ---
+        const avgCalElem = document.getElementById('avgCal');
+        avgCalElem.innerText = avgCal + " kcal";
+        avgCalElem.style.color = avgCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
+
+        const avgProtElem = document.getElementById('avgProt');
+        avgProtElem.innerText = avgProt + " g";
+        avgProtElem.style.color = avgProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
+
+        document.getElementById('totalMeals').innerText = meals.length;
+    }
+
+    function changePeriod(p, btn) {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadData(p);
+    }
+
+    async function loadUserProfile() {
+        try {
+            const res = await fetch('/trackcalorilog/me', { 
+                headers: { 'Authorization': `Bearer ${cleanToken}` } 
+            });
+            const user = await res.json();
+            if (user) {
+                USER_ID = user._id || user.id;
+                DAILY_CAL_GOAL = user.dailyCalorieGoal || 2000;
+                DAILY_PROT_GOAL = user.dailyProteinGoal || 160;
+                document.getElementById('goalValue').innerText = DAILY_CAL_GOAL;
+                document.getElementById('goalProtValue').innerText = DAILY_PROT_GOAL;
+                updateGoalsInChart();
+            }
+        } catch (e) {
+            console.error("Erreur profil:", e);
+        }
+    }
+
+    function updateGoalsInChart() {
+        if (evolutionChart) {
+            evolutionChart.options.plugins.annotation = {
+                annotations: {
+                    lineCal: {
+                        type: 'line',
+                        yMin: DAILY_CAL_GOAL,
+                        yMax: DAILY_CAL_GOAL,
+                        borderColor: 'rgba(245, 101, 101, 0.7)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        label: { content: 'Obj. kcal', enabled: true, position: 'end' }
+                    },
+                    lineProt: {
+                        type: 'line',
+                        yScaleID: 'y1', 
+                        yMin: DAILY_PROT_GOAL,
+                        yMax: DAILY_PROT_GOAL,
+                        borderColor: 'rgba(72, 187, 120, 0.7)',
+                        borderWidth: 2,
+                        borderDash: [5, 5],
+                        label: { content: 'Obj. Prot', enabled: true, position: 'start' }
+                    }
+                }
+            };
+            evolutionChart.update();
+        }
+    }
+
+    async function editGoal() {
+        const newGoal = prompt("Nouvel objectif calories (kcal) :", DAILY_CAL_GOAL);
+        if (newGoal && !isNaN(newGoal) && USER_ID) {
+            DAILY_CAL_GOAL = parseInt(newGoal);
+            document.getElementById('goalValue').innerText = DAILY_CAL_GOAL;
+            updateGoalsInChart();
+            loadData(); 
+        }
+    }
+
+    async function editProtGoal() {
+        const newGoal = prompt("Nouvel objectif protéines (g) :", DAILY_PROT_GOAL);
+        if (newGoal && !isNaN(newGoal) && USER_ID) {
+            DAILY_PROT_GOAL = parseInt(newGoal);
+            document.getElementById('goalProtValue').innerText = DAILY_PROT_GOAL;
+            updateGoalsInChart();
+            loadData();
+        }
+    }
+
+    window.onload = () => { loadUserProfile(); initCharts(); loadData();};
+</script>
+</body>
+</html>
