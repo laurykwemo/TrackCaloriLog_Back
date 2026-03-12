@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 // 2. Logique d'envoi réutilisable
 const sendEmailLogic = async (email) => {
     const user = await authService.resendVerificationEmail(email);
-    const verificationUrl = `http://localhost:3000/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
+    const verificationUrl = `/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
     
     const mailOptions = {
         from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
@@ -37,7 +37,7 @@ const authController = {
     register: async (req, res) => {
         try {
             const user = await authService.register(req.body);
-            const verificationUrl = `http://localhost:3000/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
+            const verificationUrl = `/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
 
             await transporter.sendMail({
                 from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
@@ -173,7 +173,7 @@ const authController = {
             const { email } = req.body;
             const { user, resetToken } = await authService.forgotPassword(email);
 
-            const resetUrl = `http://localhost:3000/trackcalorilog/reset-password?token=${resetToken}`;
+            const resetUrl = `/trackcalorilog/reset-password?token=${resetToken}`;
 
             await transporter.sendMail({
                 from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
