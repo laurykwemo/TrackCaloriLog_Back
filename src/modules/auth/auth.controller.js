@@ -33,11 +33,16 @@ const sendEmailLogic = async (email) => {
     await transporter.sendMail(mailOptions);
 };
 
+const BASE_URL = process.env.NODE_ENV === 'production' 
+    ? 'https://trackcalorilog-back.onrender.com' 
+    : 'http://localhost:3000';
+
 const authController = {
+    
     register: async (req, res) => {
         try {
             const user = await authService.register(req.body);
-            const verificationUrl = `/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
+            const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
 
             await transporter.sendMail({
                 from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
@@ -173,7 +178,7 @@ const authController = {
             const { email } = req.body;
             const { user, resetToken } = await authService.forgotPassword(email);
 
-            const resetUrl = `/trackcalorilog/reset-password?token=${resetToken}`;
+            const resetUrl = `${BASE_URL}/trackcalorilog/reset-password?token=${resetToken}`;
 
             await transporter.sendMail({
                 from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
