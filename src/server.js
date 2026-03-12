@@ -11,7 +11,7 @@ mongoose.connect(DB_URI)
     .then(() => {
         console.log('✅ Connexion à MongoDB Atlas réussie !');
         // On lance le serveur HTTP (qui contient Socket.io) et NON app.listen
-        server.listen(PORT, () => {
+        server.listen(PORT, '0.0.0.0', () => {
             console.log(`🚀 Serveur démarré sur http://localhost:${PORT}`);
         });
     })
@@ -19,5 +19,3 @@ mongoose.connect(DB_URI)
         console.error('❌ Erreur de connexion Atlas :', err);
         process.exit(1);
     });
-
-// Ton code CRON reste ici inchangé...
