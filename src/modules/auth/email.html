@@ -218,7 +218,7 @@
             const emailError = document.getElementById('email-error');
 
             try {
-                const response = await fetch('http://localhost:3000/trackcalorilog/forgot-password', {
+                const response = await fetch('/trackcalorilog/forgot-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })

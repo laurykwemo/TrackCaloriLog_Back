@@ -110,11 +110,11 @@ app.get('/trackcalorilog/login', (req, res) => {
 });
 
 app.get('/trackcalorilog/forgot-password', (req, res) => {
-    res.sendFile(path.join(__dirname, 'modules/auth/password.html'));
+    res.sendFile(path.join(__dirname, 'modules/auth/email.html'));
 });
 
-app.get('/trackcalorilog/register', (req, res) => {
-    res.sendFile(path.join(__dirname, 'modules/auth/register.html'));
+app.get('/trackcalorilog/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'modules/auth/password.html'));
 });
 
 app.get('/nutrition', verifyTokenPage, (req, res) => {
