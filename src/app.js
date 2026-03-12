@@ -109,6 +109,10 @@ app.get('/trackcalorilog/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'modules/auth/login.html'));
 });
 
+app.get('/trackcalorilog/forgot-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'modules/auth/password.html'));
+});
+
 app.get('/trackcalorilog/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'modules/auth/register.html'));
 });
