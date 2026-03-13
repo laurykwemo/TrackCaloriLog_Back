@@ -308,6 +308,13 @@
 
     let sexs = [];  
 
+    function togglePassword(inputId) {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    }
+
     function validateAge() {
         const input = document.getElementById('register-birthdate');
         const ageerrorMsg = document.getElementById('age-error');
