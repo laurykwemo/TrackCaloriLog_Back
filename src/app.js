@@ -144,9 +144,9 @@ app.use((req, res) => {
     res.status(404).json({ message: "Route non trouvée" });
 });
 
-server.listen(PORT, () => {
+/*server.listen(PORT, () => {
     console.log(`Serveur actif sur le port ${PORT}`);
-})
+})*/
 
 module.exports = app;
 module.exports = { app, server, io };
