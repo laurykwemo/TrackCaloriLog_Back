@@ -4,8 +4,20 @@
     <meta charset="UTF-8">
     <title>Bienvenue - TrackCaloriLog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --nutrition: #10b981;
+            --activity: #8b5cf6;
+            --admin: #3b82f6;
+            --danger: #ef4444;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,130 +25,159 @@
         }
 
         body {
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top left, var(--primary), var(--secondary));
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow: hidden;
+        }
+
+        /* Décoration de fond */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: -1;
+            filter: blur(40px);
         }
 
         .welcome-container {
-            background: white;
-            padding: 50px 40px;
-            border-radius: 20px;
-            max-width: 700px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 60px 40px;
+            border-radius: 32px;
+            max-width: 500px;
+            width: 90%;
             text-align: center;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-            animation: fadeIn 0.6s ease;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .logo-placeholder {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            margin: 0 auto 24px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
         }
 
         h1 {
-            font-size: 32px;
-            color: #333;
-            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
         }
 
         p {
-            font-size: 18px;
-            color: #555;
+            font-size: 16px;
+            color: var(--text-muted);
             line-height: 1.6;
+            margin-bottom: 32px;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         button {
-            padding: 14px 30px;
+            width: 100%;
+            padding: 16px 24px;
             border: none;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #ff4b4b 0%, #d32f2f 100%);
-            color: white;
-            font-size: 16px;
+            border-radius: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: white;
         }
 
-        #adminBtn{
-            background: linear-gradient(135deg, #034ef0ff 0%, #2558ffff 100%);
+        button i { font-size: 18px; }
+
+        #nutritionBtn { background-color: var(--nutrition); }
+        #nutritionBtn:hover { 
+            background-color: #059669;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
         }
 
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(255, 75, 75, 0.4);
+        #activityBtn { background-color: var(--activity); }
+        #activityBtn:hover { 
+            background-color: #7c3aed;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
         }
 
-        button:active {
-            transform: translateY(0);
+        #adminBtn { background-color: var(--admin); }
+        #adminBtn:hover { 
+            background-color: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
         }
 
-        #nutritionBtn {
-            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
-            margin-bottom: 10px;
-            width: 100%; /* Optionnel : pour qu'ils fassent la même largeur */
-        }
-        #nutritionBtn:hover {
-            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
-        }
-
-        #activityBtn {
-            background: linear-gradient(135deg, #9043a0 0%, #7d2e70 100%);
-            margin-bottom: 10px;
-            width: 100%; /* Optionnel : pour qu'ils fassent la même largeur */
-        }
-        #activityBtn:hover {
-            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
-        }
-        
-        .gap-3 { display: flex; flex-direction: column; gap: 15px; align-items: center; }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .logout-link {
+            margin-top: 24px;
+            color: var(--danger);
+            background: transparent;
+            border: 1.5px solid #fee2e2;
+            color: var(--danger);
         }
 
-        @media (max-width: 600px) {
-            h1 {
-                font-size: 26px;
-            }
+        .logout-link:hover {
+            background: #fef2f2;
+            border-color: var(--danger);
+        }
 
-            p {
-                font-size: 16px;
-            }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .welcome-container { padding: 40px 24px; }
+            h1 { font-size: 24px; }
         }
     </style>
 </head>
 <body>
 
+    <div class="bg-circle" style="width: 400px; height: 400px; top: -100px; left: -100px;"></div>
+    <div class="bg-circle" style="width: 300px; height: 300px; bottom: -50px; right: -50px; background: rgba(118, 75, 162, 0.2);"></div>
+
     <div class="welcome-container">
-        <h1>Bienvenue sur TrackCaloriLog 👋</h1>
+        <div class="logo-placeholder">🔥</div>
+        <h1>Salut, <span id="userName">Aventurier</span> !</h1>
         <p>
-            Bienvenue dans votre application qui va révolutionner votre manière
-            de gérer vos calories, vos dépenses énergétiques et votre bien-être
-            au quotidien.
-            <br><br>
-            Prenez le contrôle de votre santé, un pas à la fois.
+            Ton tableau de bord est prêt. Que souhaites-tu suivre aujourd'hui ?
         </p>
-        <div class="d-flex flex-column align-items-center gap-3">
-            <button onclick="goToAdmin()"
-            id="adminBtn"
-            style="display:none;">
+        
+        <div class="nav-menu">
+            <button onclick="goToAdmin()" id="adminBtn" style="display:none;">
                 ⚙️ Dashboard Admin
             </button>
 
             <button onclick="goToNutrition()" id="nutritionBtn">
-                🥗 Mon Espace Nutrition
+                🥗 Nutrition & Repas
             </button>
 
             <button onclick="goToActivity()" id="activityBtn">
-                🏃‍♂️ Activity
+                🏃‍♂️ Activité Physique
             </button>
 
-            <button onclick="logout()" class="btn btn-danger px-4">
+            <button onclick="logout()" class="logout-link">
                 🚪 Déconnexion
             </button>
         </div>
@@ -146,79 +187,46 @@
     (function() {
         const token = localStorage.getItem('token');
         const user = JSON.parse(localStorage.getItem('user'));
-
-        // Si pas de token, on n'attend même pas le chargement, on dégage
         if (!token || !user) {
             window.location.href = "/trackcalorilog/login";
         }
     })();
-    function logout() {
-        // On demande confirmation avant d'agir
-        const confirmation = confirm("Es-tu sûr de vouloir te déconnecter ?");
 
-        if (confirmation) {
-            // 1. On vide le localStorage uniquement si l'utilisateur a confirmé
-            localStorage.clear(); 
+    window.onload = () => {
+        const userStr = localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+
+        if (user) {
+            // Affiche le prénom personnalisé
+            document.getElementById('userName').innerText = user.name.split(' ')[0];
             
-            // 2. Redirection vers la page de login
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            if (user.role.toLowerCase() === 'admin') {
+                document.getElementById('adminBtn').style.display = 'flex';
+            }
+        }
+    };
+
+    function logout() {
+        if (confirm("Se déconnecter ?")) {
+            localStorage.clear(); 
             window.location.href = "/trackcalorilog/login";
-        } else {
-            // Si l'utilisateur annule, on affiche un petit message en console (optionnel)
-            console.log("Déconnexion annulée");
         }
     }
-    // Dans ton fichier user.html
+
     function goToAdmin() {
         const token = localStorage.getItem('token');
-        if (token) {
-            // On passe le token dans l'URL pour que le middleware isAdmin de app.js soit content
-            window.location.href = `/admin?token=${token}`;
-        } else {
-            window.location.href = '/trackcalorilog/login';
-        }
+        window.location.href = `/admin?token=${token}`;
     }
 
     function goToNutrition() {
         const token = localStorage.getItem('token');
-        if (token) {
-            // On redirige vers la nouvelle route qu'on a créée dans app.js
-            window.location.href = `/nutrition?token=${token}`;
-        } else {
-            window.location.href = '/trackcalorilog/login';
-        }
+        window.location.href = `/nutrition?token=${token}`;
     }
 
     function goToActivity() {
         const token = localStorage.getItem('token');
-        if (token) {
-            // On redirige vers la nouvelle route qu'on a créée dans app.js
-            window.location.href = `/activity?token=${token}`;
-        } else {
-            window.location.href = '/trackcalorilog/login';
-        }
+        window.location.href = `/activity?token=${token}`;
     }
-
-    window.onload = () => {
-        const userStr = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-        const user = userStr ? JSON.parse(userStr) : null;
-
-        if (!token || !user) {
-            window.location.href = "/trackcalorilog/login";
-            return;
-        }
-
-        // --- LA MAGIE ICI ---
-        // Si l'utilisateur est admin, on montre le bouton
-        if (user.role.toLowerCase() === 'admin') {
-            document.getElementById('adminBtn').style.display = 'inline-block';
-        }
-
-        // On peut aussi afficher un message de bienvenue personnalisé
-        console.log("Bienvenue sur l'espace user, " + user.name);
-    };
 </script>
 
 </body>
