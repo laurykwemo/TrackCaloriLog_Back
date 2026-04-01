@@ -76,6 +76,15 @@
         #nutritionBtn:hover {
             box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
         }
+
+        #activityBtn {
+            background: linear-gradient(135deg, #9043a0 0%, #7d2e70 100%);
+            margin-bottom: 10px;
+            width: 100%; /* Optionnel : pour qu'ils fassent la même largeur */
+        }
+        #activityBtn:hover {
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.4);
+        }
         
         .gap-3 { display: flex; flex-direction: column; gap: 15px; align-items: center; }
 
@@ -121,6 +130,10 @@
 
             <button onclick="goToNutrition()" id="nutritionBtn">
                 🥗 Mon Espace Nutrition
+            </button>
+
+            <button onclick="goToActivity()" id="activityBtn">
+                🏃‍♂️ Activity
             </button>
 
             <button onclick="logout()" class="btn btn-danger px-4">
@@ -172,6 +185,16 @@
         if (token) {
             // On redirige vers la nouvelle route qu'on a créée dans app.js
             window.location.href = `/nutrition?token=${token}`;
+        } else {
+            window.location.href = '/trackcalorilog/login';
+        }
+    }
+
+    function goToActivity() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            // On redirige vers la nouvelle route qu'on a créée dans app.js
+            window.location.href = `/activity?token=${token}`;
         } else {
             window.location.href = '/trackcalorilog/login';
         }
