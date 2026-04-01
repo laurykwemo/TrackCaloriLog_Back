@@ -16,6 +16,7 @@ const adminRoutes = require('./modules/admin/admin.routes');
 const authRoutes = require('./modules/auth/auth.routes');
 const notificationRoutes = require('./modules/notification/notification.routes');
 const nutritionRoutes = require('./modules/nutrition/nutrition.routes');
+const activityRoutes = require('./modules/activity/activity.routes')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -88,6 +89,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/admin/notifications', notificationRoutes);
 app.use('/api/nutrition', nutritionRoutes);
 app.use('/trackcalorilog', authRoutes);
+app.use('/api/activity', activityRoutes)
 
 // --- ROUTES PAGES (SERVEUR DE FICHIERS) ---
 
@@ -133,14 +135,18 @@ app.get('/nutrition/journal', verifyTokenPage, (req, res) => {
     res.sendFile(path.join(__dirname, 'modules/nutrition/journal.html'));
 });
 
+app.get('/activity', verifyTokenPage, (req, res) => {
+    res.sendFile(path.join(__dirname, 'modules/activity/activity.html'));
+});
+
 // --- FIN ---
 app.use((req, res) => {
     res.status(404).json({ message: "Route non trouvée" });
 });
 
-/*server.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Serveur actif sur le port ${PORT}`);
-});
+})
 
-module.exports = app;*/
+module.exports = app;
 module.exports = { app, server, io };

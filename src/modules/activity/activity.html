@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport d'Activité - TrackCaloriLog</title>
+    <style>
+        :root {
+            --primary: #667eea;
+            --success: #48bb78;
+            --warning: #f6ad55;
+            --danger: #f56565;
+            --bg: #f7fafc;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .report-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h1 { color: #2d3748; font-size: 1.5rem; }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            padding: 15px;
+            border-radius: 10px;
+            background: #f0f4ff;
+        }
+
+        .label { font-size: 0.8rem; color: #718096; text-transform: uppercase; font-weight: bold; }
+        .value { font-size: 1.4rem; font-weight: 800; color: var(--primary); }
+
+        .bonus { color: var(--success); }
+
+        /* Jauge de progression */
+        .gauge-container {
+            height: 25px;
+            background: #edf2f7;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gauge-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), #764ba2);
+            transition: width 1s ease-in-out;
+        }
+
+        .message {
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .btn-refresh {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="report-container">
+    <div class="card">
+        <h1>📊 Rapport Journalier</h1>
+        <p id="currentDate" style="color: #a0aec0;"></p>
+        
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="label">Objectif Base</div>
+                <div class="value" id="baseGoal">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="label">Bonus Montre</div>
+                <div class="value bonus" id="extraCals">+0</div>
+            </div>
+        </div>
+
+        <div class="label">Objectif Ajusté (Total)</div>
+        <div class="value" id="adjustedGoal" style="font-size: 2.5rem; margin: 10px 0;">0</div>
+        
+        <div class="gauge-container">
+            <div id="gaugeFill" class="gauge-fill"></div>
+        </div>
+        
+        <div id="statusMessage" class="message">Chargement des données...</div>
+        
+        <button class="btn-refresh" onclick="fetchActivityData()" style="margin-top: 20px;">🔄 Actualiser</button>
+    </div>
+</div>
+
+<script>
+    // Récupération du token (ajuste selon ton système de stockage)
+    const token = localStorage.getItem('token'); 
+
+    async function fetchActivityData() {
+        try {
+            // On récupère la date du jour au format YYYY-MM-DD
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+            const response = await fetch(`/api/activity/daily?date=${today}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error("Erreur serveur");
+
+            const data = await response.json();
+
+            // Mise à jour de l'UI
+            document.getElementById('baseGoal').innerText = data.baseGoal;
+            document.getElementById('extraCals').innerText = `+${data.extraCals}`;
+            document.getElementById('adjustedGoal').innerText = data.adjustedGoal;
+
+            // Simulation de consommation (à remplacer par ton vrai fetch de calories mangées)
+            const caloriesEaten = 1450; // Exemple
+            updateGauge(caloriesEaten, data.adjustedGoal);
+
+        } catch (error) {
+            console.error(error);
+            document.getElementById('statusMessage').innerText = "Erreur de connexion aux données.";
+        }
+    }
+
+    function updateGauge(consumed, total) {
+        const percentage = Math.min((consumed / total) * 100, 100);
+        document.getElementById('gaugeFill').style.width = percentage + '%';
+        
+        const remaining = total - consumed;
+        const msgEl = document.getElementById('statusMessage');
+        
+        if (remaining > 0) {
+            msgEl.innerText = `Il vous reste ${remaining} kcal à consommer.`;
+            msgEl.style.backgroundColor = "#f0fff4";
+            msgEl.style.color = "#2f855a";
+        } else {
+            msgEl.innerText = `Objectif atteint ! Attention au surplus (${Math.abs(remaining)} kcal).`;
+            msgEl.style.backgroundColor = "#fff5f5";
+            msgEl.style.color = "#c53030";
+        }
+    }
+
+    // Charger au démarrage
+    window.onload = fetchActivityData;
+</script>
+
+</body>
+</html>

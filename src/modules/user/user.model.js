@@ -62,6 +62,10 @@ const userSchema = new mongoose.Schema({
     dailyProteinGoal: { 
         type: Number, 
         default: 160 
+    },
+    connectedServices: {
+        appleHealth: { isConnected: Boolean, lastSync: Date },
+        samsungHealth: { isConnected: Boolean, lastSync: Date }
     }
 }, { timestamps: true });
 
