@@ -134,6 +134,7 @@
         <button class="period-btn active" onclick="changePeriod('day', this)">Jour</button>
         <button class="period-btn" onclick="changePeriod('week', this)">Semaine</button>
         <button class="period-btn" onclick="changePeriod('month', this)">Mois</button>
+        <button class="period-btn" onclick="changePeriod('year', this)">Année</button>
     </div>
 
     <div class="dashboard-grid">
@@ -242,6 +243,7 @@
                         return mealDate >= sevenDaysAgo;
                     }
                     if (view === 'month') return mealDate.getMonth() === now.getMonth() && mealDate.getFullYear() === now.getFullYear();
+                    if (view === 'year') return mealDate.getFullYear() === now.getFullYear();
                     return true;
                 });
 
@@ -268,8 +270,11 @@
                 key = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
             } else if (view === 'week') {
                 key = getWeekRange(d); 
-            } else {
+            }else if (view === 'month') {
                 key = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+            } else if (view === 'year') {
+                // Groupement par mois pour la vue annuelle
+                key = d.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase() + " " + d.getFullYear();
             }
 
             if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0 };
