@@ -427,21 +427,65 @@
 
     async function editGoal() {
         const newGoal = prompt("Nouvel objectif calories (kcal) :", DAILY_CAL_GOAL);
+        
         if (newGoal && !isNaN(newGoal) && USER_ID) {
-            DAILY_CAL_GOAL = parseInt(newGoal);
-            document.getElementById('goalValue').innerText = DAILY_CAL_GOAL;
-            updateGoalsInChart();
-            loadData(); 
+            const goalValue = parseInt(newGoal);
+            const token = localStorage.getItem('token'); // Récupération du token pour l'auth
+
+            try {
+                const response = await fetch(`/api/users/${USER_ID}/daily-goal`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ dailyGoal: goalValue })
+                });
+
+                if (response.ok) {
+                    DAILY_CAL_GOAL = goalValue;
+                    document.getElementById('goalValue').innerText = DAILY_CAL_GOAL;
+                    updateGoalsInChart();
+                    loadData(); 
+                    console.log("Objectif calories mis à jour en base !");
+                } else {
+                    alert("Erreur lors de la mise à jour sur le serveur.");
+                }
+            } catch (error) {
+                console.error("Erreur réseau :", error);
+            }
         }
     }
 
     async function editProtGoal() {
         const newGoal = prompt("Nouvel objectif protéines (g) :", DAILY_PROT_GOAL);
+        
         if (newGoal && !isNaN(newGoal) && USER_ID) {
-            DAILY_PROT_GOAL = parseInt(newGoal);
-            document.getElementById('goalProtValue').innerText = DAILY_PROT_GOAL;
-            updateGoalsInChart();
-            loadData();
+            const goalValue = parseInt(newGoal);
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch(`/api/users/${USER_ID}/dailyprot-goal`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ dailyProtGoal: goalValue })
+                });
+
+                if (response.ok) {
+                    DAILY_PROT_GOAL = goalValue;
+                    document.getElementById('goalProtValue').innerText = DAILY_PROT_GOAL;
+                    updateGoalsInChart();
+                    loadData();
+                    console.log("Objectif protéines mis à jour en base !");
+                } else {
+                    alert("Erreur lors de la mise à jour sur le serveur.");
+                }
+            } catch (error) {
+                console.error("Erreur réseau :", error);
+            }
         }
     }
 
