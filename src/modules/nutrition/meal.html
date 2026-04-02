@@ -66,6 +66,43 @@
         /* Barre de progression Calories */
         .progress-container { width: 100%; background: #edf2f7; border-radius: 10px; height: 8px; margin-top: 8px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary); transition: width 0.5s ease; }
+        /* --- RESPONSIVE SEARCH HEADER --- */
+        .search-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1rem; 
+            gap: 20px;
+        }
+
+        .search-title-group {
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex-grow: 1;
+        }
+
+        /* Quand l'écran est petit (Mobile) */
+        @media (max-width: 768px) {
+            .search-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-title-group {
+                flex-direction: column; /* Empile le titre et la date */
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .search-title-group .field {
+                width: 100% !important; /* Le champ date prend toute la largeur */
+            }
+            
+            .search-title-group h2 {
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -100,8 +137,8 @@
     </section>
 
     <section class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; gap: 20px;">
-            <div style="display: flex; align-items: center; gap: 15px; flex-grow: 1;">
+        <div class="search-header">
+            <div class="search-title-group">
                 <h2 style="margin:0;">🔍 Rechercher un aliment</h2>
                 <div class="field" style="width: 200px;">
                     <input type="datetime-local" id="mealDateCustom">
