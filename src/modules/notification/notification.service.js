@@ -19,7 +19,7 @@ const notificationService = {
             }
 
             const newNotif = await Notification.create({
-                message: `Tentative d'accès non autorisée détectée`, // Message générique
+                message: data.message || `Tentative d'accès non autorisée détectée`, // Message générique
                 userEmail: data.userEmail,
                 severity: 'high',
                 ipAddress: data.ipAddress

@@ -23,19 +23,32 @@ const adminController = {
             }
 
             // 2. SÉCURITÉ : Empêcher un admin de modifier son propre rôle 
-            // (pour éviter de se bloquer l'accès au panel)
             if (req.user.id === id) {
                 return res.status(403).json({ message: "Vous ne pouvez pas modifier votre propre rôle." });
             }
 
-            // 3. Appel au service avec uniquement la donnée filtrée
+            // --- AJOUT DE LA DÉTECTION DE TENTATIVE FRAUDULEUSE ---
+            // Si l'utilisateur qui fait la requête N'EST PAS admin (faille potentielle)
+            // OU si tu veux simplement logger chaque promotion d'admin par sécurité
+            if (role === 'admin' && req.user.role !== 'admin') {
+                
+                await notificationService.createAlert(req.app, {
+                    userEmail: req.user.email,
+                    ipAddress: req.ip,
+                    message: `ALERTE : Tentative de promotion ADMIN sur l'ID ${id} par ${req.user.email}`
+                });
+
+                return res.status(403).json({ message: "Action critique bloquée : Droits insuffisants." });
+            }
+            // -----------------------------------------------------
+
+            // 3. Appel au service
             const updatedUser = await adminService.updateUserRole(id, role);
             
             if (!updatedUser) {
                 return res.status(404).json({ message: "Utilisateur introuvable." });
             }
 
-            // 4. On renvoie une réponse propre (sans mot de passe)
             res.json({
                 message: "Rôle mis à jour avec succès",
                 user: {
