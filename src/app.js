@@ -22,6 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
+app.set('io', io);
 
 // --- MIDDLEWARE DE VÉRIFICATION POUR LES PAGES HTML ---
 const verifyTokenPage = (req, res, next) => {
