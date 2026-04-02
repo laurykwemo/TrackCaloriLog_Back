@@ -10,75 +10,79 @@ const authService = {
     },
     login: async (email, password) => {
         try {
-            // 1. Chercher l'utilisateur
             const user = await userService.findByEmail(email);
+            if (!user) throw new Error('Identifiants incorrects');
 
-            if (!user) {
-                throw new Error('Identifiants incorrects');
-            }
-
-            // 2. Vérifier si le compte est verrouillé temporellement
             if (user.lockUntil && user.lockUntil > Date.now()) {
                 throw new Error(`Compte bloqué. Réessayez plus tard.`);
             }
 
-            // 3. Vérifier si l'email est validé
             if (!user.isEmailVerified) {
                 throw new Error("Veuillez vérifier votre boîte mail pour valider votre compte.");
             }
 
+            // --- LOGIQUE DE BAN : vérifiée AVANT isActive ---
+            // (car bannir un user met isActive=false, on doit d'abord lever le ban expiré)
+            if (user.isBanned) {
+                const now = new Date();
+                const banEnd = user.banExpires ? new Date(user.banExpires) : null;
+
+                if (!banEnd || banEnd > now) {
+                    // Ban encore actif → on bloque
+                    const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+                    const msg = banEnd 
+                        ? `Votre compte est banni jusqu'au : ${banEnd.toLocaleString('fr-FR', dateOptions)}.`
+                        : "Votre compte est banni définitivement.";
+                    throw new Error(msg);
+                }
+
+                if (banEnd && banEnd <= now) {
+                    user.isBanned = false;
+                    user.banExpires = null;
+                    user.isActive = true; // <--- On le rend actif pour qu'il puisse passer les vérifications suivantes
+                    await user.save();
+                }
+
+                // Ban expiré → on nettoie immédiatement en base
+                user.isBanned = false;
+                user.banExpires = null;
+                user.banReason = null;
+                user.isActive = true;
+                await user.save();
+                console.log(`[AUTO-UNBAN] Ban expiré levé au login pour : ${user.email}`);
+            }
+
+            // Check isActive APRÈS la gestion du ban
             if (!user.isActive) {
                 throw new Error("Votre compte a été suspendu. Contactez le support.");
             }
 
-            if (user.isBanned) {
-                if (user.banExpires && new Date() > user.banExpires) {
-                    // Le ban temporaire est expiré, on réactive auto
-                    user.isBanned = false;
-                    user.banExpires = null;
-                    user.isActive = true;
-                    await user.save();
-                } else {
-                    const message = user.banExpires 
-                        ? `Votre compte est banni jusqu'au ${user.banExpires.toLocaleDateString()}`
-                        : "Votre compte est banni définitivement.";
-                    throw new Error(message);
-                }
-            }
-
-            // 4. Comparer le mot de passe
             const isValid = await bcrypt.compare(password, user.password);
-
             if (!isValid) {
-                // C'est ICI qu'on gère l'échec
                 user.loginAttempts += 1;
-                
                 if (user.loginAttempts >= 5) {
-                    user.lockUntil = Date.now() + 1 * 60 * 60 * 1000; // Bloqué 1h
+                    user.lockUntil = Date.now() + 1 * 60 * 60 * 1000;
                     await user.save();
                     throw new Error("Trop de tentatives. Compte bloqué pour 1h.");
                 }
-
-                await user.save(); // On sauvegarde l'incrémentation
+                await user.save();
                 throw new Error("Identifiants incorrects"); 
             }
 
-            // 5. SI TOUT EST OK : Réinitialisation et Token
+            // Succès
             user.loginAttempts = 0;
             user.lockUntil = undefined;
             user.lastLogin = Date.now();
-            await user.save();
+            // On ne fait pas encore le save() ici, on laisse le controller le faire 
+            // (ou on le fait ici, mais le controller gère le nettoyage du ban)
 
             const token = jwt.sign(
                 { userId: user._id, role: user.role },
                 process.env.JWT_SECRET,
-                { expiresIn: '1h' }
+                { expiresIn: '24h' }
             );
             
-            return { 
-                token, 
-                user: { id: user._id, name: user.name, email: user.email, role: user.role} 
-            };
+            return { token, user }; // Retourne l'objet user complet pour le controller
 
         } catch (error) {
             throw error;

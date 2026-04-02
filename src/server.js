@@ -19,3 +19,24 @@ mongoose.connect(DB_URI)
         console.error('❌ Erreur de connexion Atlas :', err);
         process.exit(1);
     });
+
+    // Débannissement automatique toutes les 10 minutes
+cron.schedule('*/10 * * * *', async () => {
+    try {
+        const now = new Date();
+        const result = await User.updateMany(
+            { 
+                isBanned: true, 
+                banExpires: { $lte: now } 
+            }, 
+            { 
+                $set: { isBanned: false, banExpires: null, banReason: null, isActive: true } 
+            }
+        );
+        if(result.modifiedCount > 0) {
+            console.log(`[CRON] ${result.modifiedCount} utilisateur(s) débanni(s) automatiquement.`);
+        }
+    } catch (error) {
+        console.error("[CRON] Erreur lors du débannissement auto:", error);
+    }
+});

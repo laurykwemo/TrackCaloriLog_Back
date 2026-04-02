@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 // 2. Logique d'envoi réutilisable
 const sendEmailLogic = async (email) => {
     const user = await authService.resendVerificationEmail(email);
-    const verificationUrl = `/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
+    const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
     
     const mailOptions = {
         from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
@@ -63,53 +63,25 @@ const authController = {
     login: async (req, res) => {
         try {
             const { email, password } = req.body;
-            
-            // 1. Appeler le service login pour récupérer l'utilisateur (et valider mdp/email)
             const result = await authService.login(email, password);
-            const user = result.user; // On suppose que ton service retourne { user, token }
-            
-            // 2. Vérification du bannissement
-            if (user.isBanned) {
-                const now = new Date();
-                // On s'assure que banExpires est bien un objet Date
-                const expiryDate = user.banExpires ? new Date(user.banExpires) : null;
+            const user = result.user;
 
-                console.log(`Vérification Ban pour ${user.email}: Expire le ${expiryDate}, Il est actuellement ${now}`);
+            // Le nettoyage du ban expiré est désormais géré dans authService.login
+            // On sauvegarde uniquement pour persister lastLogin et la remise à zéro des tentatives
+            await user.save();
 
-                if (expiryDate && expiryDate <= now) {
-                    // AUTO-DÉBANNISSEMENT
-                    console.log("Date dépassée ! Débannissement automatique en cours...");
-                    user.isBanned = false;
-                    user.banExpires = null;
-                    await user.save(); 
-                    // Note: Ici, l'utilisateur continue vers l'étape 3 et se connecte.
-                } else {
-                    // TOUJOURS BANNI
-                    const dateOptions = { 
-                        day: '2-digit', month: '2-digit', year: 'numeric', 
-                        hour: '2-digit', minute: '2-digit' 
-                    };
-                    const dateFr = expiryDate 
-                        ? expiryDate.toLocaleDateString('fr-FR', dateOptions) 
-                        : "définitivement";
-
-                    return res.status(403).json({ 
-                        message: `Accès refusé. Votre compte est banni jusqu'au : ${dateFr}.` 
-                    });
-                }
-            }
-
-            // 3. Si tout est OK, on renvoie le résultat (token + user)
-            res.status(200).json(result);
+            // On renvoie une version propre du user (sans le password)
+            return res.status(200).json({
+                token: result.token,
+                user: { id: user._id, name: user.name, email: user.email, role: user.role }
+            });
 
         } catch (error) {
-            // Déclenchement automatique du renvoi si mail non vérifié
-            if (error.message === "Veuillez vérifier votre boîte mail pour valider votre compte.") {
+            // Gestion du mail de vérification (inchangée mais propre)
+            if (error.message.includes("vérifier votre boîte mail")) {
                 try {
                     await sendEmailLogic(req.body.email); 
-                    return res.status(401).json({ 
-                        message: "Compte non vérifié. Un nouveau lien vient de vous être envoyé." 
-                    });
+                    return res.status(401).json({ message: "Compte non vérifié. Un nouveau lien a été envoyé." });
                 } catch (err) {
                     return res.status(500).json({ message: "Erreur lors du renvoi du mail." });
                 }

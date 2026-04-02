@@ -454,7 +454,7 @@
 
     function renderUsers(list){
         document.getElementById('adminTableBody').innerHTML=list.map(u=>{
-            const banned=u.isBanned||(u.banExpires&&new Date(u.banExpires)>new Date());
+            const banned = u.isBanned||(u.banExpires && new Date(u.banExpires) >new Date());
             return`<tr data-id="${u._id}">
                 <td ondblclick="makeEditable(this)">${u.name}</td>
                 <td ondblclick="makeEditable(this)">${u.email}</td>
@@ -520,15 +520,49 @@
     function openBanModal(userId){document.getElementById('banUserId').value=userId;new bootstrap.Modal(document.getElementById('banModal')).show();}
 
     async function confirmBan(){
-        const userId=document.getElementById('banUserId').value,endDate=document.getElementById('banEndDate').value,reason=document.getElementById('banReasonInput').value.trim();
-        if(!endDate){alert("Sélectionnez une date !");return;}
-        if(!reason){alert("Saisissez une raison !");return;}
-        try{
-            const data=await handleResponse(await fetch(`/api/admin/users/ban/${userId}`,{method:'POST',headers:{...getAuthHeaders(),'Content-Type':'application/json'},body:JSON.stringify({banUntil:endDate,reason})}));
-            if(data){alert(data.message);const idx=users.findIndex(u=>u._id===userId);if(idx!==-1)users[idx]=data.user;
-            bootstrap.Modal.getInstance(document.getElementById('banModal')).hide();
-            document.getElementById('banReasonInput').value='';document.getElementById('banEndDate').value='';await loadAdminUsers();}
-        }catch(e){alert("Erreur : "+e.message);}
+        const userId = document.getElementById('banUserId').value;
+        const endDateInput = document.getElementById('banEndDate').value; // ex: "2026-04-02T15:30"
+        const reason = document.getElementById('banReasonInput').value.trim();
+
+        if(!endDateInput){ alert("Sélectionnez une date !"); return; }
+        if(!reason){ alert("Saisissez une raison !"); return; }
+
+        // Conversion explicite en objet Date pour s'assurer de l'envoi au format ISO
+        const banUntilDate = new Date(endDateInput).toISOString();
+
+        try {
+            const response = await fetch(`/api/admin/users/ban/${userId}`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify({ 
+                    banUntil: banUntilDate, // Envoi en ISO string (UTC)
+                    reason: reason 
+                })
+            });
+
+            const data = await handleResponse(response);
+            
+            if(data) {
+                alert("Utilisateur banni jusqu'au : " + new Date(endDateInput).toLocaleString());
+                
+                // Mise à jour locale de la liste
+                const idx = users.findIndex(u => u._id === userId);
+                if(idx !== -1) users[idx] = data.user;
+
+                // Fermeture propre de la modal Bootstrap
+                const modalElement = document.getElementById('banModal');
+                const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modalInstance.hide();
+
+                // Reset des champs
+                document.getElementById('banReasonInput').value = '';
+                document.getElementById('banEndDate').value = '';
+                
+                await loadAdminUsers(); // Recharger pour voir le changement de bouton (Ban -> Unban)
+            }
+        } catch(e) {
+            alert("Erreur lors du bannissement : " + e.message);
+        }
     }
 
     async function unbanUser(userId){
@@ -581,6 +615,11 @@
             document.body.style.display='block';
             loadAdminUsers();loadAdminUsersd();
         }catch(e){localStorage.clear();window.location.replace("/trackcalorilog/login");}
+        setInterval(() => {
+            loadAdminUsers()
+            loadAdminUsersd(); // Recharge la liste et mettra à jour les boutons Ban/Unban et le statut
+            loadStats();
+        }, 60000);
     };
 </script>
 </body>
