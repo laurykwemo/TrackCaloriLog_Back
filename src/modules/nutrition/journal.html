@@ -427,7 +427,8 @@
 
     async function editGoal() {
         const newGoal = prompt("Nouvel objectif calories (kcal) :", DAILY_CAL_GOAL);
-        
+        const user = await res.json();
+        USER_ID = user._id || user.id;
         if (newGoal && !isNaN(newGoal) && USER_ID) {
             const goalValue = parseInt(newGoal);
             const token = localStorage.getItem('token'); // Récupération du token pour l'auth
@@ -459,6 +460,8 @@
 
     async function editProtGoal() {
         const newGoal = prompt("Nouvel objectif protéines (g) :", DAILY_PROT_GOAL);
+        const user = await res.json();
+        USER_ID = user._id || user.id;
         
         if (newGoal && !isNaN(newGoal) && USER_ID) {
             const goalValue = parseInt(newGoal);
