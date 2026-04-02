@@ -417,6 +417,7 @@
         for (const [title, data] of Object.entries(groups)) {
             let calColor = data.totalCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
             let protColor = data.totalProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
+            let saltColor = 'var(--warning)'
 
             let groupHtml = `
                 <div class="history-group">
@@ -425,6 +426,7 @@
                         <div class="group-totals">
                             <span style="color:${calColor}">🔥 ${Math.round(data.totalCal)} kcal</span>
                             <span style="color:${protColor}">🥩 ${data.totalProt.toFixed(1)}g prot</span>
+                            <span style="color:${saltColor}">🧂 ${data.totalSalt.toFixed(1)}g sel</span>
                         </div>
                     </div>`;
             
@@ -526,10 +528,11 @@
             else if (view === 'month') key = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
             else if (view === 'year') key = d.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase() + " " + d.getFullYear();
 
-            if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0 };
+            if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0, totalSalt: 0 };
             groups[key].meals.push(m);
             groups[key].totalCal += m.totals.calories;
             groups[key].totalProt += m.totals.proteins;
+            groups[key].totalSalt += m.totals.salt;
         });
         return groups;
     }
