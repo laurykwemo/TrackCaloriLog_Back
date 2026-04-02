@@ -25,8 +25,14 @@ const notificationService = {
                 ipAddress: data.ipAddress
             });
 
+            console.log("Tentative d'envoi Socket à l'admin pour :", newNotif.userEmail);
             const io = app.get('io');
-            if (io) io.emit('new_security_alert', newNotif);
+            if (io) {
+                io.emit('new_security_alert', newNotif);
+                console.log("Signal émis avec succès !");
+            } else {
+                console.error("ERREUR : io est undefined dans le service !");
+            }
 
             return newNotif;
         } catch (error) {
