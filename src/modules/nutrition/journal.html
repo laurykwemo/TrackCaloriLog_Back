@@ -338,6 +338,7 @@
         <div class="total-box">
             <span id="modalTotalCal" style="color:var(--primary)">0 kcal</span>
             <span id="modalTotalProt" style="color:var(--success)">0g Prot</span>
+            <span id="modalTotalSalt" style="color:var(--warning)">0g Prot</span>
         </div>
     </div>
 </div>
@@ -454,6 +455,7 @@
         document.getElementById('modalTitle').innerText = meal.title || "Détails du repas";
         document.getElementById('modalTotalCal').innerText = Math.round(meal.totals.calories) + " kcal";
         document.getElementById('modalTotalProt').innerText = (meal.totals.proteins || 0).toFixed(1) + "g Prot";
+        document.getElementById('modalTotalSalt').innerText = (meal.totals.salt || 0).toFixed(1) + "g Sel";
 
         let bodyHtml = "";
 
