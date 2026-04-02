@@ -444,7 +444,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ dailyGoal: goalValue })
+                        body: JSON.stringify({ dailyCalorieGoal: goalValue })
                     });
 
                     if (response.ok) {
@@ -482,7 +482,7 @@
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({ dailyProtGoal: goalValue })
+                        body: JSON.stringify({ dailyProteinGoal: goalValue })
                     });
 
                     if (response.ok) {
