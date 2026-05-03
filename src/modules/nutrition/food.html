@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue Aliments - TrackCaloriLog</title>
+    <!-- Lib de scan de code-barres : https://github.com/mebjas/html5-qrcode -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
             --primary: #667eea; --secondary: #718096; --success: #48bb78;
@@ -32,219 +34,171 @@
             flex-wrap: wrap;
             gap: 0.75rem;
         }
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
-        header nav {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.25rem 1.5rem;
-        }
+        .logo { font-size: 1.4rem; font-weight: 800; letter-spacing: -1px; }
+        header nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1.5rem; }
         header nav a {
-            color: rgba(255,255,255,0.85);
-            text-decoration: none;
-            font-weight: 500;
-            transition: 0.3s;
-            padding: 0.4rem 0.2rem;
+            color: rgba(255,255,255,0.85); text-decoration: none;
+            font-weight: 500; transition: 0.3s; padding: 0.4rem 0.2rem;
         }
         header nav a:hover { color: white; }
 
         /* ============ MAIN ============ */
-        main {
-            max-width: 1000px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+        main { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
         .card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            background: white; border-radius: 12px; padding: 1.5rem;
+            margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .card h2 {
-            margin-top: 0;
-            font-size: 1.25rem;
-        }
+        .card h2 { margin-top: 0; font-size: 1.25rem; }
 
         /* ============ FORM ============ */
         .grid-inputs {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 1rem; margin-bottom: 1rem;
         }
-        .field {
-            display: flex;
-            flex-direction: column;
-            min-width: 0; /* évite les débordements en grid */
-        }
+        .field { display: flex; flex-direction: column; min-width: 0; }
         label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #4a5568;
-            margin-bottom: 0.4rem;
+            font-size: 0.85rem; font-weight: 600;
+            color: #4a5568; margin-bottom: 0.4rem;
         }
         input {
-            padding: 0.75rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 16px; /* évite le zoom auto sur iOS */
-            width: 100%;
-            min-height: 44px; /* taille tactile recommandée */
-            font-family: inherit;
+            padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 16px; width: 100%; min-height: 44px; font-family: inherit;
         }
         input:focus {
-            outline: none;
-            border-color: var(--primary);
+            outline: none; border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
         }
         button {
-            cursor: pointer;
-            border: none;
-            border-radius: 8px;
-            padding: 0.85rem 1.2rem;
-            font-weight: 600;
-            font-size: 0.95rem;
-            min-height: 44px;
-            transition: 0.2s;
-            font-family: inherit;
+            cursor: pointer; border: none; border-radius: 8px;
+            padding: 0.85rem 1.2rem; font-weight: 600; font-size: 0.95rem;
+            min-height: 44px; transition: 0.2s; font-family: inherit;
         }
         .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: #5568d3; }
         .btn-primary:active { transform: scale(0.98); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #e04848; }
 
-        .barcode-row {
+        .barcode-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .barcode-row input { flex: 1 1 200px; }
+        .barcode-row button { flex: 0 0 auto; }
+
+        .submit-btn { width: 100%; margin-top: 0.5rem; }
+
+        /* ============ SCANNER ============ */
+        #scannerContainer {
+            display: none;
+            margin-top: 1rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            position: relative;
+        }
+        #scannerContainer.active { display: block; }
+        #reader { width: 100%; min-height: 250px; }
+        #reader video {
+            border-radius: 12px;
+            width: 100% !important;
+        }
+        .scanner-controls {
             display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
+            justify-content: center;
+            padding: 0.75rem;
+            background: #1a202c;
         }
-        .barcode-row input {
-            flex: 1 1 200px;
+        .scanner-status {
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: #a0aec0;
+            background: #1a202c;
         }
-        .barcode-row button {
-            flex: 0 0 auto;
+        .scanner-status.error { color: #fc8181; }
+        .scanner-status.success { color: #68d391; }
+
+        .loading-indicator {
+            display: inline-block;
+            width: 14px; height: 14px;
+            border: 2px solid #e2e8f0;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .info-banner {
+            background: #ebf8ff;
+            border-left: 3px solid #4299e1;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            color: #2c5282;
+        }
+        .info-banner.success {
+            background: #f0fff4;
+            border-left-color: var(--success);
+            color: #22543d;
         }
 
-        .submit-btn {
-            width: 100%;
-            margin-top: 0.5rem;
-        }
-
-        /* ============ TABLE (desktop) ============ */
+        /* ============ TABLE ============ */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin-top: 1rem;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 500px;
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 500px; }
         th {
-            background: #f8fafc;
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 2px solid #edf2f7;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            color: #718096;
-            white-space: nowrap;
+            background: #f8fafc; text-align: left; padding: 1rem;
+            border-bottom: 2px solid #edf2f7; font-size: 0.8rem;
+            text-transform: uppercase; color: #718096; white-space: nowrap;
         }
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid #edf2f7;
-            font-size: 0.9rem;
-        }
+        td { padding: 1rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem; }
 
-        /* ============ MOBILE : table -> cards ============ */
+        /* ============ MOBILE ============ */
         @media (max-width: 600px) {
-            header {
-                padding: 1rem;
-                justify-content: center;
-                text-align: center;
-            }
-            header nav {
-                width: 100%;
-                justify-content: center;
-                gap: 0.25rem 1rem;
-            }
-            header nav a {
-                font-size: 0.9rem;
-            }
-            main {
-                margin: 1rem auto;
-            }
-            .card {
-                padding: 1.1rem;
-                border-radius: 10px;
-                margin-bottom: 1.25rem;
-            }
-            .card h2 {
-                font-size: 1.1rem;
-            }
-            .grid-inputs {
-                grid-template-columns: 1fr 1fr;
-                gap: 0.75rem;
-            }
-            /* nom et marque en pleine largeur */
-            .grid-inputs.full-width-mobile {
-                grid-template-columns: 1fr;
-            }
+            header { padding: 1rem; justify-content: center; text-align: center; }
+            header nav { width: 100%; justify-content: center; gap: 0.25rem 1rem; }
+            header nav a { font-size: 0.9rem; }
+            main { margin: 1rem auto; }
+            .card { padding: 1.1rem; border-radius: 10px; margin-bottom: 1.25rem; }
+            .card h2 { font-size: 1.1rem; }
+            .grid-inputs { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .grid-inputs.full-width-mobile { grid-template-columns: 1fr; }
 
-            /* Transformation table -> cartes empilées */
             .table-wrapper { overflow: visible; }
-            table, thead, tbody, tr, td {
-                display: block;
-                width: 100%;
-            }
+            table, thead, tbody, tr, td { display: block; width: 100%; }
             table { min-width: 0; }
             thead { display: none; }
             tbody tr {
-                background: #f8fafc;
-                border-radius: 10px;
-                padding: 0.75rem 1rem;
-                margin-bottom: 0.75rem;
+                background: #f8fafc; border-radius: 10px;
+                padding: 0.75rem 1rem; margin-bottom: 0.75rem;
                 border: 1px solid #edf2f7;
             }
             tbody td {
-                border: none;
-                padding: 0.4rem 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 1rem;
-                font-size: 0.95rem;
+                border: none; padding: 0.4rem 0;
+                display: flex; justify-content: space-between;
+                align-items: center; gap: 1rem; font-size: 0.95rem;
             }
             tbody td::before {
                 content: attr(data-label);
-                font-weight: 600;
-                color: #718096;
-                font-size: 0.8rem;
-                text-transform: uppercase;
+                font-weight: 600; color: #718096;
+                font-size: 0.8rem; text-transform: uppercase;
                 letter-spacing: 0.02em;
             }
             tbody td:first-child {
-                font-weight: 700;
-                font-size: 1.05rem;
-                padding-bottom: 0.5rem;
-                margin-bottom: 0.4rem;
-                border-bottom: 1px solid #edf2f7;
-                display: block; /* le nom prend toute la ligne, sans label */
+                font-weight: 700; font-size: 1.05rem;
+                padding-bottom: 0.5rem; margin-bottom: 0.4rem;
+                border-bottom: 1px solid #edf2f7; display: block;
             }
-            tbody td:first-child::before {
-                display: none;
-            }
+            tbody td:first-child::before { display: none; }
         }
 
-        /* ============ TRES PETIT (< 380px) ============ */
         @media (max-width: 380px) {
-            .grid-inputs {
-                grid-template-columns: 1fr;
-            }
+            .grid-inputs { grid-template-columns: 1fr; }
             header { padding: 0.85rem; }
             .logo { font-size: 1.25rem; }
         }
@@ -264,13 +218,29 @@
 <main>
     <section class="card">
         <h2>🔍 Ajouter au catalogue</h2>
+
+        <div class="info-banner" id="infoBanner">
+            💡 Scanne le code-barres d'un produit avec ta caméra : on récupère automatiquement les infos nutritionnelles via OpenFoodFacts.
+        </div>
+
         <div class="field" style="margin-bottom: 1rem;">
-            <label>Code-barres (Simuler Scan)</label>
+            <label>Code-barres</label>
             <div class="barcode-row">
                 <input type="text" id="barcodeInput" placeholder="Ex: 3017620422003" inputmode="numeric">
-                <button type="button" class="btn-primary" onclick="simulateScan()">Scanner</button>
+                <button type="button" class="btn-primary" id="scanBtn">📷 Scanner</button>
+                <button type="button" class="btn-primary" id="lookupBtn">🔎 Chercher</button>
             </div>
         </div>
+
+        <!-- Container du scanner caméra -->
+        <div id="scannerContainer">
+            <div id="reader"></div>
+            <div class="scanner-status" id="scannerStatus">Initialisation de la caméra…</div>
+            <div class="scanner-controls">
+                <button type="button" class="btn-danger" id="closeScanBtn">✕ Fermer le scanner</button>
+            </div>
+        </div>
+
         <form id="foodForm">
             <div class="grid-inputs full-width-mobile">
                 <div class="field"><label>Nom</label><input type="text" id="foodName" required></div>
@@ -304,7 +274,6 @@
     if (!rawToken) window.location.href = '/trackcalorilog/login';
     const cleanToken = rawToken.replace('Bearer ', '').replace(/"/g, '').trim();
 
-    // Mise à jour des liens nav
     document.querySelectorAll('nav a').forEach(link => {
         if (link.id === 'logoutBtn') return;
         const href = link.getAttribute('href');
@@ -321,6 +290,162 @@
         window.location.href = '/trackcalorilog/login';
     });
 
+    /* ===========================================================
+       SCANNER DE CODE-BARRES (html5-qrcode)
+       =========================================================== */
+    let html5QrCode = null;
+    const scannerContainer = document.getElementById('scannerContainer');
+    const scannerStatus = document.getElementById('scannerStatus');
+    const scanBtn = document.getElementById('scanBtn');
+    const closeScanBtn = document.getElementById('closeScanBtn');
+
+    scanBtn.addEventListener('click', startScanner);
+    closeScanBtn.addEventListener('click', stopScanner);
+
+    async function startScanner() {
+        // La caméra ne fonctionne qu'en HTTPS (sauf sur localhost)
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            alert("⚠️ Le scan caméra nécessite HTTPS. Tu peux saisir le code manuellement et cliquer 'Chercher'.");
+            return;
+        }
+
+        scannerContainer.classList.add('active');
+        scannerStatus.className = 'scanner-status';
+        scannerStatus.textContent = 'Démarrage de la caméra…';
+
+        try {
+            html5QrCode = new Html5Qrcode("reader");
+
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 150 }, // codes-barres = horizontaux
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.EAN_13, // standard alimentaire européen
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                    Html5QrcodeSupportedFormats.CODE_128
+                ],
+                aspectRatio: 1.5
+            };
+
+            await html5QrCode.start(
+                { facingMode: "environment" }, // caméra arrière
+                config,
+                onScanSuccess,
+                onScanFailure
+            );
+
+            scannerStatus.textContent = '🎯 Pointe vers un code-barres…';
+        } catch (err) {
+            console.error("Erreur démarrage caméra:", err);
+            scannerStatus.className = 'scanner-status error';
+
+            if (err.name === 'NotAllowedError' || String(err).includes('Permission')) {
+                scannerStatus.textContent = '❌ Accès caméra refusé. Autorise-le dans les paramètres du navigateur.';
+            } else if (err.name === 'NotFoundError') {
+                scannerStatus.textContent = '❌ Aucune caméra détectée sur cet appareil.';
+            } else {
+                scannerStatus.textContent = '❌ Erreur : ' + (err.message || err);
+            }
+        }
+    }
+
+    async function stopScanner() {
+        if (html5QrCode) {
+            try {
+                await html5QrCode.stop();
+                html5QrCode.clear();
+            } catch (e) { /* déjà arrêté */ }
+            html5QrCode = null;
+        }
+        scannerContainer.classList.remove('active');
+    }
+
+    async function onScanSuccess(decodedText, decodedResult) {
+        scannerStatus.className = 'scanner-status success';
+        scannerStatus.textContent = '✅ Code détecté : ' + decodedText;
+
+        // Vibration de feedback sur mobile (si supportée)
+        if (navigator.vibrate) navigator.vibrate(150);
+
+        document.getElementById('barcodeInput').value = decodedText;
+        await stopScanner();
+
+        // Recherche auto du produit
+        await lookupProduct(decodedText);
+    }
+
+    function onScanFailure(error) {
+        // Appelé en continu quand aucun code n'est trouvé — on ignore
+    }
+
+    /* ===========================================================
+       RECHERCHE OPENFOODFACTS
+       Doc API : https://openfoodfacts.github.io/openfoodfacts-server/api/
+       =========================================================== */
+    const lookupBtn = document.getElementById('lookupBtn');
+    lookupBtn.addEventListener('click', () => {
+        const code = document.getElementById('barcodeInput').value.trim();
+        if (!code) { alert("Saisis ou scanne d'abord un code-barres."); return; }
+        lookupProduct(code);
+    });
+
+    async function lookupProduct(barcode) {
+        const originalText = lookupBtn.textContent;
+        lookupBtn.disabled = true;
+        lookupBtn.innerHTML = 'Recherche<span class="loading-indicator"></span>';
+
+        try {
+            const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+            const data = await response.json();
+
+            if (data.status === 1 && data.product) {
+                fillFormFromOpenFoodFacts(data.product);
+            } else {
+                alert("⚠️ Produit non trouvé dans OpenFoodFacts.\n\nTu peux remplir les infos manuellement et l'enregistrer — ça enrichira ton propre catalogue.");
+                document.getElementById('foodName').focus();
+            }
+        } catch (error) {
+            console.error("Erreur OpenFoodFacts:", error);
+            alert("❌ Impossible de contacter OpenFoodFacts. Vérifie ta connexion ou remplis manuellement.");
+        } finally {
+            lookupBtn.disabled = false;
+            lookupBtn.textContent = originalText;
+        }
+    }
+
+    function fillFormFromOpenFoodFacts(product) {
+        // Les noms de champs OpenFoodFacts varient — on prend le 1er disponible
+        const name = product.product_name_fr || product.product_name || product.generic_name_fr || product.generic_name || '';
+        const brand = (product.brands || '').split(',')[0].trim();
+        const n = product.nutriments || {};
+
+        document.getElementById('foodName').value = name;
+        document.getElementById('foodBrand').value = brand;
+        document.getElementById('calories').value = n['energy-kcal_100g'] ?? '';
+        document.getElementById('protein').value = n.proteins_100g ?? '';
+        document.getElementById('carbs').value = n.carbohydrates_100g ?? '';
+        document.getElementById('fat').value = n.fat_100g ?? '';
+        document.getElementById('fiber').value = n.fiber_100g ?? '';
+        document.getElementById('salt').value = n.salt_100g ?? '';
+
+        // Feedback visuel temporaire
+        const banner = document.getElementById('infoBanner');
+        const original = banner.innerHTML;
+        const originalClass = banner.className;
+        banner.className = 'info-banner success';
+        banner.innerHTML = `✅ Produit trouvé : <strong>${name || 'sans nom'}</strong>${brand ? ' — ' + brand : ''}. Vérifie les valeurs et clique "Enregistrer".`;
+
+        setTimeout(() => {
+            banner.className = originalClass;
+            banner.innerHTML = original;
+        }, 5000);
+    }
+
+    /* ===========================================================
+       CATALOGUE
+       =========================================================== */
     async function loadCatalog() {
         try {
             const response = await fetch('/api/nutrition/allFood', {
@@ -343,13 +468,6 @@
                     <td data-label="Protéines">${Number(f.proteins100g).toLocaleString('fr-FR')} g</td>
                 </tr>
             `).join('');
-    }
-
-    function simulateScan() {
-        document.getElementById('foodName').value = "Aliment Scanné Test";
-        document.getElementById('calories').value = 250.5;
-        document.getElementById('protein').value = 12.3;
-        alert("Scan réussi !");
     }
 
     document.getElementById('foodForm').addEventListener('submit', async (e) => {
