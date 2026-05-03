@@ -397,18 +397,27 @@
         lookupBtn.innerHTML = 'Recherche<span class="loading-indicator"></span>';
 
         try {
-            const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
-            const data = await response.json();
+            // On passe par notre proxy backend (évite les problèmes CORS/CSP)
+            const response = await fetch(`/api/nutrition/openfoodfacts/${barcode}`, {
+                headers: { 'Authorization': `Bearer ${cleanToken}` }
+            });
 
-            if (data.status === 1 && data.product) {
-                fillFormFromOpenFoodFacts(data.product);
-            } else {
+            if (response.status === 404) {
                 alert("⚠️ Produit non trouvé dans OpenFoodFacts.\n\nTu peux remplir les infos manuellement et l'enregistrer — ça enrichira ton propre catalogue.");
                 document.getElementById('foodName').focus();
+                return;
             }
+
+            if (!response.ok) {
+                throw new Error("Erreur HTTP " + response.status);
+            }
+
+            const product = await response.json();
+            fillFormFromOpenFoodFacts(product);
+
         } catch (error) {
             console.error("Erreur OpenFoodFacts:", error);
-            alert("❌ Impossible de contacter OpenFoodFacts. Vérifie ta connexion ou remplis manuellement.");
+            alert("❌ Impossible de contacter le serveur. Vérifie ta connexion ou remplis manuellement.");
         } finally {
             lookupBtn.disabled = false;
             lookupBtn.textContent = originalText;
@@ -416,26 +425,22 @@
     }
 
     function fillFormFromOpenFoodFacts(product) {
-        // Les noms de champs OpenFoodFacts varient — on prend le 1er disponible
-        const name = product.product_name_fr || product.product_name || product.generic_name_fr || product.generic_name || '';
-        const brand = (product.brands || '').split(',')[0].trim();
-        const n = product.nutriments || {};
-
-        document.getElementById('foodName').value = name;
-        document.getElementById('foodBrand').value = brand;
-        document.getElementById('calories').value = n['energy-kcal_100g'] ?? '';
-        document.getElementById('protein').value = n.proteins_100g ?? '';
-        document.getElementById('carbs').value = n.carbohydrates_100g ?? '';
-        document.getElementById('fat').value = n.fat_100g ?? '';
-        document.getElementById('fiber').value = n.fiber_100g ?? '';
-        document.getElementById('salt').value = n.salt_100g ?? '';
+        // Le proxy renvoie déjà des champs propres et nommés correctement
+        document.getElementById('foodName').value = product.name || '';
+        document.getElementById('foodBrand').value = product.brand || '';
+        document.getElementById('calories').value = product.calories100g ?? '';
+        document.getElementById('protein').value = product.proteins100g ?? '';
+        document.getElementById('carbs').value = product.carbs100g ?? '';
+        document.getElementById('fat').value = product.fats100g ?? '';
+        document.getElementById('fiber').value = product.fiber100g ?? '';
+        document.getElementById('salt').value = product.salt100g ?? '';
 
         // Feedback visuel temporaire
         const banner = document.getElementById('infoBanner');
         const original = banner.innerHTML;
         const originalClass = banner.className;
         banner.className = 'info-banner success';
-        banner.innerHTML = `✅ Produit trouvé : <strong>${name || 'sans nom'}</strong>${brand ? ' — ' + brand : ''}. Vérifie les valeurs et clique "Enregistrer".`;
+        banner.innerHTML = `✅ Produit trouvé : <strong>${product.name || 'sans nom'}</strong>${product.brand ? ' — ' + product.brand : ''}. Vérifie les valeurs et clique "Enregistrer".`;
 
         setTimeout(() => {
             banner.className = originalClass;

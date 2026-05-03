@@ -17,6 +17,7 @@ const authRoutes = require('./modules/auth/auth.routes');
 const notificationRoutes = require('./modules/notification/notification.routes');
 const nutritionRoutes = require('./modules/nutrition/nutrition.routes');
 const activityRoutes = require('./modules/activity/activity.routes')
+const openfoodfactsRoutes = require('./modules/nutrition/openfoodfacts.routes')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -90,6 +91,7 @@ app.use('/api/deletedusers', deleteduserRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/notifications', notificationRoutes);
 app.use('/api/nutrition', nutritionRoutes);
+app.use('/api/nutrition', openfoodfactsRoutes);
 app.use('/trackcalorilog', authRoutes);
 app.use('/api/activity', activityRoutes)
 
