@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalogue Aliments - TrackCaloriLog</title>
-    <!-- Lib de scan de code-barres : https://github.com/mebjas/html5-qrcode -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <style>
         :root {
@@ -43,7 +42,7 @@
         header nav a:hover { color: white; }
 
         /* ============ MAIN ============ */
-        main { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
+        main { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
         .card {
             background: white; border-radius: 12px; padding: 1.5rem;
             margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
@@ -97,22 +96,14 @@
         }
         #scannerContainer.active { display: block; }
         #reader { width: 100%; min-height: 250px; }
-        #reader video {
-            border-radius: 12px;
-            width: 100% !important;
-        }
+        #reader video { border-radius: 12px; width: 100% !important; }
         .scanner-controls {
-            display: flex;
-            justify-content: center;
-            padding: 0.75rem;
-            background: #1a202c;
+            display: flex; justify-content: center;
+            padding: 0.75rem; background: #1a202c;
         }
         .scanner-status {
-            text-align: center;
-            padding: 0.5rem;
-            font-size: 0.9rem;
-            color: #a0aec0;
-            background: #1a202c;
+            text-align: center; padding: 0.5rem;
+            font-size: 0.9rem; color: #a0aec0; background: #1a202c;
         }
         .scanner-status.error { color: #fc8181; }
         .scanner-status.success { color: #68d391; }
@@ -144,19 +135,61 @@
             color: #22543d;
         }
 
+        /* ============ FILTRES ============ */
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .filter-bar input {
+            flex: 1 1 200px;
+        }
+        .filter-bar select {
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            min-height: 44px;
+            background: white;
+            cursor: pointer;
+        }
+
+        /* ============ BADGES SOURCE ============ */
+        .source-badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .source-badge.ciqual { background: #c6f6d5; color: #22543d; }
+        .source-badge.openfoodfacts { background: #fed7d7; color: #742a2a; }
+        .source-badge.user { background: #e2e8f0; color: #2d3748; }
+
         /* ============ TABLE ============ */
         .table-wrapper {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             margin-top: 1rem;
         }
-        table { width: 100%; border-collapse: collapse; min-width: 500px; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
         th {
-            background: #f8fafc; text-align: left; padding: 1rem;
-            border-bottom: 2px solid #edf2f7; font-size: 0.8rem;
+            background: #f8fafc; text-align: left; padding: 0.85rem;
+            border-bottom: 2px solid #edf2f7; font-size: 0.75rem;
             text-transform: uppercase; color: #718096; white-space: nowrap;
         }
-        td { padding: 1rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem; }
+        td { padding: 0.85rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem; }
+
+        /* Sel et potassium - couleurs sémantiques */
+        .val-salt { color: #c05621; font-weight: 600; }
+        .val-potassium { color: #2b6cb0; font-weight: 600; }
+        .val-empty { color: #cbd5e0; font-style: italic; font-size: 0.85rem; }
 
         /* ============ MOBILE ============ */
         @media (max-width: 600px) {
@@ -232,7 +265,6 @@
             </div>
         </div>
 
-        <!-- Container du scanner caméra -->
         <div id="scannerContainer">
             <div id="reader"></div>
             <div class="scanner-status" id="scannerStatus">Initialisation de la caméra…</div>
@@ -248,21 +280,42 @@
             </div>
             <div class="grid-inputs">
                 <div class="field"><label>Cal/100g</label><input type="number" id="calories" step="any" inputmode="decimal" required></div>
-                <div class="field"><label>Prot/100g</label><input type="number" id="protein" step="any" inputmode="decimal"></div>
-                <div class="field"><label>Gluc/100g</label><input type="number" id="carbs" step="any" inputmode="decimal"></div>
-                <div class="field"><label>Lip/100g</label><input type="number" id="fat" step="any" inputmode="decimal"></div>
-                <div class="field"><label>Fibres/100g</label><input type="number" id="fiber" step="any" inputmode="decimal"></div>
-                <div class="field"><label>Sel/100g</label><input type="number" id="salt" step="any" inputmode="decimal"></div>
+                <div class="field"><label>Prot/100g (g)</label><input type="number" id="protein" step="any" inputmode="decimal"></div>
+                <div class="field"><label>Gluc/100g (g)</label><input type="number" id="carbs" step="any" inputmode="decimal"></div>
+                <div class="field"><label>Lip/100g (g)</label><input type="number" id="fat" step="any" inputmode="decimal"></div>
+                <div class="field"><label>Fibres/100g (g)</label><input type="number" id="fiber" step="any" inputmode="decimal"></div>
+                <div class="field"><label>🧂 Sel/100g (g)</label><input type="number" id="salt" step="any" inputmode="decimal"></div>
+                <div class="field"><label>⚡ Potassium/100g (mg)</label><input type="number" id="potassium" step="any" inputmode="decimal"></div>
             </div>
             <button type="submit" class="btn-primary submit-btn">Enregistrer l'aliment</button>
         </form>
     </section>
 
     <section class="card">
-        <h2>📋 Aliments enregistrés</h2>
+        <h2>📋 Aliments enregistrés <span id="catalogCount" style="font-weight:normal; color:#718096; font-size:0.9rem;"></span></h2>
+
+        <div class="filter-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Rechercher un aliment…">
+            <select id="sourceFilter">
+                <option value="all">Toutes sources</option>
+                <option value="ciqual">🇫🇷 Ciqual (ANSES)</option>
+                <option value="openfoodfacts">📦 OpenFoodFacts</option>
+                <option value="user">✏️ Mes saisies</option>
+            </select>
+        </div>
+
         <div class="table-wrapper">
             <table>
-                <thead><tr><th>Nom</th><th>Marque</th><th>Calories</th><th>Proteines</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Marque</th>
+                        <th>Calories</th>
+                        <th>Prot</th>
+                        <th>🧂 Sel</th>
+                        <th>⚡ Potassium</th>
+                    </tr>
+                </thead>
                 <tbody id="catalogTableBody"></tbody>
             </table>
         </div>
@@ -273,6 +326,8 @@
     const rawToken = localStorage.getItem('token');
     if (!rawToken) window.location.href = '/trackcalorilog/login';
     const cleanToken = rawToken.replace('Bearer ', '').replace(/"/g, '').trim();
+
+    let FULL_CATALOG = []; // Cache local pour le filtrage côté client
 
     document.querySelectorAll('nav a').forEach(link => {
         if (link.id === 'logoutBtn') return;
@@ -291,7 +346,7 @@
     });
 
     /* ===========================================================
-       SCANNER DE CODE-BARRES (html5-qrcode)
+       SCANNER
        =========================================================== */
     let html5QrCode = null;
     const scannerContainer = document.getElementById('scannerContainer');
@@ -303,24 +358,21 @@
     closeScanBtn.addEventListener('click', stopScanner);
 
     async function startScanner() {
-        // La caméra ne fonctionne qu'en HTTPS (sauf sur localhost)
         if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
             alert("⚠️ Le scan caméra nécessite HTTPS. Tu peux saisir le code manuellement et cliquer 'Chercher'.");
             return;
         }
-
         scannerContainer.classList.add('active');
         scannerStatus.className = 'scanner-status';
         scannerStatus.textContent = 'Démarrage de la caméra…';
 
         try {
             html5QrCode = new Html5Qrcode("reader");
-
             const config = {
                 fps: 10,
-                qrbox: { width: 250, height: 150 }, // codes-barres = horizontaux
+                qrbox: { width: 250, height: 150 },
                 formatsToSupport: [
-                    Html5QrcodeSupportedFormats.EAN_13, // standard alimentaire européen
+                    Html5QrcodeSupportedFormats.EAN_13,
                     Html5QrcodeSupportedFormats.EAN_8,
                     Html5QrcodeSupportedFormats.UPC_A,
                     Html5QrcodeSupportedFormats.UPC_E,
@@ -328,23 +380,15 @@
                 ],
                 aspectRatio: 1.5
             };
-
-            await html5QrCode.start(
-                { facingMode: "environment" }, // caméra arrière
-                config,
-                onScanSuccess,
-                onScanFailure
-            );
-
+            await html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure);
             scannerStatus.textContent = '🎯 Pointe vers un code-barres…';
         } catch (err) {
             console.error("Erreur démarrage caméra:", err);
             scannerStatus.className = 'scanner-status error';
-
             if (err.name === 'NotAllowedError' || String(err).includes('Permission')) {
-                scannerStatus.textContent = '❌ Accès caméra refusé. Autorise-le dans les paramètres du navigateur.';
+                scannerStatus.textContent = '❌ Accès caméra refusé.';
             } else if (err.name === 'NotFoundError') {
-                scannerStatus.textContent = '❌ Aucune caméra détectée sur cet appareil.';
+                scannerStatus.textContent = '❌ Aucune caméra détectée.';
             } else {
                 scannerStatus.textContent = '❌ Erreur : ' + (err.message || err);
             }
@@ -353,36 +397,25 @@
 
     async function stopScanner() {
         if (html5QrCode) {
-            try {
-                await html5QrCode.stop();
-                html5QrCode.clear();
-            } catch (e) { /* déjà arrêté */ }
+            try { await html5QrCode.stop(); html5QrCode.clear(); } catch (e) {}
             html5QrCode = null;
         }
         scannerContainer.classList.remove('active');
     }
 
-    async function onScanSuccess(decodedText, decodedResult) {
+    async function onScanSuccess(decodedText) {
         scannerStatus.className = 'scanner-status success';
         scannerStatus.textContent = '✅ Code détecté : ' + decodedText;
-
-        // Vibration de feedback sur mobile (si supportée)
         if (navigator.vibrate) navigator.vibrate(150);
-
         document.getElementById('barcodeInput').value = decodedText;
         await stopScanner();
-
-        // Recherche auto du produit
         await lookupProduct(decodedText);
     }
 
-    function onScanFailure(error) {
-        // Appelé en continu quand aucun code n'est trouvé — on ignore
-    }
+    function onScanFailure() { /* ignoré */ }
 
     /* ===========================================================
-       RECHERCHE OPENFOODFACTS
-       Doc API : https://openfoodfacts.github.io/openfoodfacts-server/api/
+       OPENFOODFACTS (via proxy)
        =========================================================== */
     const lookupBtn = document.getElementById('lookupBtn');
     lookupBtn.addEventListener('click', () => {
@@ -397,27 +430,22 @@
         lookupBtn.innerHTML = 'Recherche<span class="loading-indicator"></span>';
 
         try {
-            // On passe par notre proxy backend (évite les problèmes CORS/CSP)
             const response = await fetch(`/api/nutrition/openfoodfacts/${barcode}`, {
                 headers: { 'Authorization': `Bearer ${cleanToken}` }
             });
 
             if (response.status === 404) {
-                alert("⚠️ Produit non trouvé dans OpenFoodFacts.\n\nTu peux remplir les infos manuellement et l'enregistrer — ça enrichira ton propre catalogue.");
+                alert("⚠️ Produit non trouvé dans OpenFoodFacts.\n\nTu peux remplir les infos manuellement et l'enregistrer.");
                 document.getElementById('foodName').focus();
                 return;
             }
-
-            if (!response.ok) {
-                throw new Error("Erreur HTTP " + response.status);
-            }
+            if (!response.ok) throw new Error("Erreur HTTP " + response.status);
 
             const product = await response.json();
             fillFormFromOpenFoodFacts(product);
-
         } catch (error) {
             console.error("Erreur OpenFoodFacts:", error);
-            alert("❌ Impossible de contacter le serveur. Vérifie ta connexion ou remplis manuellement.");
+            alert("❌ Impossible de contacter le serveur.");
         } finally {
             lookupBtn.disabled = false;
             lookupBtn.textContent = originalText;
@@ -425,7 +453,6 @@
     }
 
     function fillFormFromOpenFoodFacts(product) {
-        // Le proxy renvoie déjà des champs propres et nommés correctement
         document.getElementById('foodName').value = product.name || '';
         document.getElementById('foodBrand').value = product.brand || '';
         document.getElementById('calories').value = product.calories100g ?? '';
@@ -434,18 +461,21 @@
         document.getElementById('fat').value = product.fats100g ?? '';
         document.getElementById('fiber').value = product.fiber100g ?? '';
         document.getElementById('salt').value = product.salt100g ?? '';
+        document.getElementById('potassium').value = product.potassium100g ?? '';
 
-        // Feedback visuel temporaire
         const banner = document.getElementById('infoBanner');
         const original = banner.innerHTML;
         const originalClass = banner.className;
         banner.className = 'info-banner success';
-        banner.innerHTML = `✅ Produit trouvé : <strong>${product.name || 'sans nom'}</strong>${product.brand ? ' — ' + product.brand : ''}. Vérifie les valeurs et clique "Enregistrer".`;
+        const kInfo = product.potassium100g != null
+            ? ` (Potassium : ${product.potassium100g} mg/100g ✅)`
+            : ' (Potassium non renseigné chez OFF ⚠️)';
+        banner.innerHTML = `✅ Produit trouvé : <strong>${product.name || 'sans nom'}</strong>${product.brand ? ' — ' + product.brand : ''}${kInfo}. Vérifie et clique "Enregistrer".`;
 
         setTimeout(() => {
             banner.className = originalClass;
             banner.innerHTML = original;
-        }, 5000);
+        }, 6000);
     }
 
     /* ===========================================================
@@ -457,24 +487,75 @@
                 headers: { 'Authorization': `Bearer ${cleanToken}` }
             });
             const data = await response.json();
-            if (Array.isArray(data)) renderCatalog(data);
+            if (Array.isArray(data)) {
+                FULL_CATALOG = data;
+                applyFilters();
+            }
         } catch (error) { console.error("Erreur chargement:", error); }
+    }
+
+    // Filtrage côté client (rapide, pas besoin de re-fetch)
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('sourceFilter').addEventListener('change', applyFilters);
+
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value.toLowerCase().trim();
+        const sourceFilter = document.getElementById('sourceFilter').value;
+
+        let filtered = FULL_CATALOG;
+
+        if (sourceFilter !== 'all') {
+            filtered = filtered.filter(f => (f.source || 'user') === sourceFilter);
+        }
+
+        if (search) {
+            filtered = filtered.filter(f =>
+                (f.name || '').toLowerCase().includes(search) ||
+                (f.brand || '').toLowerCase().includes(search)
+            );
+        }
+
+        renderCatalog(filtered);
+    }
+
+    function formatVal(val, unit, className) {
+        if (val == null || val === 0) {
+            return `<span class="val-empty">—</span>`;
+        }
+        const formatted = Number(val).toLocaleString('fr-FR');
+        return `<span class="${className}">${formatted} ${unit}</span>`;
+    }
+
+    function sourceBadge(source) {
+        const s = source || 'user';
+        const labels = { ciqual: 'Ciqual', openfoodfacts: 'OFF', user: 'Perso' };
+        return `<span class="source-badge ${s}">${labels[s] || s}</span>`;
     }
 
     function renderCatalog(catalog) {
         const body = document.getElementById('catalogTableBody');
-        body.innerHTML = catalog.length === 0
-            ? '<tr><td colspan="4" style="text-align:center">Aucun aliment</td></tr>'
-            : catalog.map(f => `
-                <tr>
-                    <td data-label="Nom">${f.name}</td>
-                    <td data-label="Marque">${f.brand || '-'}</td>
-                    <td data-label="Calories">${Number(f.calories100g).toLocaleString('fr-FR')} kcal</td>
-                    <td data-label="Protéines">${Number(f.proteins100g).toLocaleString('fr-FR')} g</td>
-                </tr>
-            `).join('');
+        document.getElementById('catalogCount').textContent = `(${catalog.length} aliment${catalog.length > 1 ? 's' : ''})`;
+
+        if (catalog.length === 0) {
+            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem; color:#a0aec0;">Aucun aliment</td></tr>';
+            return;
+        }
+
+        body.innerHTML = catalog.map(f => `
+            <tr>
+                <td data-label="Nom">${f.name}${sourceBadge(f.source)}</td>
+                <td data-label="Marque">${f.brand || '-'}</td>
+                <td data-label="Calories">${Number(f.calories100g || 0).toLocaleString('fr-FR')} kcal</td>
+                <td data-label="Protéines">${Number(f.proteins100g || 0).toLocaleString('fr-FR')} g</td>
+                <td data-label="Sel">${formatVal(f.salt100g, 'g', 'val-salt')}</td>
+                <td data-label="Potassium">${formatVal(f.potassium100g, 'mg', 'val-potassium')}</td>
+            </tr>
+        `).join('');
     }
 
+    /* ===========================================================
+       SOUMISSION
+       =========================================================== */
     document.getElementById('foodForm').addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -488,7 +569,9 @@
             carbs100g: parseFloat(document.getElementById('carbs').value) || 0,
             fats100g: parseFloat(document.getElementById('fat').value) || 0,
             fiber100g: parseFloat(document.getElementById('fiber').value) || 0,
-            salt100g: parseFloat(document.getElementById('salt').value) || 0
+            salt100g: parseFloat(document.getElementById('salt').value) || 0,
+            potassium100g: parseFloat(document.getElementById('potassium').value) || 0,
+            source: barcodeValue ? 'openfoodfacts' : 'user' // si barcode -> probablement OFF
         };
 
         if (barcodeValue !== "") {

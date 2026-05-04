@@ -1,36 +1,30 @@
 // modules/nutrition/openfoodfacts.routes.js
 // Proxy vers l'API OpenFoodFacts pour éviter les problèmes CORS/CSP/réseau côté client.
+// Récupère également le potassium (champ disponible sur ~30-40% des produits OFF).
 
 const express = require('express');
 const router = express.Router();
 
-// Petit cache mémoire pour éviter de re-taper l'API pour le même produit
-// (durée 1h - les données nutritionnelles ne bougent pas)
 const cache = new Map();
-const CACHE_TTL = 60 * 60 * 1000; // 1h en ms
+const CACHE_TTL = 60 * 60 * 1000; // 1h
 
 router.get('/openfoodfacts/:barcode', async (req, res) => {
     const { barcode } = req.params;
 
-    // Validation basique : un code-barres c'est 8 à 14 chiffres
     if (!/^\d{8,14}$/.test(barcode)) {
         return res.status(400).json({ error: "Code-barres invalide" });
     }
 
-    // Check cache
     const cached = cache.get(barcode);
     if (cached && (Date.now() - cached.timestamp < CACHE_TTL)) {
         return res.json(cached.data);
     }
 
     try {
-        // Node.js 18+ a fetch() natif. Si tu es sur une version plus ancienne,
-        // installe node-fetch : npm install node-fetch
         const response = await fetch(
             `https://world.openfoodfacts.org/api/v2/product/${barcode}.json`,
             {
                 headers: {
-                    // OpenFoodFacts demande qu'on s'identifie avec un User-Agent
                     'User-Agent': 'TrackCaloriLog - https://trackcalorilog.onrender.com'
                 }
             }
@@ -45,15 +39,18 @@ router.get('/openfoodfacts/:barcode', async (req, res) => {
 
         const data = await response.json();
 
-        // Si produit non trouvé, on renvoie un 404 propre
         if (data.status !== 1 || !data.product) {
             return res.status(404).json({ error: "Produit non trouvé" });
         }
 
-        // On extrait uniquement ce dont le frontend a besoin
-        // (réduit la taille de la réponse - OFF renvoie des MÉGAS de données)
         const p = data.product;
         const n = p.nutriments || {};
+
+        // OpenFoodFacts donne le potassium en GRAMMES dans potassium_100g
+        // On le convertit en MILLIGRAMMES pour cohérence avec les conventions nutritionnelles
+        // (les emballages affichent toujours le K en mg)
+        const potassiumGrams = n.potassium_100g;
+        const potassiumMg = potassiumGrams != null ? Math.round(potassiumGrams * 1000) : null;
 
         const cleaned = {
             barcode,
@@ -65,10 +62,10 @@ router.get('/openfoodfacts/:barcode', async (req, res) => {
             fats100g: n.fat_100g ?? null,
             fiber100g: n.fiber_100g ?? null,
             salt100g: n.salt_100g ?? null,
+            potassium100g: potassiumMg, // ← AJOUT (mg/100g)
             imageUrl: p.image_front_small_url || null
         };
 
-        // On met en cache
         cache.set(barcode, { data: cleaned, timestamp: Date.now() });
 
         res.json(cleaned);

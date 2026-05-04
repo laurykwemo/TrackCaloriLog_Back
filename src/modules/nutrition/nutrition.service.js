@@ -3,7 +3,7 @@ const { Food, Meal } = require('./nutrition.model');
 const nutritionService = {
     // --- FOOD LOGIC ---
     getAllFoods: async () => await Food.find().sort({ name: 1 }),
-    
+
     getFoodById: async (id) => await Food.findById(id),
 
     getOrCreateFood: async (foodData) => {
@@ -30,45 +30,61 @@ const nutritionService = {
     },
 
     // --- MEAL LOGIC ---
-    
-    // On centralise le calcul ici pour l'utiliser partout
+
+    /**
+     * Centralise le calcul des totaux d'un repas.
+     * On reçoit les `items` avec leurs valeurs DÉJÀ calculées selon la quantité
+     * (le frontend a fait calories100g * quantity / 100 par exemple).
+     *
+     * NOTE: salt est en GRAMMES, potassium en MILLIGRAMMES.
+     * Pour le ratio Na/K, on convertira côté frontend.
+     */
     calculateTotals: (items) => {
-        let totals = { calories: 0, proteins: 0, carbs: 0, fats: 0, fiber: 0, salt: 0 };
+        let totals = {
+            calories: 0, proteins: 0, carbs: 0, fats: 0,
+            fiber: 0, salt: 0, potassium: 0
+        };
+
         const updatedItems = items.map(item => {
-            //const qtyRatio = item.quantity / 100;
             const calculated = {
-                // On s'assure d'utiliser les valeurs 100g fournies par le front ou la DB
-                calories: Math.round((item.calories || 0)),
+                calories: Math.round(item.calories || 0),
                 proteins: Number((item.proteins || 0).toFixed(1)),
                 carbs: Number((item.carbs || 0).toFixed(1)),
                 fats: Number((item.fats || 0).toFixed(1)),
                 fiber: Number((item.fiber || 0).toFixed(1)),
-                salt: Number((item.salt || 0).toFixed(1))
+                salt: Number((item.salt || 0).toFixed(2)),       // 2 décimales (g, valeurs faibles)
+                potassium: Math.round(item.potassium || 0)        // mg, entier suffisant
             };
+
             Object.keys(totals).forEach(key => totals[key] += calculated[key]);
-            
-            // On retourne l'item avec ses macros calculées pour le sous-document 'items'
-            return { 
+
+            return {
                 foodId: item.foodId,
                 name: item.name,
                 quantity: item.quantity,
-                ...calculated 
+                ...calculated
             };
         });
-        
-        // On arrondit les totaux finaux
-        Object.keys(totals).forEach(key => totals[key] = Number(totals[key].toFixed(1)));
-        
+
+        // Arrondi final
+        totals.calories = Math.round(totals.calories);
+        totals.proteins = Number(totals.proteins.toFixed(1));
+        totals.carbs = Number(totals.carbs.toFixed(1));
+        totals.fats = Number(totals.fats.toFixed(1));
+        totals.fiber = Number(totals.fiber.toFixed(1));
+        totals.salt = Number(totals.salt.toFixed(2));
+        totals.potassium = Math.round(totals.potassium);
+
         return { items: updatedItems, totals };
     },
 
     createMeal: async (userId, mealData) => {
         const { items, totals } = nutritionService.calculateTotals(mealData.items);
-        
-        return await Meal.create({ 
-            ...mealData, 
-            userId, 
-            items, 
+
+        return await Meal.create({
+            ...mealData,
+            userId,
+            items,
             totals,
         });
     },
@@ -90,23 +106,16 @@ const nutritionService = {
         return await Meal.find({ userId }).sort({ date: -1 });
     },
 
-    // nutrition.service.js
-
     getUserMealsByDate: async (userId, date) => {
         const start = new Date(date);
         start.setHours(0, 0, 0, 0);
-        
+
         const end = new Date(date);
         end.setHours(23, 59, 59, 999);
 
-        console.log(`Recherche repas entre ${start.toISOString()} et ${end.toISOString()}`);
-
         return await Meal.find({
             userId,
-            date: { 
-                $gte: start, 
-                $lte: end 
-            }
+            date: { $gte: start, $lte: end }
         }).sort({ date: 1 });
     },
 
@@ -114,7 +123,6 @@ const nutritionService = {
         return await Food.find({ isFavorite: true }).sort({ name: 1 });
     },
 
-    // Inverser l'état favori d'un aliment
     toggleFoodFavorite: async (id) => {
         const food = await Food.findById(id);
         if (!food) return null;
@@ -123,15 +131,12 @@ const nutritionService = {
     },
 
     getRecentFoods: async (userId) => {
-        // 1. Récupérer les 5 derniers repas de l'utilisateur
         const lastMeals = await Meal.find({ userId })
             .sort({ date: -1 })
             .limit(5);
 
-        // 2. Extraire tous les items de ces repas
         const allItems = lastMeals.flatMap(meal => meal.items);
 
-        // 3. Garder uniquement les aliments uniques par leur nom (ou foodId)
         const uniqueFoods = [];
         const seen = new Set();
 
@@ -140,12 +145,13 @@ const nutritionService = {
                 seen.add(item.name);
                 uniqueFoods.push({
                     name: item.name,
-                    calories100g: item.calories, // On réutilise les macros stockées
+                    calories100g: item.calories,
                     proteins100g: item.proteins,
                     carbs100g: item.carbs,
                     fats100g: item.fats,
                     fiber100g: item.fiber,
-                    salt100g: item.salt
+                    salt100g: item.salt,
+                    potassium100g: item.potassium // ← AJOUT
                 });
             }
         }
