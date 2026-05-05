@@ -21,17 +21,19 @@
             --gray-300: #e2e8f0;
             --gray-400: #a0aec0;
             --gray-500: #718096;
+            --salt-color: #c05621;
+            --k-color: #2b6cb0;
             --shadow: 0 4px 6px rgba(0,0,0,0.05);
             --transition: all 0.3s ease;
         }
 
         * { box-sizing: border-box; }
 
-        body { 
-            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif; 
-            background: var(--bg); 
-            margin: 0; 
-            color: var(--dark); 
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--dark);
             overflow-x: hidden;
             line-height: 1.5;
         }
@@ -39,168 +41,186 @@
         body.modal-open { overflow: hidden; }
 
         /* --- HEADER --- */
-        header { 
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); 
-            color: white; 
-            padding: 1rem 2rem; 
-            display: flex; 
-            justify-content: space-between; 
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         /* --- LAYOUT --- */
-        main { 
-            max-width: 1200px; 
-            margin: 2rem auto; 
-            padding: 0 1.5rem; 
-        }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
+        .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
 
-        .dashboard-grid { 
-            display: grid; 
-            grid-template-columns: 2fr 1fr; 
-            gap: 1.5rem; 
-        }
-
-        .card { 
-            background: var(--white); 
-            border-radius: 16px; 
-            padding: 1.5rem; 
-            box-shadow: var(--shadow); 
-            margin-bottom: 1.5rem; 
+        .card {
+            background: var(--white); border-radius: 16px; padding: 1.5rem;
+            box-shadow: var(--shadow); margin-bottom: 1.5rem;
             border: 1px solid var(--gray-200);
         }
 
         /* --- NAVIGATION & BOUTONS --- */
         .period-selector {
-            display: inline-flex; 
-            gap: 5px; 
-            margin-bottom: 2rem; 
-            background: var(--gray-200); 
-            padding: 5px; 
-            border-radius: 12px; 
+            display: inline-flex; gap: 5px; margin-bottom: 2rem;
+            background: var(--gray-200); padding: 5px; border-radius: 12px;
         }
-
         .period-btn {
-            border: none; 
-            padding: 0.6rem 1.2rem; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 600; 
-            transition: var(--transition);
-            background: transparent;
-            color: var(--gray-500);
+            border: none; padding: 0.6rem 1.2rem; border-radius: 8px;
+            cursor: pointer; font-weight: 600; transition: var(--transition);
+            background: transparent; color: var(--gray-500);
         }
-
-        .period-btn.active { 
-            background: var(--white); 
-            color: var(--primary); 
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+        .period-btn.active {
+            background: var(--white); color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         /* --- STATISTIQUES --- */
-        .stats-row { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 1rem; 
-            margin-bottom: 1.5rem; 
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
-
-        .stat-item { 
-            text-align: center; 
-            border-right: 1px solid var(--gray-200); 
-            padding: 0 10px; 
+        .stat-item {
+            text-align: center;
+            border-right: 1px solid var(--gray-200);
+            padding: 0 10px;
         }
-        
         .stat-item:last-child { border: none; }
         .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--primary); }
         .stat-label { font-size: 0.7rem; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
 
+        /* ============ INDICATEUR NA/K ============ */
+        .nak-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+            border: 2px solid var(--gray-200);
+            transition: var(--transition);
+        }
+        .nak-card.good { border-color: var(--success); background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); }
+        .nak-card.medium { border-color: var(--warning); background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%); }
+        .nak-card.bad { border-color: var(--danger); background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); }
+
+        .nak-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .nak-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+        .nak-emoji {
+            font-size: 2rem;
+            line-height: 1;
+        }
+        .nak-ratio {
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin: 0.5rem 0;
+        }
+        .nak-card.good .nak-ratio { color: var(--success); }
+        .nak-card.medium .nak-ratio { color: var(--warning); }
+        .nak-card.bad .nak-ratio { color: var(--danger); }
+        .nak-card.unknown .nak-ratio { color: var(--gray-400); }
+
+        .nak-verdict {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        .nak-card.good .nak-verdict { color: #22543d; }
+        .nak-card.medium .nak-verdict { color: #7b341e; }
+        .nak-card.bad .nak-verdict { color: #742a2a; }
+
+        .nak-details {
+            display: flex;
+            justify-content: space-around;
+            padding: 0.75rem;
+            background: rgba(255,255,255,0.6);
+            border-radius: 10px;
+            margin-top: 0.75rem;
+        }
+        .nak-detail-item {
+            text-align: center;
+        }
+        .nak-detail-label {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .nak-detail-value {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .nak-detail-value.salt { color: var(--salt-color); }
+        .nak-detail-value.potassium { color: var(--k-color); }
+
+        .nak-reliability {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-top: 0.75rem;
+            text-align: center;
+            font-style: italic;
+        }
+        .nak-reliability.warn { color: var(--warning); font-style: normal; font-weight: 600; }
+
         /* --- HISTORIQUE --- */
-        .group-header { 
-            background: var(--gray-100); 
-            padding: 1rem; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            color: var(--primary); 
+        .group-header {
+            background: var(--gray-100); padding: 1rem; border-radius: 10px;
+            font-weight: bold; color: var(--primary);
             margin: 1.5rem 0 0.5rem 0;
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
+            display: flex; justify-content: space-between; align-items: center;
             border-left: 4px solid var(--primary);
         }
-
-        .group-totals { font-size: 0.85rem; display: flex; gap: 8px; }
-        .group-totals span { padding: 4px 10px; background: var(--white); border-radius: 6px; box-shadow: 2px 2px 5px rgba(0,0,0,0.02); }
-
-        .meal-item { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            padding: 1rem; 
-            border-bottom: 1px solid var(--gray-200); 
-            cursor: pointer;
-            transition: var(--transition);
-            border-radius: 8px;
+        .group-totals { font-size: 0.85rem; display: flex; gap: 8px; flex-wrap: wrap; }
+        .group-totals span {
+            padding: 4px 10px; background: var(--white);
+            border-radius: 6px; box-shadow: 2px 2px 5px rgba(0,0,0,0.02);
         }
 
+        .meal-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; border-bottom: 1px solid var(--gray-200);
+            cursor: pointer; transition: var(--transition); border-radius: 8px;
+        }
         .meal-item:hover { background-color: #f0f4ff; transform: translateX(5px); }
         .meal-info strong { font-size: 1rem; color: var(--dark); }
         .meal-info span { font-size: 0.8rem; color: var(--gray-400); }
 
         /* --- MODALE --- */
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 2000;
+            display: none; position: fixed; z-index: 2000;
             left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
+            background-color: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
         }
-
         .modal-content {
-            background-color: var(--white);
-            margin: 2rem auto;
-            padding: 24px;
-            border-radius: 24px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 85vh;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--white); margin: 2rem auto;
+            padding: 24px; border-radius: 24px;
+            width: 90%; max-width: 500px; max-height: 85vh;
+            display: flex; flex-direction: column;
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             animation: slideUp 0.3s ease-out;
         }
-
-        /* Style pour l'entête de la modale et la croix */
         .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 10px;
             border-bottom: 1px solid var(--gray-200);
         }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.25rem;
-            color: var(--dark);
-        }
-
+        .modal-header h3 { margin: 0; font-size: 1.25rem; color: var(--dark); }
         .close-modal {
-            color: var(--gray-400);
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: var(--transition);
-            line-height: 1;
+            color: var(--gray-400); font-size: 28px; font-weight: bold;
+            cursor: pointer; transition: var(--transition); line-height: 1;
         }
-
-        .close-modal:hover {
-            color: var(--danger);
-        }
-
+        .close-modal:hover { color: var(--danger); }
         @keyframes slideUp {
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -208,64 +228,52 @@
 
         #modalBody { flex: 1; overflow-y: auto; padding-right: 8px; }
 
-        /* --- DETAILS ALIMENTS --- */
         .food-detail-item {
-            padding: 12px 0;
-            border-bottom: 1px solid var(--gray-200);
+            padding: 12px 0; border-bottom: 1px solid var(--gray-200);
         }
-
         .food-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+            display: flex; justify-content: space-between;
+            align-items: flex-start; margin-bottom: 8px;
         }
-
         .food-name { font-weight: 700; color: var(--dark); flex: 1; }
         .macro-badges { display: flex; flex-wrap: wrap; gap: 6px; }
         .macro-badges span {
-            background: var(--gray-100);
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            border: 1px solid var(--gray-200);
+            background: var(--gray-100); padding: 4px 8px;
+            border-radius: 6px; font-size: 0.75rem;
+            color: var(--gray-500); border: 1px solid var(--gray-200);
         }
 
         .total-box {
-            background: var(--gray-100);
-            padding: 1.2rem;
-            border-radius: 16px;
-            margin-top: 1rem;
-            display: flex;
-            justify-content: space-around;
-            font-weight: 800;
-            border: 1px solid var(--gray-200);
+            background: var(--gray-100); padding: 1.2rem;
+            border-radius: 16px; margin-top: 1rem;
+            display: flex; justify-content: space-around;
+            font-weight: 800; border: 1px solid var(--gray-200);
+            flex-wrap: wrap; gap: 0.5rem;
         }
 
         /* --- RESPONSIVE --- */
-        @media (max-width: 900px) { 
-            .dashboard-grid { grid-template-columns: 1fr; } 
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
         }
-
         @media (max-width: 600px) {
             header { padding: 1rem; flex-direction: column; gap: 12px; }
             .stats-row { grid-template-columns: 1fr; gap: 0; }
-            .stat-item { 
-                border-right: none; 
-                border-bottom: 1px solid var(--gray-200); 
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid var(--gray-200);
                 padding: 12px 0;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                display: flex; justify-content: space-between; align-items: center;
             }
             .stat-item:last-child { border-bottom: none; }
             .stat-label { order: 1; }
             .stat-value { order: 2; font-size: 1.1rem; }
-            
+
             .group-header { flex-direction: column; align-items: flex-start; gap: 8px; }
             .period-selector { display: flex; width: 100%; justify-content: center; }
             .period-btn { flex: 1; padding: 0.5rem; font-size: 0.85rem; }
+
+            .nak-ratio { font-size: 2rem; }
+            .nak-details { flex-direction: column; gap: 0.5rem; }
         }
     </style>
 </head>
@@ -317,6 +325,29 @@
             </section>
         </div>
         <div class="right-col">
+            <!-- ============ NOUVELLE CARTE : INDICATEUR Na/K ============ -->
+            <section class="card nak-card unknown" id="nakCard">
+                <div class="nak-header">
+                    <h3 class="nak-title">⚖️ Équilibre Sodium / Potassium</h3>
+                    <span class="nak-emoji" id="nakEmoji">⚪</span>
+                </div>
+                <div class="nak-ratio" id="nakRatio">—</div>
+                <div class="nak-verdict" id="nakVerdict">Pas encore de données</div>
+
+                <div class="nak-details">
+                    <div class="nak-detail-item">
+                        <div class="nak-detail-label">🧂 Sel</div>
+                        <div class="nak-detail-value salt" id="nakSalt">0 g</div>
+                    </div>
+                    <div class="nak-detail-item">
+                        <div class="nak-detail-label">⚡ Potassium</div>
+                        <div class="nak-detail-value potassium" id="nakK">0 mg</div>
+                    </div>
+                </div>
+
+                <div class="nak-reliability" id="nakReliability"></div>
+            </section>
+
             <section class="card">
                 <h3>Macros (%)</h3>
                 <canvas id="macroChart"></canvas>
@@ -331,14 +362,12 @@
             <h3 id="modalTitle">Détails du repas</h3>
             <span class="close-modal" onclick="closeModal()">&times;</span>
         </div>
-        
-        <div id="modalBody">
-            </div>
-
+        <div id="modalBody"></div>
         <div class="total-box">
             <span id="modalTotalCal" style="color:var(--primary)">0 kcal</span>
             <span id="modalTotalProt" style="color:var(--success)">0g Prot</span>
-            <span id="modalTotalSalt" style="color:var(--warning)">0g Prot</span>
+            <span id="modalTotalSalt" style="color:var(--salt-color)">0g Sel</span>
+            <span id="modalTotalK" style="color:var(--k-color)">0mg K</span>
         </div>
     </div>
 </div>
@@ -349,22 +378,24 @@
     let DAILY_CAL_GOAL = 2000;
     let DAILY_PROT_GOAL = 160;
     let USER_ID = null;
-    let ALL_MEALS_DATA = []; // Stockage global pour retrouver les détails facilement
+    let ALL_MEALS_DATA = [];
+
+    // Constantes biologiques
+    const SODIUM_FACTOR = 0.4; // 1g de sel = 0.4g de sodium (Na)
 
     function initCharts() {
         const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
         evolutionChart = new Chart(ctxEvo, {
             type: 'line',
-            data: { 
-                labels: [], 
+            data: {
+                labels: [],
                 datasets: [
                     { label: 'Calories (kcal)', borderColor: '#667eea', data: [], tension: 0.4, yAxisID: 'y', fill: false },
                     { label: 'Protéines (g)', borderColor: '#48bb78', data: [], tension: 0.4, yAxisID: 'y1', fill: false }
-                ] 
+                ]
             },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
+            options: {
+                responsive: true, maintainAspectRatio: false,
                 scales: {
                     y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Calories' } },
                     y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Protéines' } }
@@ -381,14 +412,14 @@
 
     async function loadData(view = 'day') {
         try {
-            const res = await fetch('/api/nutrition/meals/log/all', { 
-                headers: { 'Authorization': `Bearer ${cleanToken}` } 
+            const res = await fetch('/api/nutrition/meals/log/all', {
+                headers: { 'Authorization': `Bearer ${cleanToken}` }
             });
             if (!res.ok) throw new Error("Erreur serveur");
             const allMeals = await res.json();
-            
+
             if (Array.isArray(allMeals)) {
-                ALL_MEALS_DATA = allMeals; // On sauvegarde
+                ALL_MEALS_DATA = allMeals;
                 const now = new Date();
                 const filteredMeals = allMeals.filter(m => {
                     const mealDate = new Date(m.date);
@@ -402,22 +433,126 @@
                     if (view === 'year') return mealDate.getFullYear() === now.getFullYear();
                     return true;
                 });
-                updateUI(filteredMeals, view); 
+                updateUI(filteredMeals, view);
             }
-        } catch (e) { 
+        } catch (e) {
             console.error("Erreur", e);
             document.getElementById('historyContainer').innerHTML = "Erreur de chargement.";
+        }
+    }
+
+    /* ===========================================================
+       INDICATEUR NA/K (Option B avec fiabilité)
+       ===========================================================
+       Stratégie : on calcule UNIQUEMENT sur les aliments qui ont
+       les 2 valeurs (sel ET potassium) renseignées.
+       Si 0% des aliments ont les données → on ne peut pas calculer.
+       =========================================================== */
+    function computeNaKIndicator(meals) {
+        let saltGrams = 0;       // total sel (g) des aliments comptabilisés
+        let potassiumMg = 0;     // total K (mg) des aliments comptabilisés
+        let itemsWithBoth = 0;   // nb items avec sel + K renseignés
+        let itemsTotal = 0;      // nb items total
+
+        meals.forEach(meal => {
+            (meal.items || []).forEach(item => {
+                itemsTotal++;
+                const hasSalt = item.salt != null && item.salt > 0;
+                const hasK = item.potassium != null && item.potassium > 0;
+
+                // On comptabilise uniquement si les 2 valeurs sont là
+                if (hasSalt && hasK) {
+                    itemsWithBoth++;
+                    saltGrams += item.salt;
+                    potassiumMg += item.potassium;
+                }
+            });
+        });
+
+        // Conversion en grammes pour le ratio
+        const sodiumG = saltGrams * SODIUM_FACTOR;
+        const potassiumG = potassiumMg / 1000;
+
+        const reliability = itemsTotal > 0 ? itemsWithBoth / itemsTotal : 0;
+
+        return {
+            saltGrams,
+            potassiumMg,
+            sodiumG,
+            potassiumG,
+            ratio: potassiumG > 0 ? sodiumG / potassiumG : null,
+            reliability,
+            itemsWithBoth,
+            itemsTotal
+        };
+    }
+
+    function renderNaKIndicator(meals) {
+        const card = document.getElementById('nakCard');
+        const emoji = document.getElementById('nakEmoji');
+        const ratioEl = document.getElementById('nakRatio');
+        const verdict = document.getElementById('nakVerdict');
+        const saltEl = document.getElementById('nakSalt');
+        const kEl = document.getElementById('nakK');
+        const reliabilityEl = document.getElementById('nakReliability');
+
+        const data = computeNaKIndicator(meals);
+
+        // Reset des classes
+        card.classList.remove('good', 'medium', 'bad', 'unknown');
+
+        // Affichage des totaux bruts (toujours visibles)
+        saltEl.innerText = data.saltGrams.toFixed(2) + ' g';
+        kEl.innerText = Math.round(data.potassiumMg) + ' mg';
+
+        // Cas 1 : aucune donnée exploitable
+        if (data.ratio === null) {
+            card.classList.add('unknown');
+            emoji.innerText = '⚪';
+            ratioEl.innerText = '—';
+            verdict.innerText = data.itemsTotal === 0
+                ? "Pas encore de repas sur cette période"
+                : "Données insuffisantes (aucun aliment n'a sel + potassium)";
+            reliabilityEl.innerText = '';
+            return;
+        }
+
+        // Cas 2 : on a un ratio à afficher
+        const ratio = data.ratio;
+        ratioEl.innerText = ratio.toFixed(2);
+
+        if (ratio <= 1) {
+            card.classList.add('good');
+            emoji.innerText = '🟢';
+            verdict.innerText = '✅ Excellent équilibre — autant ou plus de potassium que de sodium';
+        } else if (ratio <= 2) {
+            card.classList.add('medium');
+            emoji.innerText = '🟡';
+            verdict.innerText = '⚠️ Acceptable — mais l\'OMS recommande un ratio sous 1';
+        } else {
+            card.classList.add('bad');
+            emoji.innerText = '🔴';
+            verdict.innerText = '❌ Trop de sel par rapport au potassium';
+        }
+
+        // Indicateur de fiabilité
+        const pct = Math.round(data.reliability * 100);
+        if (pct < 70) {
+            reliabilityEl.classList.add('warn');
+            reliabilityEl.innerText = `⚠️ Calculé sur ${data.itemsWithBoth}/${data.itemsTotal} aliments (${pct}% des données disponibles)`;
+        } else {
+            reliabilityEl.classList.remove('warn');
+            reliabilityEl.innerText = `Calculé sur ${data.itemsWithBoth}/${data.itemsTotal} aliments (${pct}% de fiabilité)`;
         }
     }
 
     function renderHistory(groups) {
         const container = document.getElementById('historyContainer');
         container.innerHTML = Object.keys(groups).length ? "" : "Aucun repas sur cette période.";
-        
+
         for (const [title, data] of Object.entries(groups)) {
             let calColor = data.totalCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
             let protColor = data.totalProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
-            let saltColor = 'var(--warning)'
 
             let groupHtml = `
                 <div class="history-group">
@@ -426,12 +561,12 @@
                         <div class="group-totals">
                             <span style="color:${calColor}">🔥 ${Math.round(data.totalCal)} kcal</span>
                             <span style="color:${protColor}">🥩 ${data.totalProt.toFixed(1)}g prot</span>
-                            <span style="color:${saltColor}">🧂 ${data.totalSalt.toFixed(1)}g sel</span>
+                            <span style="color:var(--salt-color)">🧂 ${data.totalSalt.toFixed(2)}g sel</span>
+                            <span style="color:var(--k-color)">⚡ ${Math.round(data.totalK)}mg K</span>
                         </div>
                     </div>`;
-            
+
             data.meals.forEach(m => {
-                // MODIFICATION : Ajout de l'événement onclick
                 groupHtml += `
                     <div class="meal-item" onclick="showMealDetails('${m._id || m.id}')">
                         <div class="meal-info">
@@ -448,8 +583,6 @@
         }
     }
 
-    // NOUVELLE FONCTION : Afficher les détails du repas
-    // MODIFICATION : Ajout du blocage de scroll (body.classList)
     function showMealDetails(mealId) {
         const meal = ALL_MEALS_DATA.find(m => (m._id || m.id) === mealId);
         if (!meal) return;
@@ -457,7 +590,8 @@
         document.getElementById('modalTitle').innerText = meal.title || "Détails du repas";
         document.getElementById('modalTotalCal').innerText = Math.round(meal.totals.calories) + " kcal";
         document.getElementById('modalTotalProt').innerText = (meal.totals.proteins || 0).toFixed(1) + "g Prot";
-        document.getElementById('modalTotalSalt').innerText = (meal.totals.salt || 0).toFixed(1) + "g Sel";
+        document.getElementById('modalTotalSalt').innerText = (meal.totals.salt || 0).toFixed(2) + "g Sel";
+        document.getElementById('modalTotalK').innerText = Math.round(meal.totals.potassium || 0) + "mg K";
 
         let bodyHtml = "";
 
@@ -476,12 +610,13 @@
                                 ${Math.round(f.calories)} kcal
                             </div>
                         </div>
-                        
+
                         <div class="macro-badges">
                             <span title="Protéines">🥩 <strong>P:</strong> ${(f.proteins || 0).toFixed(1)}g</span>
                             <span title="Glucides">🍞 <strong>G:</strong> ${(f.carbs || 0).toFixed(1)}g</span>
                             <span title="Lipides">🥑 <strong>L:</strong> ${(f.fats || 0).toFixed(1)}g</span>
-                            <span title="Sel">🧂 <strong>L:</strong> ${(f.salt || 0).toFixed(1)}g</span>
+                            <span title="Sel" style="color:var(--salt-color)">🧂 <strong>S:</strong> ${(f.salt || 0).toFixed(2)}g</span>
+                            <span title="Potassium" style="color:var(--k-color)">⚡ <strong>K:</strong> ${Math.round(f.potassium || 0)}mg</span>
                         </div>
                     </div>
                 `;
@@ -491,31 +626,25 @@
         }
 
         document.getElementById('modalBody').innerHTML = bodyHtml;
-        
-        // Affiche la modale et bloque le scroll
         document.getElementById('mealModal').style.display = "block";
         document.body.classList.add('modal-open');
     }
 
     function closeModal() {
         document.getElementById('mealModal').style.display = "none";
-        // Libère le scroll
         document.body.classList.remove('modal-open');
     }
 
-    // Mise à jour du clic extérieur pour aussi libérer le scroll
     window.onclick = function(event) {
         const modal = document.getElementById('mealModal');
-        if (event.target == modal) {
-            closeModal();
-        }
+        if (event.target == modal) closeModal();
     }
 
-    // --- Reste du code existant (groupMeals, renderCharts, etc.) ---
     function updateUI(meals, view) {
         const groups = groupMeals(meals, view);
         renderHistory(groups);
         renderCharts(meals, view);
+        renderNaKIndicator(meals); // ← NOUVEAU
     }
 
     function groupMeals(meals, view) {
@@ -524,15 +653,16 @@
             const d = new Date(m.date);
             let key;
             if (view === 'day') key = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-            else if (view === 'week') key = getWeekRange(d); 
+            else if (view === 'week') key = getWeekRange(d);
             else if (view === 'month') key = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
             else if (view === 'year') key = d.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase() + " " + d.getFullYear();
 
-            if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0, totalSalt: 0 };
+            if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0, totalSalt: 0, totalK: 0 };
             groups[key].meals.push(m);
             groups[key].totalCal += m.totals.calories;
             groups[key].totalProt += m.totals.proteins;
-            groups[key].totalSalt += m.totals.salt;
+            groups[key].totalSalt += (m.totals.salt || 0);
+            groups[key].totalK += (m.totals.potassium || 0); // ← AJOUT
         });
         return groups;
     }
@@ -570,7 +700,7 @@
         const nbJours = labels.length || 1;
         const avgCal = Math.round(labels.reduce((s, l) => s + dailyData[l].cal, 0) / nbJours);
         const avgProt = Math.round(labels.reduce((s, l) => s + dailyData[l].prot, 0) / nbJours);
-        
+
         document.getElementById('avgCal').innerText = avgCal + " kcal";
         document.getElementById('avgCal').style.color = avgCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
         document.getElementById('avgProt').innerText = avgProt + " g";
