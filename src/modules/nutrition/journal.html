@@ -442,28 +442,32 @@
     }
 
     /* ===========================================================
-       INDICATEUR NA/K (Option B avec fiabilité)
+       INDICATEUR NA/K (version honnête)
        ===========================================================
-       Stratégie : on calcule UNIQUEMENT sur les aliments qui ont
-       les 2 valeurs (sel ET potassium) renseignées.
-       Si 0% des aliments ont les données → on ne peut pas calculer.
+       Stratégie : on additionne TOUT le sel et TOUT le potassium
+       de la journée. Pour les aliments sans potassium renseigné,
+       on compte 0 mg (hypothèse pessimiste, le ratio sera donc
+       potentiellement surévalué vers le mauvais côté).
+
+       L'indicateur de fiabilité dit quel % du potassium provient
+       d'aliments avec données certaines.
        =========================================================== */
     function computeNaKIndicator(meals) {
-        let saltGrams = 0;       // total sel (g) des aliments comptabilisés
-        let potassiumMg = 0;     // total K (mg) des aliments comptabilisés
-        let itemsWithBoth = 0;   // nb items avec sel + K renseignés
-        let itemsTotal = 0;      // nb items total
+        let saltGrams = 0;          // total sel (g) - TOUS les aliments
+        let potassiumMg = 0;        // total K (mg) - aliments avec donnée
+        let itemsWithK = 0;         // nb items avec K renseigné
+        let itemsTotal = 0;         // nb items total
 
         meals.forEach(meal => {
             (meal.items || []).forEach(item => {
                 itemsTotal++;
-                const hasSalt = item.salt != null && item.salt > 0;
-                const hasK = item.potassium != null && item.potassium > 0;
+                // On additionne tout le sel, même si K manquant
+                saltGrams += (item.salt || 0);
 
-                // On comptabilise uniquement si les 2 valeurs sont là
-                if (hasSalt && hasK) {
-                    itemsWithBoth++;
-                    saltGrams += item.salt;
+                // Le potassium n'est ajouté que s'il est renseigné
+                const hasK = item.potassium != null && item.potassium > 0;
+                if (hasK) {
+                    itemsWithK++;
                     potassiumMg += item.potassium;
                 }
             });
@@ -473,7 +477,7 @@
         const sodiumG = saltGrams * SODIUM_FACTOR;
         const potassiumG = potassiumMg / 1000;
 
-        const reliability = itemsTotal > 0 ? itemsWithBoth / itemsTotal : 0;
+        const reliability = itemsTotal > 0 ? itemsWithK / itemsTotal : 0;
 
         return {
             saltGrams,
@@ -482,7 +486,7 @@
             potassiumG,
             ratio: potassiumG > 0 ? sodiumG / potassiumG : null,
             reliability,
-            itemsWithBoth,
+            itemsWithK,
             itemsTotal
         };
     }
@@ -510,9 +514,11 @@
             card.classList.add('unknown');
             emoji.innerText = '⚪';
             ratioEl.innerText = '—';
-            verdict.innerText = data.itemsTotal === 0
-                ? "Pas encore de repas sur cette période"
-                : "Données insuffisantes (aucun aliment n'a sel + potassium)";
+            if (data.itemsTotal === 0) {
+                verdict.innerText = "Pas encore de repas sur cette période";
+            } else {
+                verdict.innerText = "Aucun potassium renseigné dans tes aliments";
+            }
             reliabilityEl.innerText = '';
             return;
         }
@@ -535,14 +541,17 @@
             verdict.innerText = '❌ Trop de sel par rapport au potassium';
         }
 
-        // Indicateur de fiabilité
+        // Indicateur de fiabilité (couverture du potassium)
         const pct = Math.round(data.reliability * 100);
         if (pct < 70) {
             reliabilityEl.classList.add('warn');
-            reliabilityEl.innerText = `⚠️ Calculé sur ${data.itemsWithBoth}/${data.itemsTotal} aliments (${pct}% des données disponibles)`;
+            reliabilityEl.innerText = `⚠️ Potassium connu pour ${data.itemsWithK}/${data.itemsTotal} aliments (${pct}%). Ton ratio réel est probablement meilleur.`;
+        } else if (pct < 100) {
+            reliabilityEl.classList.remove('warn');
+            reliabilityEl.innerText = `Potassium connu pour ${data.itemsWithK}/${data.itemsTotal} aliments (${pct}%)`;
         } else {
             reliabilityEl.classList.remove('warn');
-            reliabilityEl.innerText = `Calculé sur ${data.itemsWithBoth}/${data.itemsTotal} aliments (${pct}% de fiabilité)`;
+            reliabilityEl.innerText = `✓ Données complètes (${data.itemsTotal}/${data.itemsTotal} aliments)`;
         }
     }
 
