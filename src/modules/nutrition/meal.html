@@ -9,7 +9,6 @@
             --primary: #667eea; --primary-dark: #5a67d8; --success: #48bb78;
             --danger: #f56565; --bg: #f7fafc; --dark: #2d3748;
             --gray: #718096; --light-gray: #e2e8f0;
-            --salt-color: #c05621; --k-color: #2b6cb0;
         }
 
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); margin: 0; color: var(--dark); }
@@ -30,7 +29,7 @@
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
         .field { display: flex; flex-direction: column; }
         label { font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 0.4rem; }
-
+        
         input, select, textarea { padding: 0.7rem; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.95rem; transition: 0.2s; font-family: inherit; }
 
         button { cursor: pointer; border: none; border-radius: 8px; padding: 0.7rem 1.2rem; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
@@ -44,19 +43,13 @@
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; text-align: left; padding: 1rem; border-bottom: 2px solid #edf2f7; font-size: 0.75rem; text-transform: uppercase; color: var(--gray); }
         td { padding: 1rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem; vertical-align: middle; }
-
+        
         .editable:hover { background: #fffdeb; cursor: pointer; }
 
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 0.75rem; margin-top: 1.5rem; }
-        .stat-card { background: #f0f4ff; padding: 0.85rem; border-radius: 12px; text-align: center; border: 1px solid #dce3f8; }
-        .stat-value { font-size: 1.1rem; font-weight: 800; color: var(--primary); }
-        .stat-label { font-size: 0.65rem; text-transform: uppercase; color: var(--gray); font-weight: bold; letter-spacing: 0.5px; }
-
-        /* Cards spéciales sel/potassium */
-        .stat-card.salt { background: #fffaf0; border-color: #fbd38d; }
-        .stat-card.salt .stat-value { color: var(--salt-color); }
-        .stat-card.potassium { background: #ebf8ff; border-color: #90cdf4; }
-        .stat-card.potassium .stat-value { color: var(--k-color); }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
+        .stat-card { background: #f0f4ff; padding: 1rem; border-radius: 12px; text-align: center; border: 1px solid #dce3f8; }
+        .stat-value { font-size: 1.2rem; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gray); font-weight: bold; }
 
         #searchResults {
             position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--light-gray);
@@ -66,23 +59,49 @@
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
         .modal-content { margin: 5% auto; width: 90%; max-width: 650px; position: relative; }
         .close-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--gray); }
+        /* Indicateur Nutri-Score Maison */
+        .nutri-indicator { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
+        .nutri-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
+        /* Barre de progression Calories */
         .progress-container { width: 100%; background: #edf2f7; border-radius: 10px; height: 8px; margin-top: 8px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary); transition: width 0.5s ease; }
-
+        /* --- RESPONSIVE SEARCH HEADER --- */
         .search-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 1rem; gap: 20px;
-        }
-        .search-title-group {
-            display: flex; align-items: center; gap: 15px; flex-grow: 1;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 1rem; 
+            gap: 20px;
         }
 
+        .search-title-group {
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            flex-grow: 1;
+        }
+
+        /* Quand l'écran est petit (Mobile) */
         @media (max-width: 768px) {
-            .search-header { flex-direction: column; align-items: flex-start; }
-            .search-title-group { flex-direction: column; align-items: flex-start; width: 100%; }
-            .search-title-group .field { width: 100% !important; }
-            .search-title-group h2 { margin-bottom: 5px; }
+            .search-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-title-group {
+                flex-direction: column; /* Empile le titre et la date */
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .search-title-group .field {
+                width: 100% !important; /* Le champ date prend toute la largeur */
+            }
+            
+            .search-title-group h2 {
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -139,8 +158,35 @@
                 <div id="searchResults"></div>
             </div>
             <div class="field">
-                <label>Quantité (g/ml)</label>
-                <input type="number" id="mealQty" value="100" oninput="calculatePreview()">
+                <label>Quantité</label>
+                <div style="display:flex; gap:0.4rem; align-items:center;">
+                    <!-- Bouton - -->
+                    <button type="button" onclick="stepQty(-1)"
+                        style="background:#edf2f7; border:1px solid var(--light-gray); border-radius:8px;
+                               padding:0.5rem 0.75rem; font-size:1.1rem; font-weight:700; cursor:pointer;
+                               min-width:36px; flex-shrink:0;">−</button>
+                    <!-- Input quantité -->
+                    <input type="number" id="mealQty" value="100" min="0.1" step="any"
+                        oninput="calculatePreview()"
+                        style="text-align:center; width:70px; flex-shrink:0;">
+                    <!-- Bouton + -->
+                    <button type="button" onclick="stepQty(1)"
+                        style="background:#edf2f7; border:1px solid var(--light-gray); border-radius:8px;
+                               padding:0.5rem 0.75rem; font-size:1.1rem; font-weight:700; cursor:pointer;
+                               min-width:36px; flex-shrink:0;">+</button>
+                    <!-- Sélecteur d'unité -->
+                    <select id="qtyUnit" onchange="onUnitChange()"
+                        style="flex:1; min-width:0; padding:0.7rem 0.4rem; border:1px solid var(--light-gray);
+                               border-radius:8px; font-size:0.9rem; background:white; cursor:pointer;">
+                        <option value="g"     data-ml="1"    data-label="g">g / ml</option>
+                        <option value="cac"   data-ml="5"    data-label="cac">🥄 Cuillère à café (5ml)</option>
+                        <option value="cas"   data-ml="15"   data-label="cas">🥄 Cuillère à soupe (15ml)</option>
+                        <option value="pincee" data-ml="0.3" data-label="pincée">🤏 Pincée (0,3g)</option>
+                        <option value="unite" data-ml="1"    data-label="unité">🔢 Unité / pièce</option>
+                    </select>
+                </div>
+                <!-- Affichage de la conversion en temps réel -->
+                <div id="qtyConversion" style="font-size:0.78rem; color:var(--gray); margin-top:4px; min-height:18px;"></div>
             </div>
         </div>
 
@@ -151,8 +197,7 @@
                 <div class="field"><label>Gluc (g)</label><input type="number" id="adjCarb" readonly style="background:#eee"></div>
                 <div class="field"><label>Lip (g)</label><input type="number" id="adjFat" readonly style="background:#eee"></div>
                 <div class="field"><label>Fib (g)</label><input type="number" id="adjFib" readonly style="background:#eee"></div>
-                <div class="field"><label>🧂 Sel (g)</label><input type="number" id="adjSalt" readonly style="background:#eee"></div>
-                <div class="field"><label>⚡ K (mg)</label><input type="number" id="adjK" readonly style="background:#eee"></div>
+                <div class="field"><label>Sel (g)</label><input type="number" id="adjSalt" readonly style="background:#eee"></div>
             </div>
         </div>
         <button id="addToListBtn" class="btn-primary" style="margin-top:15px; width:100%">➕ Ajouter à l'assiette</button>
@@ -162,7 +207,7 @@
         <h2>🍱 Mon Assiette</h2>
         <div class="table-container">
             <table>
-                <thead><tr><th>Aliment</th><th>Qté</th><th>Cal</th><th>Prot</th><th>🧂 Sel</th><th>⚡ K</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Aliment</th><th>Qté</th><th>Cal</th><th>Prot</th><th>Actions</th></tr></thead>
                 <tbody id="mealItemsBody"></tbody>
             </table>
         </div>
@@ -172,8 +217,7 @@
             <div class="stat-card"><div class="stat-label">GLUCIDES</div><div class="stat-value" id="tCarb">0g</div></div>
             <div class="stat-card"><div class="stat-label">LIPIDES</div><div class="stat-value" id="tFat">0g</div></div>
             <div class="stat-card"><div class="stat-label">FIBRES</div><div class="stat-value" id="tFib">0g</div></div>
-            <div class="stat-card salt"><div class="stat-label">🧂 SEL</div><div class="stat-value" id="tSalt">0g</div></div>
-            <div class="stat-card potassium"><div class="stat-label">⚡ POTASSIUM</div><div class="stat-value" id="tK">0mg</div></div>
+            <div class="stat-card"><div class="stat-label">SEL</div><div class="stat-value" id="tSalt">0g</div></div>
         </div>
         <button class="btn-success" onclick="saveMeal()">💾 Enregistrer le repas</button>
     </section>
@@ -205,9 +249,6 @@
                 <div class="field"><label>Prot/100g</label><input type="number" id="mProt" step="any" value="0"></div>
                 <div class="field"><label>Gluc/100g</label><input type="number" id="mCarb" step="any" value="0"></div>
                 <div class="field"><label>Lip/100g</label><input type="number" id="mFat" step="any" value="0"></div>
-                <div class="field"><label>Fib/100g</label><input type="number" id="mFib" step="any" value="0"></div>
-                <div class="field"><label>🧂 Sel/100g (g)</label><input type="number" id="mSalt" step="any" value="0"></div>
-                <div class="field"><label>⚡ K/100g (mg)</label><input type="number" id="mK" step="any" value="0"></div>
             </div>
             <button type="submit" class="btn-success">💾 Sauvegarder</button>
         </form>
@@ -242,6 +283,7 @@
         } catch (error) { console.error(error); }
     }
 
+    // --- RECHERCHE ET SELECTION ---
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim();
         if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
@@ -266,7 +308,7 @@
                             <small>${f.brand || 'Générique'} - ${f.calories100g || f.calories} kcal</small>
                         </div>
                         ${idToUse ? `
-                        <button onclick="event.stopPropagation(); toggleFavorite('${idToUse}')"
+                        <button onclick="event.stopPropagation(); toggleFavorite('${idToUse}')" 
                                 style="background:none; border:none; color:${starColor}; font-size:1.4rem; cursor:pointer;">
                             ${isFav}
                         </button>` : ''}
@@ -278,47 +320,123 @@
 
     window.handleSelection = (food) => {
         selectedFood = food;
-        // Normalisation des clés (catalogue OU récents)
+        // On normalise les clés pour gérer à la fois le catalogue et les récents
         selectedFood.calories100g = food.calories100g || food.calories || 0;
         selectedFood.proteins100g = food.proteins100g || food.proteins || 0;
         selectedFood.carbs100g = food.carbs100g || food.carbs || 0;
         selectedFood.fats100g = food.fats100g || food.fats || 0;
         selectedFood.fiber100g = food.fiber100g || food.fiber || 0;
         selectedFood.salt100g = food.salt100g || food.salt || 0;
-        selectedFood.potassium100g = food.potassium100g || food.potassium || 0; // ← AJOUT
 
         searchInput.value = food.name;
         resultsDiv.style.display = 'none';
         calculatePreview();
     };
 
+    /* ===========================================================
+       GESTION DES UNITÉS
+       Toutes les valeurs sont toujours stockées en grammes/ml.
+       L'unité est juste un affichage pratique côté user.
+       =========================================================== */
+
+    // Table de conversion : unité → grammes/ml équivalents
+    const UNIT_CONVERSIONS = {
+        g:      { ml: 1,    label: 'g',      step: 10  },
+        cac:    { ml: 5,    label: 'cac',    step: 1   },
+        cas:    { ml: 15,   label: 'cas',    step: 1   },
+        pincee: { ml: 0.3,  label: 'pincée', step: 1   },
+        unite:  { ml: 1,    label: 'unité',  step: 1   },
+    };
+
+    // Convertit la saisie user en grammes réels pour le calcul
+    function getQtyInGrams() {
+        const unit = document.getElementById('qtyUnit').value;
+        const val = parseFloat(document.getElementById('mealQty').value) || 0;
+        return val * UNIT_CONVERSIONS[unit].ml;
+    }
+
+    // Affiche la conversion sous le champ (ex: "2 cac = 10 g")
+    function updateConversionHint() {
+        const unit = document.getElementById('qtyUnit').value;
+        const val = parseFloat(document.getElementById('mealQty').value) || 0;
+        const conv = UNIT_CONVERSIONS[unit];
+        const hint = document.getElementById('qtyConversion');
+
+        if (unit === 'g') {
+            hint.textContent = '';
+        } else {
+            const grams = val * conv.ml;
+            hint.textContent = `= ${grams % 1 === 0 ? grams : grams.toFixed(1)} g / ml`;
+        }
+    }
+
+    // Appelé quand on change d'unité → reset à 1 et recalcul
+    window.onUnitChange = () => {
+        const unit = document.getElementById('qtyUnit').value;
+        const conv = UNIT_CONVERSIONS[unit];
+        const qtyEl = document.getElementById('mealQty');
+
+        // Valeur par défaut selon l'unité
+        if (unit === 'g')      qtyEl.value = 100;
+        else if (unit === 'cac')    qtyEl.value = 1;
+        else if (unit === 'cas')    qtyEl.value = 1;
+        else if (unit === 'pincee') qtyEl.value = 1;
+        else if (unit === 'unite')  qtyEl.value = 1;
+
+        updateConversionHint();
+        calculatePreview();
+    };
+
+    // Boutons +/- : incrémente selon le step de l'unité
+    window.stepQty = (direction) => {
+        const unit = document.getElementById('qtyUnit').value;
+        const conv = UNIT_CONVERSIONS[unit];
+        const qtyEl = document.getElementById('mealQty');
+        const current = parseFloat(qtyEl.value) || 0;
+        const newVal = Math.max(conv.ml > 0 ? conv.ml : 0.1, current + direction * conv.step);
+        qtyEl.value = Number(newVal.toFixed(2));
+        updateConversionHint();
+        calculatePreview();
+    };
+
     window.calculatePreview = () => {
         if (!selectedFood) return;
-        const r = (parseFloat(qtyInput.value) || 0) / 100;
-        document.getElementById('adjCal').value = (selectedFood.calories100g * r).toFixed(1);
+        const grams = getQtyInGrams();
+        const r = grams / 100;
+        document.getElementById('adjCal').value  = (selectedFood.calories100g * r).toFixed(1);
         document.getElementById('adjProt').value = (selectedFood.proteins100g * r).toFixed(1);
         document.getElementById('adjCarb').value = (selectedFood.carbs100g * r).toFixed(1);
-        document.getElementById('adjFat').value = (selectedFood.fats100g * r).toFixed(1);
-        document.getElementById('adjFib').value = (selectedFood.fiber100g * r).toFixed(1);
+        document.getElementById('adjFat').value  = (selectedFood.fats100g * r).toFixed(1);
+        document.getElementById('adjFib').value  = (selectedFood.fiber100g * r).toFixed(1);
         document.getElementById('adjSalt').value = (selectedFood.salt100g * r).toFixed(2);
-        document.getElementById('adjK').value = Math.round(selectedFood.potassium100g * r); // ← AJOUT
+        updateConversionHint();
     };
 
     document.getElementById('addToListBtn').addEventListener('click', () => {
         if (!selectedFood) return alert("Sélectionnez un aliment d'abord");
-        const qty = parseFloat(qtyInput.value);
-        if (isNaN(qty) || qty <= 0) return alert("Quantité invalide");
+
+        const grams = getQtyInGrams();
+        if (isNaN(grams) || grams <= 0) return alert("Quantité invalide");
+
+        const unit = document.getElementById('qtyUnit').value;
+        const rawQty = parseFloat(document.getElementById('mealQty').value);
+        const conv = UNIT_CONVERSIONS[unit];
+
+        // Label affiché dans le tableau (ex: "2 cac (10g)")
+        const qtyLabel = unit === 'g'
+            ? `${grams}g`
+            : `${rawQty} ${conv.label} (${grams % 1 === 0 ? grams : grams.toFixed(1)}g)`;
 
         currentMealItems.push({
             name: selectedFood.name,
-            qty: qty,
-            cal: parseFloat(document.getElementById('adjCal').value),
+            qty: grams,        // Toujours en grammes pour les calculs
+            qtyLabel,          // Affiché dans le tableau
+            cal:  parseFloat(document.getElementById('adjCal').value),
             prot: parseFloat(document.getElementById('adjProt').value),
             carb: parseFloat(document.getElementById('adjCarb').value),
-            fat: parseFloat(document.getElementById('adjFat').value),
-            fib: parseFloat(document.getElementById('adjFib').value),
-            salt: parseFloat(document.getElementById('adjSalt').value),
-            potassium: parseFloat(document.getElementById('adjK').value) || 0 // ← AJOUT
+            fat:  parseFloat(document.getElementById('adjFat').value),
+            fib:  parseFloat(document.getElementById('adjFib').value),
+            salt: parseFloat(document.getElementById('adjSalt').value)
         });
 
         updateMealUI();
@@ -328,36 +446,29 @@
     });
 
     function resetAdjustmentZone() {
-        ['adjCal', 'adjProt', 'adjCarb', 'adjFat', 'adjFib', 'adjSalt', 'adjK'].forEach(id => {
+        ['adjCal', 'adjProt', 'adjCarb', 'adjFat', 'adjFib', 'adjSalt'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = "";
         });
-        const qtyInput = document.getElementById('mealQty');
-        if (qtyInput) qtyInput.value = 100;
+        document.getElementById('mealQty').value = 100;
+        document.getElementById('qtyUnit').value = 'g';
+        document.getElementById('qtyConversion').textContent = '';
     }
 
     function updateMealUI() {
         const body = document.getElementById('mealItemsBody');
         body.innerHTML = "";
-        let totals = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0, potassium:0 };
+        let totals = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0 };
 
         currentMealItems.forEach((it, i) => {
-            totals.cal += it.cal;
-            totals.prot += it.prot;
-            totals.carb += it.carb;
-            totals.fat += it.fat;
-            totals.fib += it.fib;
-            totals.salt += it.salt;
-            totals.potassium += (it.potassium || 0);
-
+            totals.cal += it.cal; totals.prot += it.prot; totals.carb += it.carb;
+            totals.fat += it.fat; totals.fib += it.fib; totals.salt += it.salt;
             body.innerHTML += `
                 <tr>
                     <td><strong>${it.name}</strong></td>
-                    <td class="editable" onclick="editLocalItem(${i}, 'qty')">${it.qty}g</td>
+                    <td class="editable" onclick="editLocalItem(${i}, 'qty')">${it.qtyLabel || it.qty + 'g'}</td>
                     <td>${it.cal.toFixed(0)}</td>
                     <td>${it.prot.toFixed(1)}g</td>
-                    <td style="color:var(--salt-color)">${it.salt.toFixed(2)}g</td>
-                    <td style="color:var(--k-color)">${Math.round(it.potassium || 0)}mg</td>
                     <td><button class="btn-danger-sm" onclick="removeItem(${i})">X</button></td>
                 </tr>`;
         });
@@ -367,7 +478,6 @@
         document.getElementById('tFat').innerText = totals.fat.toFixed(1) + "g";
         document.getElementById('tFib').innerText = totals.fib.toFixed(1) + "g";
         document.getElementById('tSalt').innerText = totals.salt.toFixed(2) + "g";
-        document.getElementById('tK').innerText = Math.round(totals.potassium) + "mg";
     }
 
     window.editLocalItem = (index, field) => {
@@ -387,8 +497,9 @@
                 headers: { 'Authorization': `Bearer ${cleanToken}` }
             });
             if (res.ok) {
+                // On recharge le catalogue en arrière plan et on rafraîchit la vue
                 await loadFullCatalog();
-                loadFavorites();
+                loadFavorites(); 
             }
         } catch (e) { console.error(e); }
     };
@@ -404,15 +515,8 @@
             description: document.getElementById('mealDesc').value,
             date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
             items: currentMealItems.map(it => ({
-                name: it.name,
-                quantity: it.qty,
-                calories: it.cal,
-                proteins: it.prot,
-                carbs: it.carb,
-                fats: it.fat,
-                fiber: it.fib,
-                salt: it.salt,
-                potassium: it.potassium || 0 // ← AJOUT
+                name: it.name, quantity: it.qty, calories: it.cal, proteins: it.prot, 
+                carbs: it.carb, fats: it.fat, fiber: it.fib, salt: it.salt
             }))
         };
 
@@ -428,7 +532,7 @@
             document.getElementById('mealTitle').value = "";
             document.getElementById('mealDesc').value = "";
             document.getElementById('mealType').value = "lunch";
-            updateMealUI();
+            updateMealUI(); 
             renderHistory();
         }
     };
@@ -472,7 +576,7 @@
 
     window.openFoodModal = () => document.getElementById('foodModal').style.display='block';
     window.closeFoodModal = () => document.getElementById('foodModal').style.display='none';
-
+    
     async function handleModalSubmit(e) {
         e.preventDefault();
         const food = {
@@ -481,11 +585,7 @@
             calories100g: parseFloat(document.getElementById('mCal').value),
             proteins100g: parseFloat(document.getElementById('mProt').value),
             carbs100g: parseFloat(document.getElementById('mCarb').value),
-            fats100g: parseFloat(document.getElementById('mFat').value),
-            fiber100g: parseFloat(document.getElementById('mFib').value) || 0, // ← AJOUT
-            salt100g: parseFloat(document.getElementById('mSalt').value) || 0, // ← AJOUT
-            potassium100g: parseFloat(document.getElementById('mK').value) || 0, // ← AJOUT
-            source: 'user'
+            fats100g: parseFloat(document.getElementById('mFat').value)
         };
         const res = await fetch('/api/nutrition/addFood', {
             method: 'POST',
