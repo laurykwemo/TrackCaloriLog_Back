@@ -197,7 +197,8 @@
                 <div class="field"><label>Gluc (g)</label><input type="number" id="adjCarb" readonly style="background:#eee"></div>
                 <div class="field"><label>Lip (g)</label><input type="number" id="adjFat" readonly style="background:#eee"></div>
                 <div class="field"><label>Fib (g)</label><input type="number" id="adjFib" readonly style="background:#eee"></div>
-                <div class="field"><label>Sel (g)</label><input type="number" id="adjSalt" readonly style="background:#eee"></div>
+                <div class="field"><label>🧂 Sel (g)</label><input type="number" id="adjSalt" readonly style="background:#eee"></div>
+                <div class="field"><label>⚡ K (mg)</label><input type="number" id="adjK" readonly style="background:#eee"></div>
             </div>
         </div>
         <button id="addToListBtn" class="btn-primary" style="margin-top:15px; width:100%">➕ Ajouter à l'assiette</button>
@@ -207,7 +208,7 @@
         <h2>🍱 Mon Assiette</h2>
         <div class="table-container">
             <table>
-                <thead><tr><th>Aliment</th><th>Qté</th><th>Cal</th><th>Prot</th><th>Actions</th></tr></thead>
+                <thead><tr><th>Aliment</th><th>Qté</th><th>Cal</th><th>Prot</th><th>🧂 Sel</th><th>⚡ K</th><th>Actions</th></tr></thead>
                 <tbody id="mealItemsBody"></tbody>
             </table>
         </div>
@@ -217,7 +218,8 @@
             <div class="stat-card"><div class="stat-label">GLUCIDES</div><div class="stat-value" id="tCarb">0g</div></div>
             <div class="stat-card"><div class="stat-label">LIPIDES</div><div class="stat-value" id="tFat">0g</div></div>
             <div class="stat-card"><div class="stat-label">FIBRES</div><div class="stat-value" id="tFib">0g</div></div>
-            <div class="stat-card"><div class="stat-label">SEL</div><div class="stat-value" id="tSalt">0g</div></div>
+            <div class="stat-card" style="background:#fffaf0; border-color:#fbd38d;"><div class="stat-label">🧂 SEL</div><div class="stat-value" style="color:#c05621;" id="tSalt">0g</div></div>
+            <div class="stat-card" style="background:#ebf8ff; border-color:#90cdf4;"><div class="stat-label">⚡ POTASSIUM</div><div class="stat-value" style="color:#2b6cb0;" id="tK">0mg</div></div>
         </div>
         <button class="btn-success" onclick="saveMeal()">💾 Enregistrer le repas</button>
     </section>
@@ -249,6 +251,9 @@
                 <div class="field"><label>Prot/100g</label><input type="number" id="mProt" step="any" value="0"></div>
                 <div class="field"><label>Gluc/100g</label><input type="number" id="mCarb" step="any" value="0"></div>
                 <div class="field"><label>Lip/100g</label><input type="number" id="mFat" step="any" value="0"></div>
+                <div class="field"><label>Fib/100g</label><input type="number" id="mFib" step="any" value="0"></div>
+                <div class="field"><label>🧂 Sel/100g (g)</label><input type="number" id="mSalt" step="any" value="0"></div>
+                <div class="field"><label>⚡ K/100g (mg)</label><input type="number" id="mK" step="any" value="0"></div>
             </div>
             <button type="submit" class="btn-success">💾 Sauvegarder</button>
         </form>
@@ -320,13 +325,13 @@
 
     window.handleSelection = (food) => {
         selectedFood = food;
-        // On normalise les clés pour gérer à la fois le catalogue et les récents
-        selectedFood.calories100g = food.calories100g || food.calories || 0;
-        selectedFood.proteins100g = food.proteins100g || food.proteins || 0;
-        selectedFood.carbs100g = food.carbs100g || food.carbs || 0;
-        selectedFood.fats100g = food.fats100g || food.fats || 0;
-        selectedFood.fiber100g = food.fiber100g || food.fiber || 0;
-        selectedFood.salt100g = food.salt100g || food.salt || 0;
+        selectedFood.calories100g  = food.calories100g  || food.calories  || 0;
+        selectedFood.proteins100g  = food.proteins100g  || food.proteins  || 0;
+        selectedFood.carbs100g     = food.carbs100g     || food.carbs     || 0;
+        selectedFood.fats100g      = food.fats100g      || food.fats      || 0;
+        selectedFood.fiber100g     = food.fiber100g     || food.fiber     || 0;
+        selectedFood.salt100g      = food.salt100g      || food.salt      || 0;
+        selectedFood.potassium100g = food.potassium100g || food.potassium || 0;
 
         searchInput.value = food.name;
         resultsDiv.style.display = 'none';
@@ -409,6 +414,7 @@
         document.getElementById('adjFat').value  = (selectedFood.fats100g * r).toFixed(1);
         document.getElementById('adjFib').value  = (selectedFood.fiber100g * r).toFixed(1);
         document.getElementById('adjSalt').value = (selectedFood.salt100g * r).toFixed(2);
+        document.getElementById('adjK').value    = Math.round((selectedFood.potassium100g || 0) * r);
         updateConversionHint();
     };
 
@@ -422,21 +428,21 @@
         const rawQty = parseFloat(document.getElementById('mealQty').value);
         const conv = UNIT_CONVERSIONS[unit];
 
-        // Label affiché dans le tableau (ex: "2 cac (10g)")
         const qtyLabel = unit === 'g'
             ? `${grams}g`
             : `${rawQty} ${conv.label} (${grams % 1 === 0 ? grams : grams.toFixed(1)}g)`;
 
         currentMealItems.push({
             name: selectedFood.name,
-            qty: grams,        // Toujours en grammes pour les calculs
-            qtyLabel,          // Affiché dans le tableau
-            cal:  parseFloat(document.getElementById('adjCal').value),
-            prot: parseFloat(document.getElementById('adjProt').value),
-            carb: parseFloat(document.getElementById('adjCarb').value),
-            fat:  parseFloat(document.getElementById('adjFat').value),
-            fib:  parseFloat(document.getElementById('adjFib').value),
-            salt: parseFloat(document.getElementById('adjSalt').value)
+            qty: grams,
+            qtyLabel,
+            cal:       parseFloat(document.getElementById('adjCal').value),
+            prot:      parseFloat(document.getElementById('adjProt').value),
+            carb:      parseFloat(document.getElementById('adjCarb').value),
+            fat:       parseFloat(document.getElementById('adjFat').value),
+            fib:       parseFloat(document.getElementById('adjFib').value),
+            salt:      parseFloat(document.getElementById('adjSalt').value),
+            potassium: parseFloat(document.getElementById('adjK').value) || 0
         });
 
         updateMealUI();
@@ -446,7 +452,7 @@
     });
 
     function resetAdjustmentZone() {
-        ['adjCal', 'adjProt', 'adjCarb', 'adjFat', 'adjFib', 'adjSalt'].forEach(id => {
+        ['adjCal', 'adjProt', 'adjCarb', 'adjFat', 'adjFib', 'adjSalt', 'adjK'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.value = "";
         });
@@ -458,26 +464,30 @@
     function updateMealUI() {
         const body = document.getElementById('mealItemsBody');
         body.innerHTML = "";
-        let totals = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0 };
+        let totals = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0, potassium:0 };
 
         currentMealItems.forEach((it, i) => {
             totals.cal += it.cal; totals.prot += it.prot; totals.carb += it.carb;
             totals.fat += it.fat; totals.fib += it.fib; totals.salt += it.salt;
+            totals.potassium += (it.potassium || 0);
             body.innerHTML += `
                 <tr>
                     <td><strong>${it.name}</strong></td>
                     <td class="editable" onclick="editLocalItem(${i}, 'qty')">${it.qtyLabel || it.qty + 'g'}</td>
                     <td>${it.cal.toFixed(0)}</td>
                     <td>${it.prot.toFixed(1)}g</td>
+                    <td style="color:#c05621">${it.salt.toFixed(2)}g</td>
+                    <td style="color:#2b6cb0">${Math.round(it.potassium || 0)}mg</td>
                     <td><button class="btn-danger-sm" onclick="removeItem(${i})">X</button></td>
                 </tr>`;
         });
-        document.getElementById('tCal').innerText = totals.cal.toFixed(0);
+        document.getElementById('tCal').innerText  = totals.cal.toFixed(0);
         document.getElementById('tProt').innerText = totals.prot.toFixed(1) + "g";
         document.getElementById('tCarb').innerText = totals.carb.toFixed(1) + "g";
-        document.getElementById('tFat').innerText = totals.fat.toFixed(1) + "g";
-        document.getElementById('tFib').innerText = totals.fib.toFixed(1) + "g";
+        document.getElementById('tFat').innerText  = totals.fat.toFixed(1) + "g";
+        document.getElementById('tFib').innerText  = totals.fib.toFixed(1) + "g";
         document.getElementById('tSalt').innerText = totals.salt.toFixed(2) + "g";
+        document.getElementById('tK').innerText    = Math.round(totals.potassium) + "mg";
     }
 
     window.editLocalItem = (index, field) => {
@@ -515,8 +525,9 @@
             description: document.getElementById('mealDesc').value,
             date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
             items: currentMealItems.map(it => ({
-                name: it.name, quantity: it.qty, calories: it.cal, proteins: it.prot, 
-                carbs: it.carb, fats: it.fat, fiber: it.fib, salt: it.salt
+                name: it.name, quantity: it.qty, calories: it.cal, proteins: it.prot,
+                carbs: it.carb, fats: it.fat, fiber: it.fib, salt: it.salt,
+                potassium: it.potassium || 0
             }))
         };
 
@@ -582,10 +593,14 @@
         const food = {
             name: document.getElementById('mFoodName').value,
             brand: document.getElementById('mFoodBrand').value,
-            calories100g: parseFloat(document.getElementById('mCal').value),
-            proteins100g: parseFloat(document.getElementById('mProt').value),
-            carbs100g: parseFloat(document.getElementById('mCarb').value),
-            fats100g: parseFloat(document.getElementById('mFat').value)
+            calories100g:  parseFloat(document.getElementById('mCal').value),
+            proteins100g:  parseFloat(document.getElementById('mProt').value),
+            carbs100g:     parseFloat(document.getElementById('mCarb').value),
+            fats100g:      parseFloat(document.getElementById('mFat').value),
+            fiber100g:     parseFloat(document.getElementById('mFib').value)  || 0,
+            salt100g:      parseFloat(document.getElementById('mSalt').value) || 0,
+            potassium100g: parseFloat(document.getElementById('mK').value)    || 0,
+            source: 'user'
         };
         const res = await fetch('/api/nutrition/addFood', {
             method: 'POST',
