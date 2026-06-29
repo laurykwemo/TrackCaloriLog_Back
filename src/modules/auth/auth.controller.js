@@ -42,21 +42,23 @@ const authController = {
     register: async (req, res) => {
         try {
             const user = await authService.register(req.body);
+            console.log('✅ User créé:', user.email);
+    
             const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
-
-            await transporter.sendMail({
-                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
+    
+            const info = await transporter.sendMail({
+                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>', // ← changé
                 to: user.email,
                 subject: 'Bienvenue ! Vérification de votre adresse email',
-                html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
+                html: `...`
             });
-
-            res.status(201).json({
-                message: "Inscription réussie. Un email de vérification a été envoyé.",
-                user: { id: user._id, name: user.name, email: user.email }
-            });
+    
+            console.log('✅ Mail envoyé, ID:', info.messageId); // ← AJOUT
+    
+            res.status(201).json({ ... });
         } catch (error) {
-            res.status(400).json({ message: error.message || "Erreur lors de l'inscription" });
+            console.error('❌ Erreur complète:', error); // ← AJOUT
+            res.status(400).json({ message: error.message });
         }
     },
 
