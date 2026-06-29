@@ -320,7 +320,7 @@
         const ageerrorMsg = document.getElementById('age-error');
         const submitBtn = document.querySelector('button[type="submit"]');
 
-        if (!input.value) return; // Si vide, on ne fait rien
+        if (!input.value) return false; // Si vide, on ne fait rien
 
         // CORRECT : On transforme la String en objet Date
         const birthDate = new Date(input.value);
