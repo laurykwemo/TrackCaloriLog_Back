@@ -47,17 +47,20 @@ const authController = {
             const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
     
             const info = await transporter.sendMail({
-                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>', // ← changé
+                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
                 to: user.email,
                 subject: 'Bienvenue ! Vérification de votre adresse email',
-                html: `...`
+                html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
             });
     
-            console.log('✅ Mail envoyé, ID:', info.messageId); // ← AJOUT
+            console.log('✅ Mail envoyé, ID:', info.messageId);
     
-            res.status(201).json({ ... });
+            res.status(201).json({
+                message: "Inscription réussie. Un email de vérification a été envoyé.",
+                user: { id: user._id, name: user.name, email: user.email }
+            });
         } catch (error) {
-            console.error('❌ Erreur complète:', error); // ← AJOUT
+            console.error('❌ Erreur complète:', error);
             res.status(400).json({ message: error.message });
         }
     },
