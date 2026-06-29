@@ -18,7 +18,7 @@ const sendEmailLogic = async (email) => {
     const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
     
     const mailOptions = {
-        from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
+        from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
         to: user.email,
         subject: 'Vérification de votre compte - Nouveau lien',
         html: `
@@ -45,7 +45,7 @@ const authController = {
             const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
 
             await transporter.sendMail({
-                from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
+                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
                 to: user.email,
                 subject: 'Bienvenue ! Vérification de votre adresse email',
                 html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
@@ -153,7 +153,7 @@ const authController = {
             const resetUrl = `${BASE_URL}/trackcalorilog/reset-password?token=${resetToken}`;
 
             await transporter.sendMail({
-                from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
+                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
                 to: user.email,
                 subject: 'Réinitialisation de votre mot de passe',
                 html: `
