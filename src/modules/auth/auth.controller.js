@@ -77,26 +77,23 @@ const authController = {
             const { email, password } = req.body;
             const result = await authService.login(email, password);
             const user = result.user;
-
-            // Le nettoyage du ban expiré est désormais géré dans authService.login
-            // On sauvegarde uniquement pour persister lastLogin et la remise à zéro des tentatives
+    
             await user.save();
-
-            // On renvoie une version propre du user (sans le password)
+    
             return res.status(200).json({
                 token: result.token,
                 user: { id: user._id, name: user.name, email: user.email, role: user.role }
             });
-
+    
         } catch (error) {
-            // Gestion du mail de vérification (inchangée mais propre)
             if (error.message.includes("vérifier votre boîte mail")) {
-                try {
-                    await sendEmailLogic(req.body.email); 
-                    return res.status(401).json({ message: "Compte non vérifié. Un nouveau lien a été envoyé." });
-                } catch (err) {
-                    return res.status(500).json({ message: "Erreur lors du renvoi du mail." });
-                }
+                // On essaie d'envoyer le mail, mais ÇA NE DOIT JAMAIS FAIRE PLANTER LA REPONSE
+                sendEmailLogic(req.body.email).catch(err => {
+                    console.error('❌ Erreur renvoi mail (non bloquant):', err.message);
+                });
+    
+                // On répond TOUJOURS 401 propre, peu importe si le mail part ou pas
+                return res.status(401).json({ message: "Compte non vérifié. Un nouveau lien de vérification a été envoyé (si l'envoi réussit)." });
             }
             res.status(401).json({ message: error.message });
         }
