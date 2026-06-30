@@ -9,7 +9,10 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.MAIL_USER,
         pass: process.env.MAIL_PASS
-    }
+    },
+    connectionTimeout: 5000,  // ← 5 secondes max pour la connexion
+    greetingTimeout: 5000,    // ← 5 secondes max pour le greeting SMTP
+    socketTimeout: 10000 
 });
 
 // 2. Logique d'envoi réutilisable
@@ -44,23 +47,27 @@ const authController = {
             const user = await authService.register(req.body);
             console.log('✅ User créé:', user.email);
     
-            const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
-    
-            const info = await transporter.sendMail({
-                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
-                to: user.email,
-                subject: 'Bienvenue ! Vérification de votre adresse email',
-                html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
-            });
-    
-            console.log('✅ Mail envoyé, ID:', info.messageId);
-    
+            // On répond IMMÉDIATEMENT au frontend
             res.status(201).json({
                 message: "Inscription réussie. Un email de vérification a été envoyé.",
                 user: { id: user._id, name: user.name, email: user.email }
             });
+    
+            // L'envoi du mail se fait APRÈS la réponse (non bloquant)
+            const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
+            transporter.sendMail({
+                from: '"TrackCaloriLog" <9e8a2e001@smtp-brevo.com>',
+                to: user.email,
+                subject: 'Bienvenue ! Vérification de votre adresse email',
+                html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
+            }).then(info => {
+                console.log('✅ Mail envoyé:', info.messageId);
+            }).catch(err => {
+                console.error('❌ Erreur envoi mail:', err.message);
+            });
+    
         } catch (error) {
-            console.error('❌ Erreur complète:', error);
+            console.error('❌ Erreur register:', error);
             res.status(400).json({ message: error.message });
         }
     },
