@@ -96,6 +96,7 @@ const authService = {
         if (!user) return null;
 
         // 2. Mettre à jour les champs
+        user.isActive = true;
         user.isEmailVerified = true;
         user.emailVerificationToken = undefined; // On supprime le token car il a servi
         user.emailVerificationExpires = undefined;
