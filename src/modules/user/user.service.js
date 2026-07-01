@@ -50,7 +50,7 @@ const userService = {
                 height: data.height,
                 weight: data.weight,
                 role: data.role || 'user',
-                isActive: data.isActive ?? true,
+                isActive: data.isActive ?? false,
                 emailVerificationToken: verificationToken,
                 emailVerificationExpires: Date.now() + 24 * 60 * 60 * 1000, // Expire dans 24h
                 dailyCalorieGoal: data.dailyCalorieGoal || 2000
