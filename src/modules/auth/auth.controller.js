@@ -1,74 +1,55 @@
 const authService = require('./auth.service');
-const nodemailer = require('nodemailer');
 const User = require('../user/user.model');
+const { sendEmail } = require('./email.service'); // ← nouveau service API
 
-// 1. On définit la config du transporteur une seule fois en haut
-const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS
-    },
-    connectionTimeout: 5000,  // ← 5 secondes max pour la connexion
-    greetingTimeout: 5000,    // ← 5 secondes max pour le greeting SMTP
-    socketTimeout: 10000 
-});
+const BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://trackcalorilog-back.onrender.com'
+    : 'http://localhost:3000';
 
-// 2. Logique d'envoi réutilisable
+// Logique d'envoi réutilisable (renvoi de vérification)
 const sendEmailLogic = async (email) => {
     const user = await authService.resendVerificationEmail(email);
     const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
-    
-    const mailOptions = {
-        from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
-        to: user.email,
-        subject: 'Vérification de votre compte - Nouveau lien',
-        html: `
+
+    await sendEmail(
+        user.email,
+        'Vérification de votre compte - Nouveau lien',
+        `
             <h1>Validation de votre email</h1>
             <p>Vous avez demandé un nouveau lien de vérification.</p>
             <a href="${verificationUrl}" style="padding: 10px 20px; background-color: #667eea; color: white; text-decoration: none; border-radius: 5px;">
                 Vérifier mon compte
             </a>
         `
-    };
-    
-    await transporter.sendMail(mailOptions);
+    );
 };
 
-const BASE_URL = process.env.NODE_ENV === 'production' 
-    ? 'https://trackcalorilog-back.onrender.com' 
-    : 'http://localhost:3000';
-
 const authController = {
-    
+
     register: async (req, res) => {
         try {
             const user = await authService.register(req.body);
             console.log('✅ User créé:', user.email);
-    
-            // On répond IMMÉDIATEMENT au frontend
+
+            // On répond IMMÉDIATEMENT, sans attendre l'envoi du mail
             res.status(201).json({
                 message: "Inscription réussie. Un email de vérification a été envoyé.",
                 user: { id: user._id, name: user.name, email: user.email }
             });
-    
-            // L'envoi du mail se fait APRÈS la réponse (non bloquant)
+
+            // Envoi du mail en arrière-plan (non bloquant)
             const verificationUrl = `${BASE_URL}/trackcalorilog/verify-email?token=${user.emailVerificationToken}`;
-            transporter.sendMail({
-                from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
-                to: user.email,
-                subject: 'Bienvenue ! Vérification de votre adresse email',
-                html: `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
-            }).then(info => {
-                console.log('✅ Mail envoyé:', info.messageId);
-            }).catch(err => {
-                console.error('❌ Erreur envoi mail:', err.message);
+            sendEmail(
+                user.email,
+                'Bienvenue ! Vérification de votre adresse email',
+                `<h1>Bienvenue ${user.name} !</h1><p>Cliquez ici pour vérifier votre email:</p><a href="${verificationUrl}">Activer mon compte</a>`
+            ).catch(err => {
+                console.error('❌ Erreur envoi mail register (non bloquant):', err.message);
             });
-    
+
         } catch (error) {
             console.error('❌ Erreur register:', error);
-            res.status(400).json({ message: error.message });
+            res.status(400).json({ message: error.message || "Erreur lors de l'inscription" });
         }
     },
 
@@ -77,23 +58,22 @@ const authController = {
             const { email, password } = req.body;
             const result = await authService.login(email, password);
             const user = result.user;
-    
+
             await user.save();
-    
+
             return res.status(200).json({
                 token: result.token,
                 user: { id: user._id, name: user.name, email: user.email, role: user.role }
             });
-    
+
         } catch (error) {
             if (error.message.includes("vérifier votre boîte mail")) {
-                // On essaie d'envoyer le mail, mais ÇA NE DOIT JAMAIS FAIRE PLANTER LA REPONSE
+                // Envoi en arrière-plan, jamais bloquant pour la réponse
                 sendEmailLogic(req.body.email).catch(err => {
-                    console.error('❌ Erreur renvoi mail (non bloquant):', err.message);
+                    console.error('❌ Erreur renvoi mail login (non bloquant):', err.message);
                 });
-    
-                // On répond TOUJOURS 401 propre, peu importe si le mail part ou pas
-                return res.status(401).json({ message: "Compte non vérifié. Un nouveau lien de vérification a été envoyé (si l'envoi réussit)." });
+
+                return res.status(401).json({ message: "Compte non vérifié. Un nouveau lien de vérification a été envoyé." });
             }
             res.status(401).json({ message: error.message });
         }
@@ -106,7 +86,6 @@ const authController = {
 
             const user = await authService.verifyUser(token);
             if (!user) {
-                // Si le user n'est pas trouvé, c'est souvent que le token a expiré
                 return res.status(400).send(`
                     <h1>Lien expiré ou invalide</h1>
                     <p>Votre lien de vérification n'est plus valide (max 24h).</p>
@@ -129,10 +108,9 @@ const authController = {
             res.status(400).json({ message: error.message });
         }
     },
+
     me: async (req, res) => {
         try {
-            // 2. Vérifie ce que contient req.user (rempli par ton middleware isAuthenticated)
-            // Dans ton token, la clé semble être "userId" d'après ton log console
             const idToFind = req.user.userId || req.user.id;
 
             if (!idToFind) {
@@ -140,20 +118,19 @@ const authController = {
             }
 
             const user = await User.findById(idToFind).select('-password');
-            
+
             if (!user) {
                 return res.status(404).json({ message: "Utilisateur non trouvé en base" });
             }
 
-            // On renvoie l'objet user DIRECTEMENT (sans l'envelopper)
-            res.status(200).json(user); 
+            res.status(200).json(user);
 
         } catch (error) {
-            console.error("Erreur détaillée :", error); // Cela s'affichera dans ton terminal VS Code
+            console.error("Erreur détaillée :", error);
             res.status(500).json({ message: "Erreur serveur lors de la récupération du profil" });
         }
     },
-        // Demander la réinitialisation
+
     requestPasswordReset: async (req, res) => {
         try {
             const { email } = req.body;
@@ -161,16 +138,15 @@ const authController = {
 
             const resetUrl = `${BASE_URL}/trackcalorilog/reset-password?token=${resetToken}`;
 
-            await transporter.sendMail({
-                from: '"TrackCaloriLog" <alannbaywala@gmail.com>',
-                to: user.email,
-                subject: 'Réinitialisation de votre mot de passe',
-                html: `
+            await sendEmail(
+                user.email,
+                'Réinitialisation de votre mot de passe',
+                `
                     <p>Vous avez demandé une réinitialisation de mot de passe.</p>
                     <p>Cliquez sur ce lien pour choisir un nouveau mot de passe (valable 1h) :</p>
                     <a href="${resetUrl}">Réinitialiser mon mot de passe</a>
                 `
-            });
+            );
 
             res.status(200).json({ message: "Email de réinitialisation envoyé !" });
         } catch (error) {
@@ -178,7 +154,6 @@ const authController = {
         }
     },
 
-    // Valider le nouveau mot de passe
     handlePasswordReset: async (req, res) => {
         try {
             const { token, newPassword } = req.body;
