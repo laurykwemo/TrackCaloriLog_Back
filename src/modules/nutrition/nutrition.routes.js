@@ -23,6 +23,13 @@ router.post('/meals', nutritionController.addMeal);
 // PUT /api/nutrition/meals/:id (Modifier un repas)
 router.put('/meals/:id', nutritionController.updateMeal);
 
+// DRAFTS / MEAL PLANNING
+router.get('/meals/drafts', nutritionController.getDraftsByWeek);
+router.post('/meals/drafts', nutritionController.createDraft);
+router.put('/meals/drafts/:id', nutritionController.updateDraft);
+router.patch('/meals/drafts/:id/confirm', nutritionController.confirmDraft);
+router.delete('/meals/drafts/:id', nutritionController.deleteMeal); // réutilise deleteMeal
+
 // DELETE /api/nutrition/meals/:id (Supprimer un repas)
 router.delete('/meals/:id', nutritionController.deleteMeal);
 

@@ -34,6 +34,9 @@ const mealSchema = new mongoose.Schema({
     date: { type: Date, required: true, default: Date.now },
     title: { type: String, trim: true },
     description: { type: String, trim: true, default: "" },
+    isDraft: { type: Boolean, default: false },
+    plannedDate: { type: Date, default: null }, // jour planifié (sans heure précise)
+    confirmedAt: { type: Date, default: null }, // date de confirmation
     type: {
         type: String,
         enum: ['breakfast', 'lunch', 'dinner', 'snack'],

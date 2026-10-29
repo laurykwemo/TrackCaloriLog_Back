@@ -169,6 +169,59 @@ const nutritionService = {
         } catch (error) {
             throw error;
         }
+    },
+
+    // --- DRAFT / MEAL PLANNING ---
+
+    createDraftMeal: async (userId, mealData) => {
+        const { items, totals } = nutritionService.calculateTotals(mealData.items);
+        return await Meal.create({
+            ...mealData,
+            userId,
+            items,
+            totals,
+            isDraft: true,
+            plannedDate: mealData.plannedDate ? new Date(mealData.plannedDate) : null,
+        });
+    },
+
+    getDraftsByWeek: async (userId, weekStart) => {
+        const start = new Date(weekStart);
+        start.setHours(0, 0, 0, 0);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        end.setHours(23, 59, 59, 999);
+
+        return await Meal.find({
+            userId,
+            isDraft: true,
+            plannedDate: { $gte: start, $lte: end }
+        }).sort({ plannedDate: 1 });
+    },
+
+    confirmDraft: async (mealId, userId) => {
+        return await Meal.findOneAndUpdate(
+            { _id: mealId, userId, isDraft: true },
+            {
+                isDraft: false,
+                confirmedAt: new Date(),
+                date: new Date(), // date réelle = maintenant
+            },
+            { new: true }
+        );
+    },
+
+    updateDraftMeal: async (mealId, userId, updateData) => {
+        if (updateData.items) {
+            const { items, totals } = nutritionService.calculateTotals(updateData.items);
+            updateData.items = items;
+            updateData.totals = totals;
+        }
+        return await Meal.findOneAndUpdate(
+            { _id: mealId, userId, isDraft: true },
+            updateData,
+            { new: true }
+        );
     }
 };
 

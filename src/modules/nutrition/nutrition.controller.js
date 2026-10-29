@@ -144,6 +144,47 @@ const nutritionController = {
         } catch (error) {
             res.status(500).json({ message: "Erreur lors de la récupération des récents" });
         }
+    },
+
+    // --- DRAFTS ---
+
+    createDraft: async (req, res) => {
+        try {
+            const draft = await nutritionService.createDraftMeal(req.user.id, req.body);
+            res.status(201).json(draft);
+        } catch (error) {
+            res.status(400).json({ message: "Erreur création brouillon", error: error.message });
+        }
+    },
+
+    getDraftsByWeek: async (req, res) => {
+        try {
+            const weekStart = req.query.weekStart || new Date().toISOString().split('T')[0];
+            const drafts = await nutritionService.getDraftsByWeek(req.user.id, weekStart);
+            res.json(drafts);
+        } catch (error) {
+            res.status(500).json({ message: "Erreur récupération brouillons" });
+        }
+    },
+
+    confirmDraft: async (req, res) => {
+        try {
+            const meal = await nutritionService.confirmDraft(req.params.id, req.user.id);
+            if (!meal) return res.status(404).json({ message: "Brouillon introuvable" });
+            res.json(meal);
+        } catch (error) {
+            res.status(400).json({ message: "Erreur confirmation brouillon" });
+        }
+    },
+
+    updateDraft: async (req, res) => {
+        try {
+            const draft = await nutritionService.updateDraftMeal(req.params.id, req.user.id, req.body);
+            if (!draft) return res.status(404).json({ message: "Brouillon introuvable" });
+            res.json(draft);
+        } catch (error) {
+            res.status(400).json({ message: "Erreur modification brouillon" });
+        }
     }
 };
 
