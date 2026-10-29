@@ -17,7 +17,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
         header h1 { font-size: 1.4rem; margin: 0; font-weight: 800; }
         header nav a { color: rgba(255,255,255,0.8); margin-left: 1.5rem; text-decoration: none; font-weight: 500; transition: 0.3s; }
         header nav a:hover { color: white; }
@@ -29,21 +28,18 @@
         .grid-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
         .field { display: flex; flex-direction: column; }
         label { font-size: 0.85rem; font-weight: 600; color: var(--gray); margin-bottom: 0.4rem; }
-
         input, select, textarea { padding: 0.7rem; border: 1px solid var(--light-gray); border-radius: 8px; font-size: 0.95rem; transition: 0.2s; font-family: inherit; }
 
         button { cursor: pointer; border: none; border-radius: 8px; padding: 0.7rem 1.2rem; font-weight: 600; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary   { background: var(--primary); color: white; }
         .btn-secondary { background: #edf2f7; color: var(--dark); border: 1px solid var(--light-gray); }
-        .btn-success { background: var(--success); color: white; width: 100%; margin-top: 1rem; font-size: 1rem; }
+        .btn-success   { background: var(--success); color: white; width: 100%; margin-top: 1rem; font-size: 1rem; }
         .btn-danger-sm { background: #fff5f5; color: var(--danger); padding: 0.4rem 0.8rem; font-size: 0.8rem; border: 1px solid #feb2b2; margin-left: 5px; }
-        .btn-edit-sm { background: #f0f4ff; color: var(--primary); padding: 0.4rem 0.8rem; font-size: 0.8rem; border: 1px solid var(--primary); }
 
         .table-container { overflow-x: auto; margin-top: 1rem; }
         table { width: 100%; border-collapse: collapse; }
         th { background: #f8fafc; text-align: left; padding: 1rem; border-bottom: 2px solid #edf2f7; font-size: 0.75rem; text-transform: uppercase; color: var(--gray); }
         td { padding: 1rem; border-bottom: 1px solid #edf2f7; font-size: 0.9rem; vertical-align: middle; }
-
         .editable:hover { background: #fffdeb; cursor: pointer; }
 
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
@@ -52,15 +48,17 @@
         .stat-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gray); font-weight: bold; }
 
         #searchResults {
-            position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--light-gray);
-            border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 1000; max-height: 250px; overflow-y: auto; display: none;
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            border: 1px solid var(--light-gray); border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); z-index: 1000;
+            max-height: 250px; overflow-y: auto; display: none;
         }
+        .search-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .search-item:hover { background: #f0f4ff; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
         .modal-content { margin: 5% auto; width: 90%; max-width: 650px; position: relative; }
         .close-modal { position: absolute; right: 20px; top: 15px; font-size: 28px; font-weight: bold; cursor: pointer; color: var(--gray); }
-        .nutri-indicator { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; transition: 0.3s; }
-        .nutri-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
         .progress-container { width: 100%; background: #edf2f7; border-radius: 10px; height: 8px; margin-top: 8px; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--primary); transition: width 0.5s ease; }
@@ -69,234 +67,92 @@
         .search-title-group { display: flex; align-items: center; gap: 15px; flex-grow: 1; }
 
         /* ===== ONGLETS ===== */
-        .tabs-bar {
-            display: flex;
-            gap: 0;
-            border-bottom: 2px solid var(--light-gray);
-            margin-bottom: 2rem;
-        }
+        .tabs-bar { display: flex; gap: 0; border-bottom: 2px solid var(--light-gray); margin-bottom: 2rem; }
         .tab-btn {
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            padding: 0.75rem 1.4rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--gray);
-            cursor: pointer;
-            border-radius: 0;
-            transition: color 0.2s, border-color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 7px;
+            background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px;
+            padding: 0.75rem 1.4rem; font-size: 0.95rem; font-weight: 600; color: var(--gray);
+            cursor: pointer; border-radius: 0; transition: color 0.2s, border-color 0.2s;
+            display: flex; align-items: center; gap: 7px;
         }
         .tab-btn:hover { color: var(--primary); }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
-
         .tab-panel { display: none; }
         .tab-panel.active { display: block; }
 
         /* ===== PLANNING ===== */
         .planning-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;
         }
-        .week-nav-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .week-label {
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--dark);
-            min-width: 200px;
-            text-align: center;
-        }
+        .week-nav-group { display: flex; align-items: center; gap: 8px; }
+        .week-label { font-weight: 700; font-size: 1rem; color: var(--dark); min-width: 200px; text-align: center; }
         .btn-week {
-            background: #edf2f7;
-            border: 1px solid var(--light-gray);
-            color: var(--gray);
-            padding: 0.45rem 0.9rem;
-            font-size: 0.85rem;
-            font-weight: 600;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.2s;
+            background: #edf2f7; border: 1px solid var(--light-gray); color: var(--gray);
+            padding: 0.45rem 0.9rem; font-size: 0.85rem; font-weight: 600; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
         }
         .btn-week:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; }
-        .btn-week.primary-week {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-color: transparent;
-            color: white;
-        }
+        .btn-week.primary-week { background: linear-gradient(135deg, #667eea, #764ba2); border-color: transparent; color: white; }
         .btn-week.primary-week:hover { opacity: 0.9; }
 
-        .week-summary-chips {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .chip {
-            background: #f0f4ff;
-            border: 1px solid #dce3f8;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
+        .week-summary-chips { display: flex; gap: 12px; flex-wrap: wrap; }
+        .chip { background: #f0f4ff; border: 1px solid #dce3f8; border-radius: 20px; padding: 4px 12px; font-size: 0.8rem; font-weight: 600; color: var(--primary); }
         .chip.ok   { background: #f0fff4; border-color: #9ae6b4; color: #276749; }
         .chip.warn { background: #fffaf0; border-color: #fbd38d; color: #744210; }
         .chip.draft-count { background: #faf5ff; border-color: #d6bcfa; color: #553c9a; }
 
-        /* Grille jours */
         .days-scroll { overflow-x: auto; }
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, minmax(135px, 1fr));
-            gap: 10px;
-            min-width: 700px;
-        }
+        .days-grid { display: grid; grid-template-columns: repeat(7, minmax(135px, 1fr)); gap: 10px; min-width: 700px; }
         .day-col { display: flex; flex-direction: column; gap: 7px; }
 
-        .day-header {
-            background: white;
-            border: 1px solid var(--light-gray);
-            border-radius: 10px;
-            padding: 10px 12px;
-        }
-        .day-header.today {
-            border-color: var(--primary);
-            background: #f0f4ff;
-        }
-        .day-name {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 700;
-            color: var(--gray);
-        }
+        .day-header { background: white; border: 1px solid var(--light-gray); border-radius: 10px; padding: 10px 12px; }
+        .day-header.today { border-color: var(--primary); background: #f0f4ff; }
+        .day-name { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; color: var(--gray); }
         .day-header.today .day-name { color: var(--primary); }
-        .day-number {
-            font-size: 1.35rem;
-            font-weight: 800;
-            color: var(--dark);
-            line-height: 1.1;
-            font-variant-numeric: tabular-nums;
-        }
+        .day-number { font-size: 1.35rem; font-weight: 800; color: var(--dark); line-height: 1.1; font-variant-numeric: tabular-nums; }
         .day-header.today .day-number { color: var(--primary); }
 
         .day-cals-bar { margin-top: 7px; }
-        .day-cals-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.7rem;
-            color: var(--gray);
-            margin-bottom: 3px;
-            font-variant-numeric: tabular-nums;
-        }
+        .day-cals-label { display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--gray); margin-bottom: 3px; font-variant-numeric: tabular-nums; }
         .day-cals-label strong { color: var(--dark); }
-        .cal-bar-track {
-            height: 4px;
-            background: var(--light-gray);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .cal-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            border-radius: 2px;
-            transition: width 0.4s;
-        }
+        .cal-bar-track { height: 4px; background: var(--light-gray); border-radius: 2px; overflow: hidden; }
+        .cal-bar-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; transition: width 0.4s; }
         .cal-bar-fill.over { background: linear-gradient(90deg, #f6ad55, #f56565); }
-        .day-prot {
-            margin-top: 5px;
-            font-size: 0.7rem;
-            color: var(--gray);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-variant-numeric: tabular-nums;
-        }
+        .day-prot { margin-top: 5px; font-size: 0.7rem; color: var(--gray); display: flex; align-items: center; gap: 4px; font-variant-numeric: tabular-nums; }
         .prot-dot { width: 6px; height: 6px; border-radius: 50%; background: #48bb78; flex-shrink: 0; }
         .prot-dot.low  { background: #f6ad55; }
         .prot-dot.vlow { background: #f56565; }
 
-        /* Cartes repas */
         .meal-draft-card {
-            background: white;
-            border: 1px solid #c4b9f0;
-            border-radius: 10px;
-            padding: 10px 11px;
-            cursor: pointer;
-            transition: box-shadow 0.15s, border-color 0.15s;
+            background: white; border: 1px solid #c4b9f0; border-radius: 10px; padding: 10px 11px;
+            cursor: pointer; transition: box-shadow 0.15s, border-color 0.15s;
         }
         .meal-draft-card:hover { box-shadow: 0 4px 12px rgba(102,126,234,0.15); border-color: var(--primary); }
         .meal-draft-card.confirmed { border-color: #9ae6b4; background: #f0fff4; }
 
-        .draft-card-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 5px;
-        }
-        .type-badge {
-            font-size: 0.65rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 2px 8px;
-            border-radius: 20px;
-        }
+        .draft-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+        .type-badge { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 8px; border-radius: 20px; }
         .type-badge.breakfast { background: #fffaf0; color: #744210; border: 1px solid #fbd38d; }
         .type-badge.lunch     { background: #f0f4ff; color: var(--primary); border: 1px solid #bee3f8; }
         .type-badge.dinner    { background: #faf5ff; color: #553c9a; border: 1px solid #d6bcfa; }
         .type-badge.snack     { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
 
-        .draft-title { font-size: 0.8rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
-        .draft-macros {
-            font-size: 0.7rem;
-            color: var(--gray);
-            display: flex;
-            gap: 8px;
-            font-variant-numeric: tabular-nums;
-        }
+        .draft-title  { font-size: 0.8rem; font-weight: 700; color: var(--dark); margin-bottom: 3px; }
+        .draft-macros { font-size: 0.7rem; color: var(--gray); display: flex; gap: 8px; font-variant-numeric: tabular-nums; flex-wrap: wrap; }
         .macro-cal  { color: var(--primary); font-weight: 700; }
         .macro-prot { color: #276749; font-weight: 600; }
+        .macro-salt { color: #c05621; }
+        .macro-k    { color: #2b6cb0; }
 
-        .draft-actions {
-            display: none;
-            gap: 4px;
-            margin-top: 8px;
-            padding-top: 7px;
-            border-top: 1px solid var(--light-gray);
-        }
+        .draft-actions { display: none; gap: 4px; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--light-gray); }
         .meal-draft-card:hover .draft-actions,
         .meal-draft-card.expanded .draft-actions { display: flex; }
 
         .btn-da {
-            flex: 1;
-            height: 26px;
-            border-radius: 6px;
-            border: 1px solid var(--light-gray);
-            background: #f7fafc;
-            color: var(--gray);
-            cursor: pointer;
-            font-size: 0.7rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            transition: 0.15s;
-            white-space: nowrap;
-            padding: 0 6px;
+            flex: 1; height: 26px; border-radius: 6px; border: 1px solid var(--light-gray);
+            background: #f7fafc; color: var(--gray); cursor: pointer; font-size: 0.7rem;
+            font-weight: 600; display: flex; align-items: center; justify-content: center;
+            gap: 3px; transition: 0.15s; white-space: nowrap; padding: 0 6px;
         }
         .btn-da:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; }
         .btn-da.confirm-btn { border-color: #9ae6b4; color: #276749; background: #f0fff4; }
@@ -304,238 +160,153 @@
         .btn-da.del-btn:hover { border-color: var(--danger); color: var(--danger); background: #fff5f5; }
 
         .btn-add-day {
-            border: 1px dashed var(--light-gray);
-            background: transparent;
-            color: #a0aec0;
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 7px;
-            border-radius: 10px;
-            width: 100%;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            border: 1px dashed var(--light-gray); background: transparent; color: #a0aec0;
+            font-size: 0.78rem; font-weight: 600; padding: 7px; border-radius: 10px;
+            width: 100%; cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; gap: 4px;
         }
-        .btn-add-day:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            background: #f0f4ff;
-            border-style: solid;
-        }
+        .btn-add-day:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; border-style: solid; }
         .day-empty { font-size: 0.72rem; color: #a0aec0; text-align: center; padding: 4px 0 2px; }
 
-        /* Modal planning */
+        /* ===== MODAL PLANNING ===== */
         #planModal {
-            display: none;
-            position: fixed;
-            z-index: 3000;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            backdrop-filter: blur(4px);
-            align-items: center;
-            justify-content: center;
+            display: none; position: fixed; z-index: 3000; inset: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            align-items: flex-start; justify-content: center; overflow-y: auto; padding: 20px 0;
         }
         #planModal.open { display: flex; }
         .plan-modal-box {
-            background: white;
-            border-radius: 14px;
-            width: 90%;
-            max-width: 480px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            background: white; border-radius: 14px; width: 90%; max-width: 580px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2); margin: auto;
         }
         .plan-modal-head {
-            padding: 1.2rem 1.4rem 1rem;
-            border-bottom: 1px solid var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            padding: 1rem 1.2rem 0.8rem; border-bottom: 1px solid var(--light-gray);
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: white; border-radius: 14px 14px 0 0; z-index: 1;
         }
-        .plan-modal-head h3 { margin: 0; font-size: 1.05rem; }
-        .plan-modal-body { padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 1rem; }
-        .plan-modal-foot {
-            padding: 1rem 1.4rem;
-            border-top: 1px solid var(--light-gray);
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
+        .plan-modal-head h3 { margin: 0; font-size: 1rem; }
+        .plan-modal-body { padding: 1rem 1.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+        .plan-modal-foot { padding: 0.9rem 1.2rem; border-top: 1px solid var(--light-gray); display: flex; gap: 8px; justify-content: flex-end; }
+
         .pm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .pm-field { display: flex; flex-direction: column; gap: 5px; }
-        .pm-label { font-size: 0.78rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
+        .pm-field { display: flex; flex-direction: column; gap: 4px; }
+        .pm-label { font-size: 0.72rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
         .pm-input, .pm-select {
-            height: 38px;
-            border-radius: 8px;
-            border: 1px solid var(--light-gray);
-            background: #f7fafc;
-            color: var(--dark);
-            padding: 0 12px;
-            font-size: 0.9rem;
-            font-family: inherit;
-            outline: none;
-            width: 100%;
-            transition: border-color 0.2s;
-            -webkit-appearance: none;
+            height: 34px; border-radius: 8px; border: 1px solid var(--light-gray);
+            background: #f7fafc; color: var(--dark); padding: 0 10px; font-size: 0.88rem;
+            font-family: inherit; outline: none; width: 100%; transition: border-color 0.2s; -webkit-appearance: none;
         }
         .pm-input:focus, .pm-select:focus { border-color: var(--primary); }
 
-        /* Aliments dans le modal planning */
-        .food-rows { display: flex; flex-direction: column; gap: 6px; }
+        /* Ligne aliment dans le modal */
         .food-row-pm {
             display: grid;
-            grid-template-columns: 1fr 70px 30px;
-            gap: 6px;
+            grid-template-columns: 1fr 60px 90px 28px;
+            gap: 5px;
             align-items: center;
         }
-        .food-row-pm input {
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid var(--light-gray);
-            background: #f7fafc;
-            color: var(--dark);
-            padding: 0 8px;
-            font-size: 0.85rem;
-            font-family: inherit;
-            outline: none;
-            width: 100%;
-            transition: border-color 0.2s;
+        .food-row-pm input[type="text"] {
+            height: 30px; border-radius: 6px; border: 1px solid var(--light-gray);
+            background: #f7fafc; color: var(--dark); padding: 0 8px; font-size: 0.82rem;
+            font-family: inherit; outline: none; transition: border-color 0.2s; width: 100%;
         }
-        .food-row-pm input:focus { border-color: var(--primary); }
+        .food-row-pm input[type="number"] {
+            height: 30px; border-radius: 6px; border: 1px solid var(--light-gray);
+            background: #f7fafc; color: var(--dark); padding: 0 6px; font-size: 0.82rem;
+            font-family: inherit; outline: none; transition: border-color 0.2s; width: 100%;
+            text-align: center; font-variant-numeric: tabular-nums;
+        }
+        .food-row-pm select {
+            height: 30px; border-radius: 6px; border: 1px solid var(--light-gray);
+            background: #f7fafc; color: var(--dark); padding: 0 4px; font-size: 0.75rem;
+            font-family: inherit; outline: none; transition: border-color 0.2s; width: 100%;
+            -webkit-appearance: none; cursor: pointer;
+        }
+        .food-row-pm input:focus, .food-row-pm select:focus { border-color: var(--primary); }
+
+        /* Résultats recherche dans modal */
+        .pm-search-wrap { position: relative; }
+        .pm-results {
+            position: absolute; top: 100%; left: 0; right: 0; background: white;
+            border: 1px solid var(--light-gray); border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12); z-index: 100;
+            max-height: 180px; overflow-y: auto; display: none;
+        }
+        .pm-result-item {
+            padding: 7px 10px; cursor: pointer; font-size: 0.82rem;
+            border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;
+        }
+        .pm-result-item:hover { background: #f0f4ff; }
+        .pm-result-item span { font-size: 0.72rem; color: var(--gray); }
+        .pm-result-item strong { color: var(--dark); }
+
         .btn-rm-food {
-            width: 30px; height: 30px;
-            border-radius: 6px;
-            border: none;
-            background: #fff5f5;
-            color: var(--danger);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 700;
-            transition: 0.15s;
+            width: 28px; height: 28px; border-radius: 6px; border: none;
+            background: #fff5f5; color: var(--danger); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; font-weight: 700; transition: 0.15s; flex-shrink: 0;
         }
         .btn-rm-food:hover { background: var(--danger); color: white; }
+
         .btn-add-food-pm {
-            height: 30px;
-            border-radius: 6px;
-            border: 1px dashed var(--light-gray);
-            background: transparent;
-            color: #a0aec0;
-            cursor: pointer;
-            font-size: 0.8rem;
-            font-weight: 600;
-            padding: 0 12px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            transition: 0.15s;
-            align-self: flex-start;
+            height: 28px; border-radius: 6px; border: 1px dashed var(--light-gray);
+            background: transparent; color: #a0aec0; cursor: pointer; font-size: 0.78rem;
+            font-weight: 600; padding: 0 12px; display: inline-flex; align-items: center;
+            gap: 5px; transition: 0.15s; margin-top: 2px;
         }
         .btn-add-food-pm:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; border-style: solid; }
 
+        .food-rows-header {
+            display: grid; grid-template-columns: 1fr 60px 90px 28px;
+            gap: 5px; margin-bottom: 3px;
+        }
+        .food-rows-header span {
+            font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+            color: var(--gray); letter-spacing: 0.04em;
+        }
+
         /* Preview totaux */
         .preview-box {
-            background: #f0f4ff;
-            border: 1px solid #dce3f8;
-            border-radius: 10px;
-            padding: 10px 14px;
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            text-align: center;
+            background: #f0f4ff; border: 1px solid #dce3f8; border-radius: 10px;
+            padding: 9px 12px; display: grid; grid-template-columns: repeat(7, 1fr);
+            gap: 6px; text-align: center;
         }
-        .prev-stat { display: flex; flex-direction: column; gap: 2px; }
-        .prev-val {
-            font-size: 1.05rem;
-            font-weight: 800;
-            color: var(--primary);
-            font-variant-numeric: tabular-nums;
-        }
+        .prev-stat { display: flex; flex-direction: column; gap: 1px; }
+        .prev-val { font-size: 0.88rem; font-weight: 800; color: var(--primary); font-variant-numeric: tabular-nums; }
         .prev-val.prot { color: #276749; }
-        .prev-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); }
+        .prev-val.salt { color: #c05621; }
+        .prev-val.k    { color: #2b6cb0; }
+        .prev-val.fib  { color: #744210; }
+        .prev-lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray); line-height: 1.2; }
 
         /* Boutons modal planning */
         .btn-pm-cancel {
-            height: 36px; padding: 0 16px;
-            border-radius: 8px;
-            border: 1px solid var(--light-gray);
-            background: transparent;
-            color: var(--gray);
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: 0.15s;
+            height: 34px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--light-gray);
+            background: transparent; color: var(--gray); cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: 0.15s;
         }
         .btn-pm-cancel:hover { border-color: var(--gray); color: var(--dark); }
         .btn-pm-save {
-            height: 36px; padding: 0 18px;
-            border-radius: 8px;
-            border: none;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 700;
-            transition: opacity 0.15s;
+            height: 34px; padding: 0 16px; border-radius: 8px; border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2); color: white;
+            cursor: pointer; font-size: 0.85rem; font-weight: 700; transition: opacity 0.15s;
         }
         .btn-pm-save:hover { opacity: 0.88; }
 
         /* Toast */
         #toastZone {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
         }
         .toast-msg {
-            background: var(--dark);
-            color: white;
-            padding: 9px 18px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
-            white-space: nowrap;
-            animation: toastin 0.22s ease;
-            pointer-events: auto;
+            background: var(--dark); color: white; padding: 9px 18px; border-radius: 20px;
+            font-size: 0.85rem; font-weight: 500; white-space: nowrap; animation: toastin 0.22s ease; pointer-events: auto;
         }
         .toast-msg.ok   { background: #48bb78; }
         .toast-msg.warn { background: #e53e3e; }
         @keyframes toastin { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
 
         /* Confirm inline */
-        .inline-confirm {
-            display: none;
-            position: fixed;
-            z-index: 4000;
-            inset: 0;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(3px);
-            align-items: center;
-            justify-content: center;
-        }
+        .inline-confirm { display: none; position: fixed; z-index: 4000; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); align-items: center; justify-content: center; }
         .inline-confirm.open { display: flex; }
-        .confirm-box {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            max-width: 340px;
-            width: 90%;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
+        .confirm-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 340px; width: 90%; text-align: center; display: flex; flex-direction: column; gap: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .confirm-box p { margin: 0; font-size: 0.95rem; color: var(--dark); }
         .confirm-box-btns { display: flex; gap: 8px; justify-content: center; }
         .confirm-box-btns button { padding: 0.5rem 1.2rem; }
@@ -543,10 +314,9 @@
         @media (max-width: 768px) {
             .search-header { flex-direction: column; align-items: flex-start; }
             .search-title-group { flex-direction: column; align-items: flex-start; width: 100%; }
-            .search-title-group .field { width: 100% !important; }
-            .search-title-group h2 { margin-bottom: 5px; }
             .planning-header { flex-direction: column; align-items: flex-start; }
             .week-label { min-width: unset; }
+            .preview-box { grid-template-columns: repeat(4, 1fr); }
         }
     </style>
 </head>
@@ -602,12 +372,10 @@
                     </div>
                 </div>
             </div>
-
             <div style="display: flex; gap: 10px; margin-bottom: 1rem;">
                 <button class="btn-secondary" onclick="loadFavorites()" style="flex:1;">⭐ Favoris</button>
                 <button class="btn-secondary" onclick="loadRecents()" style="flex:1;">🕒 Récents</button>
             </div>
-
             <div class="grid-inputs">
                 <div class="field" style="grid-column: span 2; position: relative;">
                     <label>Nom de l'aliment</label>
@@ -621,17 +389,16 @@
                         <input type="number" id="mealQty" value="100" min="0.1" step="any" oninput="calculatePreview()" style="text-align:center; width:70px; flex-shrink:0;">
                         <button type="button" onclick="stepQty(1)" style="background:#edf2f7; border:1px solid var(--light-gray); border-radius:8px; padding:0.5rem 0.75rem; font-size:1.1rem; font-weight:700; cursor:pointer; min-width:36px; flex-shrink:0;">+</button>
                         <select id="qtyUnit" onchange="onUnitChange()" style="flex:1; min-width:0; padding:0.7rem 0.4rem; border:1px solid var(--light-gray); border-radius:8px; font-size:0.9rem; background:white; cursor:pointer;">
-                            <option value="g"     data-ml="1"    data-label="g">g / ml</option>
-                            <option value="cac"   data-ml="5"    data-label="cac">🥄 Cuillère à café (5ml)</option>
-                            <option value="cas"   data-ml="15"   data-label="cas">🥄 Cuillère à soupe (15ml)</option>
-                            <option value="pincee" data-ml="0.3" data-label="pincée">🤏 Pincée (0,3g)</option>
-                            <option value="unite" data-ml="1"    data-label="unité">🔢 Unité / pièce</option>
+                            <option value="g"      data-ml="1"    data-label="g">g / ml</option>
+                            <option value="cac"    data-ml="5"    data-label="cac">🥄 Cuillère à café (5ml)</option>
+                            <option value="cas"    data-ml="15"   data-label="cas">🥄 Cuillère à soupe (15ml)</option>
+                            <option value="pincee" data-ml="0.3"  data-label="pincée">🤏 Pincée (0,3g)</option>
+                            <option value="unite"  data-ml="1"    data-label="unité">🔢 Unité / pièce</option>
                         </select>
                     </div>
                     <div id="qtyConversion" style="font-size:0.78rem; color:var(--gray); margin-top:4px; min-height:18px;"></div>
                 </div>
             </div>
-
             <div id="adjustmentZone" style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed var(--primary);">
                 <div class="grid-inputs">
                     <div class="field"><label>Cal</label><input type="number" id="adjCal" readonly style="background:#eee"></div>
@@ -691,8 +458,9 @@
                 <button class="btn-week" id="btnThisWeek" style="margin-left:4px;">Auj.</button>
             </div>
             <div class="week-summary-chips" id="planChips" style="display:none">
-                <span class="chip" id="chipCals">—</span>
-                <span class="chip ok" id="chipProt">—</span>
+                <span class="chip"      id="chipCals">—</span>
+                <span class="chip ok"   id="chipProt">—</span>
+                <span class="chip warn" id="chipSalt">—</span>
                 <span class="chip draft-count" id="chipDrafts">—</span>
             </div>
             <button class="btn-week primary-week" id="btnNewPlan">+ Planifier un repas</button>
@@ -706,7 +474,7 @@
 
 </main>
 
-<!-- Modal food catalogue -->
+<!-- Modal food catalogue (page repas) -->
 <div id="foodModal" class="modal">
     <div class="modal-content card">
         <span class="close-modal" onclick="closeFoodModal()">&times;</span>
@@ -730,21 +498,22 @@
     </div>
 </div>
 
-<!-- Modal planning -->
+<!-- Modal planning (version compacte mais complète) -->
 <div id="planModal">
     <div class="plan-modal-box">
         <div class="plan-modal-head">
             <h3 id="planModalTitle">Planifier un repas</h3>
-            <button onclick="closePlanModal()" style="background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--gray);">×</button>
+            <button onclick="closePlanModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--gray);padding:0;line-height:1;">×</button>
         </div>
         <div class="plan-modal-body">
+            <!-- Date + type -->
             <div class="pm-row">
                 <div class="pm-field">
                     <span class="pm-label">Date planifiée</span>
                     <input type="date" class="pm-input" id="pmDate">
                 </div>
                 <div class="pm-field">
-                    <span class="pm-label">Type</span>
+                    <span class="pm-label">Type de repas</span>
                     <select class="pm-select" id="pmType">
                         <option value="breakfast">🌅 Petit-déjeuner</option>
                         <option value="lunch">🌞 Déjeuner</option>
@@ -753,25 +522,41 @@
                     </select>
                 </div>
             </div>
+            <!-- Nom -->
             <div class="pm-field">
                 <span class="pm-label">Nom du repas</span>
                 <input type="text" class="pm-input" id="pmTitle" placeholder="ex: Poulet riz brocolis">
             </div>
+            <!-- Aliments -->
             <div class="pm-field">
                 <span class="pm-label">Aliments</span>
+                <!-- En-tête colonnes -->
+                <div class="food-rows-header">
+                    <span>Aliment</span>
+                    <span>Qté</span>
+                    <span>Unité</span>
+                    <span></span>
+                </div>
                 <div class="food-rows" id="pmFoodRows"></div>
                 <button class="btn-add-food-pm" id="btnPmAddFood">+ Ajouter un aliment</button>
             </div>
-            <div class="preview-box" id="pmPreview">
-                <div class="prev-stat"><span class="prev-val" id="pmPrevCal">0</span><span class="prev-lbl">kcal</span></div>
-                <div class="prev-stat"><span class="prev-val prot" id="pmPrevProt">0g</span><span class="prev-lbl">protéines</span></div>
-                <div class="prev-stat"><span class="prev-val" id="pmPrevCarb" style="color:#d69e2e;">0g</span><span class="prev-lbl">glucides</span></div>
-                <div class="prev-stat"><span class="prev-val" id="pmPrevFat" style="color:var(--gray);">0g</span><span class="prev-lbl">lipides</span></div>
+            <!-- Preview totaux -->
+            <div class="pm-field">
+                <span class="pm-label">Estimation nutritionnelle</span>
+                <div class="preview-box" id="pmPreview">
+                    <div class="prev-stat"><span class="prev-val" id="pmPrevCal">0</span><span class="prev-lbl">kcal</span></div>
+                    <div class="prev-stat"><span class="prev-val prot" id="pmPrevProt">0g</span><span class="prev-lbl">prot.</span></div>
+                    <div class="prev-stat"><span class="prev-val" id="pmPrevCarb" style="color:#d69e2e;">0g</span><span class="prev-lbl">gluc.</span></div>
+                    <div class="prev-stat"><span class="prev-val" id="pmPrevFat" style="color:var(--gray);">0g</span><span class="prev-lbl">lip.</span></div>
+                    <div class="prev-stat"><span class="prev-val fib" id="pmPrevFib">0g</span><span class="prev-lbl">fibres</span></div>
+                    <div class="prev-stat"><span class="prev-val salt" id="pmPrevSalt">0g</span><span class="prev-lbl">🧂 sel</span></div>
+                    <div class="prev-stat"><span class="prev-val k" id="pmPrevK">0mg</span><span class="prev-lbl">⚡ K</span></div>
+                </div>
             </div>
         </div>
         <div class="plan-modal-foot">
             <button class="btn-pm-cancel" onclick="closePlanModal()">Annuler</button>
-            <button class="btn-pm-save" id="btnPmSave">Enregistrer le brouillon</button>
+            <button class="btn-pm-save" id="btnPmSave">Créer le brouillon</button>
         </div>
     </div>
 </div>
@@ -790,25 +575,18 @@
 <!-- Toast -->
 <div id="toastZone"></div>
 
-<div class="progress-container">
-    <div id="calProgress" class="progress-bar" style="width: 0%"></div>
-</div>
-<small style="font-size: 0.65rem; color: var(--gray);">Objectif: 2000 kcal</small>
-
 <script>
 // ===== CONFIG =====
-const API_BASE = '';  // même origine — ajuste si besoin ex: 'https://trackcalorilog-back.onrender.com'
 const DAILY_CAL  = 2200;
 const DAILY_PROT = 160;
 
-// ===== EXISTING CODE (inchangé) =====
+// ===== VARIABLES GLOBALES =====
 let currentMealItems = [];
-let selectedFood = null;
-let fullCatalog = [];
+let selectedFood     = null;
+let fullCatalog      = [];
 
 const searchInput = document.getElementById('foodSearch');
 const resultsDiv  = document.getElementById('searchResults');
-const qtyInput    = document.getElementById('mealQty');
 const rawToken    = localStorage.getItem('token');
 const cleanToken  = rawToken ? rawToken.replace('Bearer ', '').replace(/"/g, '').trim() : null;
 
@@ -817,18 +595,19 @@ if (!cleanToken) window.location.href = '/trackcalorilog/login';
 window.goToCatalogue = () => { window.location.href = `/nutrition/catalogue?token=${cleanToken}`; };
 window.goToJournal   = () => { window.location.href = `/nutrition/journal?token=${cleanToken}`; };
 
+// ===== CATALOGUE =====
 async function loadFullCatalog() {
     try {
-        const response = await fetch('/api/nutrition/allFood', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
-        if (response.ok) fullCatalog = await response.json();
-    } catch (error) { console.error(error); }
+        const res = await fetch('/api/nutrition/allFood', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
+        if (res.ok) fullCatalog = await res.json();
+    } catch (e) { console.error(e); }
 }
 
+// ===== RECHERCHE PAGE REPAS =====
 searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    if (query.length < 1) { resultsDiv.style.display = 'none'; return; }
-    const filtered = fullCatalog.filter(f => f.name.toLowerCase().includes(query));
-    displayFoodResults(filtered);
+    const q = e.target.value.toLowerCase().trim();
+    if (q.length < 1) { resultsDiv.style.display = 'none'; return; }
+    displayFoodResults(fullCatalog.filter(f => f.name.toLowerCase().includes(q)));
 });
 
 window.displayFoodResults = (foods) => {
@@ -836,17 +615,17 @@ window.displayFoodResults = (foods) => {
         resultsDiv.innerHTML = `<div class="search-item" onclick="openFoodModal()">❌ Aucun résultat. Créer ?</div>`;
     } else {
         resultsDiv.innerHTML = foods.map(f => {
-            const isFav = f.isFavorite ? '★' : '☆';
-            const starColor = f.isFavorite ? '#f6ad55' : 'var(--gray)';
-            const foodData = JSON.stringify(f).replace(/'/g, "&apos;");
+            const isFav   = f.isFavorite ? '★' : '☆';
+            const sColor  = f.isFavorite ? '#f6ad55' : 'var(--gray)';
+            const fd      = JSON.stringify(f).replace(/'/g, "&apos;");
             const idToUse = f._id || f.foodId;
             return `
-                <div class="search-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; cursor:pointer;">
-                    <div onclick='handleSelection(${foodData})' style="flex:1;">
+                <div class="search-item" style="display:flex; justify-content:space-between; align-items:center;">
+                    <div onclick='handleSelection(${fd})' style="flex:1;">
                         <strong>${f.name}</strong><br>
-                        <small>${f.brand || 'Générique'} - ${f.calories100g || f.calories} kcal</small>
+                        <small>${f.brand || 'Générique'} — ${f.calories100g || f.calories} kcal/100g</small>
                     </div>
-                    ${idToUse ? `<button onclick="event.stopPropagation(); toggleFavorite('${idToUse}')" style="background:none; border:none; color:${starColor}; font-size:1.4rem; cursor:pointer;">${isFav}</button>` : ''}
+                    ${idToUse ? `<button onclick="event.stopPropagation(); toggleFavorite('${idToUse}')" style="background:none; border:none; color:${sColor}; font-size:1.4rem; cursor:pointer;">${isFav}</button>` : ''}
                 </div>`;
         }).join('');
     }
@@ -867,45 +646,45 @@ window.handleSelection = (food) => {
     calculatePreview();
 };
 
-const UNIT_CONVERSIONS = {
-    g:      { ml: 1,    label: 'g',      step: 10  },
-    cac:    { ml: 5,    label: 'cac',    step: 1   },
-    cas:    { ml: 15,   label: 'cas',    step: 1   },
-    pincee: { ml: 0.3,  label: 'pincée', step: 1   },
-    unite:  { ml: 1,    label: 'unité',  step: 1   },
+// ===== UNITÉS =====
+const UNIT_CONV = {
+    g:      { ml: 1,   label: 'g',      step: 10 },
+    cac:    { ml: 5,   label: 'cac',    step: 1  },
+    cas:    { ml: 15,  label: 'cas',    step: 1  },
+    pincee: { ml: 0.3, label: 'pincée', step: 1  },
+    unite:  { ml: 1,   label: 'unité',  step: 1  },
 };
 
 function getQtyInGrams() {
     const unit = document.getElementById('qtyUnit').value;
     const val  = parseFloat(document.getElementById('mealQty').value) || 0;
-    return val * UNIT_CONVERSIONS[unit].ml;
+    return val * UNIT_CONV[unit].ml;
 }
 
 function updateConversionHint() {
-    const unit = document.getElementById('qtyUnit').value;
-    const val  = parseFloat(document.getElementById('mealQty').value) || 0;
-    const conv = UNIT_CONVERSIONS[unit];
-    const hint = document.getElementById('qtyConversion');
+    const unit  = document.getElementById('qtyUnit').value;
+    const val   = parseFloat(document.getElementById('mealQty').value) || 0;
+    const conv  = UNIT_CONV[unit];
+    const hint  = document.getElementById('qtyConversion');
     if (unit === 'g') { hint.textContent = ''; return; }
-    const grams = val * conv.ml;
-    hint.textContent = `= ${grams % 1 === 0 ? grams : grams.toFixed(1)} g / ml`;
+    const g = val * conv.ml;
+    hint.textContent = `= ${g % 1 === 0 ? g : g.toFixed(1)} g / ml`;
 }
 
 window.onUnitChange = () => {
-    const unit = document.getElementById('qtyUnit').value;
+    const unit  = document.getElementById('qtyUnit').value;
     const qtyEl = document.getElementById('mealQty');
-    if (unit === 'g') qtyEl.value = 100;
-    else qtyEl.value = 1;
+    qtyEl.value = unit === 'g' ? 100 : 1;
     updateConversionHint();
     calculatePreview();
 };
 
-window.stepQty = (direction) => {
+window.stepQty = (dir) => {
     const unit  = document.getElementById('qtyUnit').value;
-    const conv  = UNIT_CONVERSIONS[unit];
+    const conv  = UNIT_CONV[unit];
     const qtyEl = document.getElementById('mealQty');
     const cur   = parseFloat(qtyEl.value) || 0;
-    qtyEl.value = Number(Math.max(conv.ml > 0 ? conv.ml : 0.1, cur + direction * conv.step).toFixed(2));
+    qtyEl.value = Number(Math.max(conv.ml > 0 ? conv.ml : 0.1, cur + dir * conv.step).toFixed(2));
     updateConversionHint();
     calculatePreview();
 };
@@ -923,13 +702,14 @@ window.calculatePreview = () => {
     updateConversionHint();
 };
 
+// ===== ASSIETTE =====
 document.getElementById('addToListBtn').addEventListener('click', () => {
     if (!selectedFood) return showToast("Sélectionnez un aliment d'abord", 'warn');
-    const grams  = getQtyInGrams();
+    const grams = getQtyInGrams();
     if (isNaN(grams) || grams <= 0) return showToast("Quantité invalide", 'warn');
     const unit   = document.getElementById('qtyUnit').value;
     const rawQty = parseFloat(document.getElementById('mealQty').value);
-    const conv   = UNIT_CONVERSIONS[unit];
+    const conv   = UNIT_CONV[unit];
     const qtyLabel = unit === 'g' ? `${grams}g` : `${rawQty} ${conv.label} (${grams % 1 === 0 ? grams : grams.toFixed(1)}g)`;
     currentMealItems.push({
         name: selectedFood.name, qty: grams, qtyLabel,
@@ -942,13 +722,15 @@ document.getElementById('addToListBtn').addEventListener('click', () => {
         potassium: parseFloat(document.getElementById('adjK').value) || 0
     });
     updateMealUI();
-    searchInput.value = "";
+    searchInput.value = '';
     selectedFood = null;
     resetAdjustmentZone();
 });
 
 function resetAdjustmentZone() {
-    ['adjCal','adjProt','adjCarb','adjFat','adjFib','adjSalt','adjK'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    ['adjCal','adjProt','adjCarb','adjFat','adjFib','adjSalt','adjK'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.value = '';
+    });
     document.getElementById('mealQty').value = 100;
     document.getElementById('qtyUnit').value = 'g';
     document.getElementById('qtyConversion').textContent = '';
@@ -956,16 +738,16 @@ function resetAdjustmentZone() {
 
 function updateMealUI() {
     const body = document.getElementById('mealItemsBody');
-    body.innerHTML = "";
-    let totals = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0, potassium:0 };
+    body.innerHTML = '';
+    let tot = { cal:0, prot:0, carb:0, fat:0, fib:0, salt:0, potassium:0 };
     currentMealItems.forEach((it, i) => {
-        totals.cal += it.cal; totals.prot += it.prot; totals.carb += it.carb;
-        totals.fat += it.fat; totals.fib  += it.fib;  totals.salt += it.salt;
-        totals.potassium += (it.potassium || 0);
+        tot.cal += it.cal; tot.prot += it.prot; tot.carb += it.carb;
+        tot.fat += it.fat; tot.fib  += it.fib;  tot.salt += it.salt;
+        tot.potassium += (it.potassium || 0);
         body.innerHTML += `
             <tr>
                 <td><strong>${it.name}</strong></td>
-                <td class="editable" onclick="editLocalItem(${i}, 'qty')">${it.qtyLabel || it.qty + 'g'}</td>
+                <td class="editable" onclick="editLocalItem(${i},'qty')">${it.qtyLabel || it.qty + 'g'}</td>
                 <td>${it.cal.toFixed(0)}</td>
                 <td>${it.prot.toFixed(1)}g</td>
                 <td style="color:#c05621">${it.salt.toFixed(2)}g</td>
@@ -973,18 +755,18 @@ function updateMealUI() {
                 <td><button class="btn-danger-sm" onclick="removeItem(${i})">X</button></td>
             </tr>`;
     });
-    document.getElementById('tCal').innerText  = totals.cal.toFixed(0);
-    document.getElementById('tProt').innerText = totals.prot.toFixed(1) + "g";
-    document.getElementById('tCarb').innerText = totals.carb.toFixed(1) + "g";
-    document.getElementById('tFat').innerText  = totals.fat.toFixed(1) + "g";
-    document.getElementById('tFib').innerText  = totals.fib.toFixed(1) + "g";
-    document.getElementById('tSalt').innerText = totals.salt.toFixed(2) + "g";
-    document.getElementById('tK').innerText    = Math.round(totals.potassium) + "mg";
+    document.getElementById('tCal').innerText  = tot.cal.toFixed(0);
+    document.getElementById('tProt').innerText = tot.prot.toFixed(1) + 'g';
+    document.getElementById('tCarb').innerText = tot.carb.toFixed(1) + 'g';
+    document.getElementById('tFat').innerText  = tot.fat.toFixed(1)  + 'g';
+    document.getElementById('tFib').innerText  = tot.fib.toFixed(1)  + 'g';
+    document.getElementById('tSalt').innerText = tot.salt.toFixed(2) + 'g';
+    document.getElementById('tK').innerText    = Math.round(tot.potassium) + 'mg';
 }
 
-window.editLocalItem = (index, field) => {
-    const newVal = prompt(`Nouvelle valeur ?`, currentMealItems[index][field]);
-    if (newVal !== null && !isNaN(newVal)) { currentMealItems[index][field] = parseFloat(newVal); updateMealUI(); }
+window.editLocalItem = (i, f) => {
+    const v = prompt('Nouvelle valeur ?', currentMealItems[i][f]);
+    if (v !== null && !isNaN(v)) { currentMealItems[i][f] = parseFloat(v); updateMealUI(); }
 };
 window.removeItem = (i) => { currentMealItems.splice(i, 1); updateMealUI(); };
 
@@ -997,11 +779,10 @@ window.toggleFavorite = async (id) => {
 
 window.saveMeal = async function() {
     const title = document.getElementById('mealTitle').value;
-    if (!title || currentMealItems.length === 0) return showToast("Données manquantes", 'warn');
-    const dateVal  = document.getElementById('mealDateCustom').value;
+    if (!title || currentMealItems.length === 0) return showToast('Données manquantes', 'warn');
+    const dateVal = document.getElementById('mealDateCustom').value;
     const mealData = {
-        title,
-        type: document.getElementById('mealType').value,
+        title, type: document.getElementById('mealType').value,
         description: document.getElementById('mealDesc').value,
         date: dateVal ? new Date(dateVal).toISOString() : new Date().toISOString(),
         items: currentMealItems.map(it => ({
@@ -1015,11 +796,11 @@ window.saveMeal = async function() {
         body: JSON.stringify(mealData)
     });
     if (res.ok) {
-        showToast("Repas enregistré ✓", 'ok');
+        showToast('Repas enregistré ✓', 'ok');
         currentMealItems = [];
-        document.getElementById('mealTitle').value = "";
-        document.getElementById('mealDesc').value  = "";
-        document.getElementById('mealType').value  = "lunch";
+        document.getElementById('mealTitle').value = '';
+        document.getElementById('mealDesc').value  = '';
+        document.getElementById('mealType').value  = 'lunch';
         updateMealUI();
         renderHistory();
     }
@@ -1044,7 +825,7 @@ window.renderHistory = async function() {
 };
 
 window.deleteMeal = async (id) => {
-    askConfirm("Supprimer ce repas ?", async () => {
+    askConfirm('Supprimer ce repas ?', async () => {
         await fetch(`/api/nutrition/meals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${cleanToken}` } });
         renderHistory();
     });
@@ -1054,7 +835,6 @@ window.loadFavorites = async () => {
     const res = await fetch('/api/nutrition/foods/favorites', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
     if (res.ok) displayFoodResults(await res.json());
 };
-
 window.loadRecents = async () => {
     const res = await fetch('/api/nutrition/meals/recents', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
     if (res.ok) displayFoodResults(await res.json());
@@ -1103,7 +883,7 @@ function showToast(msg, type) {
     setTimeout(() => t.remove(), 2800);
 }
 
-// ===== CONFIRM DIALOG (remplace alert/confirm) =====
+// ===== CONFIRM DIALOG =====
 let _confirmCb = null;
 function askConfirm(msg, cb) {
     document.getElementById('confirmMsg').textContent = msg;
@@ -1122,22 +902,21 @@ function confirmNo() {
 // ===== PLANNING =====
 let planWeekStart = getMonday(new Date());
 let planDrafts    = [];
-let pmFoodRows    = [];
+let pmFoodRows    = [];   // [{ name, qty, unit, selectedFood }]
 let pmEditId      = null;
 
 function getMonday(d) {
-    const dt = new Date(d);
+    const dt  = new Date(d);
     const day = dt.getDay();
-    const diff = dt.getDate() - day + (day === 0 ? -6 : 1);
-    dt.setDate(diff);
+    dt.setDate(dt.getDate() - day + (day === 0 ? -6 : 1));
     dt.setHours(0, 0, 0, 0);
     return dt;
 }
-function addDays(d, n) { const dt = new Date(d); dt.setDate(dt.getDate() + n); return dt; }
-function fmtDate(d) { return d.toISOString().split('T')[0]; }
-function sameDay(a, b) { return fmtDate(new Date(a)) === fmtDate(new Date(b)); }
+function addDays(d, n)  { const dt = new Date(d); dt.setDate(dt.getDate() + n); return dt; }
+function fmtDate(d)     { return d.toISOString().split('T')[0]; }
+function sameDay(a, b)  { return fmtDate(new Date(a)) === fmtDate(new Date(b)); }
 
-const DAY_SHORT  = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+const DAY_SHORT   = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTH_SHORT = ['jan.','fév.','mar.','avr.','mai','jui.','juil.','aoû.','sep.','oct.','nov.','déc.'];
 
 function weekLabel(s) {
@@ -1168,27 +947,26 @@ function renderPlanGrid() {
     const today = new Date();
     grid.innerHTML = '';
 
-    let totalCal = 0, totalProt = 0, draftCnt = 0;
+    let totalCal = 0, totalProt = 0, totalSalt = 0, draftCnt = 0;
 
     for (let i = 0; i < 7; i++) {
-        const day    = addDays(planWeekStart, i);
-        const isToday = sameDay(day, today);
+        const day      = addDays(planWeekStart, i);
+        const isToday  = sameDay(day, today);
         const dayMeals = planDrafts.filter(d => sameDay(d.plannedDate || d.date, day));
 
-        const dayCal  = dayMeals.reduce((s, d) => s + (d.totals?.calories || 0), 0);
-        const dayProt = dayMeals.reduce((s, d) => s + (d.totals?.proteins || 0), 0);
-        totalCal  += dayCal;
-        totalProt += dayProt;
+        const dayCal  = dayMeals.reduce((s, d) => s + (d.totals?.calories  || 0), 0);
+        const dayProt = dayMeals.reduce((s, d) => s + (d.totals?.proteins  || 0), 0);
+        const daySalt = dayMeals.reduce((s, d) => s + (d.totals?.salt      || 0), 0);
+        totalCal  += dayCal; totalProt += dayProt; totalSalt += daySalt;
         draftCnt  += dayMeals.filter(d => d.isDraft !== false).length;
 
-        const pct     = Math.min(Math.round(dayCal / DAILY_CAL * 100), 120);
-        const protOk  = dayProt >= DAILY_PROT * 0.85;
-        const protLow = dayProt > 0 && dayProt < DAILY_PROT * 0.5;
+        const pct    = Math.min(Math.round(dayCal / DAILY_CAL * 100), 120);
+        const protOk = dayProt >= DAILY_PROT * 0.85;
+        const protLow= dayProt > 0 && dayProt < DAILY_PROT * 0.5;
 
         const col = document.createElement('div');
         col.className = 'day-col';
 
-        // En-tête jour
         const hdr = document.createElement('div');
         hdr.className = 'day-header' + (isToday ? ' today' : '');
         hdr.innerHTML = `
@@ -1208,6 +986,7 @@ function renderPlanGrid() {
                     <div class="prot-dot${protOk ? '' : protLow ? ' vlow' : ' low'}"></div>
                     <span>${Math.round(dayProt)}g prot.</span>
                 </div>
+                ${daySalt > 0 ? `<div class="day-prot"><span style="color:#c05621">🧂 ${daySalt.toFixed(2)}g sel</span></div>` : ''}
             ` : ''}
         `;
         col.appendChild(hdr);
@@ -1222,6 +1001,7 @@ function renderPlanGrid() {
             dayMeals.forEach(draft => {
                 const card = document.createElement('div');
                 card.className = 'meal-draft-card' + (draft.isDraft === false ? ' confirmed' : '');
+                const t = draft.totals || {};
                 card.innerHTML = `
                     <div class="draft-card-top">
                         <span class="type-badge ${draft.type}">${TYPE_LBL[draft.type] || draft.type}</span>
@@ -1229,17 +1009,18 @@ function renderPlanGrid() {
                     </div>
                     <div class="draft-title">${draft.title || 'Repas sans titre'}</div>
                     <div class="draft-macros">
-                        <span class="macro-cal">${Math.round(draft.totals?.calories || 0)} kcal</span>
-                        <span class="macro-prot">${Math.round(draft.totals?.proteins || 0)}g prot</span>
-                        ${draft.totals?.carbs ? `<span>${Math.round(draft.totals.carbs)}g gluc</span>` : ''}
+                        <span class="macro-cal">${Math.round(t.calories || 0)} kcal</span>
+                        <span class="macro-prot">${Math.round(t.proteins || 0)}g prot</span>
+                        ${t.salt   > 0 ? `<span class="macro-salt">🧂 ${(t.salt||0).toFixed(2)}g</span>` : ''}
+                        ${t.potassium > 0 ? `<span class="macro-k">⚡ ${Math.round(t.potassium||0)}mg</span>` : ''}
                     </div>
                     <div class="draft-actions">
                         ${draft.isDraft !== false ? `<button class="btn-da confirm-btn" data-action="confirm" data-id="${draft._id}">✓ Confirmer</button>` : ''}
-                        <button class="btn-da" data-action="edit" data-id="${draft._id}">✎ Modifier</button>
+                        <button class="btn-da" data-action="edit"   data-id="${draft._id}">✎ Modifier</button>
                         <button class="btn-da del-btn" data-action="delete" data-id="${draft._id}">✕</button>
                     </div>
                 `;
-                card.addEventListener('click', (e) => {
+                card.addEventListener('click', e => {
                     const btn = e.target.closest('[data-action]');
                     if (btn) { e.stopPropagation(); handleDraftAction(btn.dataset.action, btn.dataset.id); }
                     else card.classList.toggle('expanded');
@@ -1253,15 +1034,15 @@ function renderPlanGrid() {
         addBtn.innerHTML = '+ Planifier';
         addBtn.addEventListener('click', () => openPlanModal(null, fmtDate(day)));
         col.appendChild(addBtn);
-
         grid.appendChild(col);
     }
 
     // Chips résumé
-    const activeDays = Array.from({length:7}, (_,i) => addDays(planWeekStart, i))
+    const activeDays = Array.from({length:7}, (_,i) => addDays(planWeekStart,i))
         .filter(d => planDrafts.some(dr => sameDay(dr.plannedDate || dr.date, d))).length || 1;
-    document.getElementById('chipCals').textContent  = `🔥 Moy. ${Math.round(totalCal / activeDays)} kcal/j`;
-    document.getElementById('chipProt').textContent  = `💪 Moy. ${Math.round(totalProt / activeDays)}g prot/j`;
+    document.getElementById('chipCals').textContent   = `🔥 Moy. ${Math.round(totalCal / activeDays)} kcal/j`;
+    document.getElementById('chipProt').textContent   = `💪 Moy. ${Math.round(totalProt / activeDays)}g prot/j`;
+    document.getElementById('chipSalt').textContent   = `🧂 Moy. ${(totalSalt / activeDays).toFixed(2)}g sel/j`;
     document.getElementById('chipDrafts').textContent = `📋 ${draftCnt} brouillon${draftCnt > 1 ? 's' : ''}`;
     document.getElementById('planChips').style.display = planDrafts.length > 0 ? 'flex' : 'none';
 }
@@ -1269,13 +1050,11 @@ function renderPlanGrid() {
 async function handleDraftAction(action, id) {
     if (action === 'confirm') {
         askConfirm('Confirmer ce repas dans ton historique ?', async () => {
-            try {
-                const res = await fetch(`/api/nutrition/meals/drafts/${id}/confirm`, {
-                    method: 'PATCH', headers: { 'Authorization': `Bearer ${cleanToken}` }
-                });
-                if (res.ok) { showToast('Repas confirmé 🎉', 'ok'); await loadPlanWeek(); }
-                else showToast('Erreur confirmation', 'warn');
-            } catch(e) { showToast('Erreur réseau', 'warn'); }
+            const res = await fetch(`/api/nutrition/meals/drafts/${id}/confirm`, {
+                method: 'PATCH', headers: { 'Authorization': `Bearer ${cleanToken}` }
+            });
+            if (res.ok) { showToast('Repas confirmé 🎉', 'ok'); await loadPlanWeek(); }
+            else showToast('Erreur confirmation', 'warn');
         });
     }
     if (action === 'edit') {
@@ -1284,18 +1063,38 @@ async function handleDraftAction(action, id) {
     }
     if (action === 'delete') {
         askConfirm('Supprimer ce brouillon ?', async () => {
-            try {
-                await fetch(`/api/nutrition/meals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${cleanToken}` } });
-                showToast('Brouillon supprimé');
-                await loadPlanWeek();
-            } catch(e) { showToast('Erreur réseau', 'warn'); }
+            await fetch(`/api/nutrition/meals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${cleanToken}` } });
+            showToast('Brouillon supprimé');
+            await loadPlanWeek();
         });
     }
 }
 
-// ===== MODAL PLANNING =====
+// ===== MODAL PLANNING — ALIMENTS AVEC CATALOGUE RÉEL =====
+
+// Calcul macros depuis l'objet food du catalogue + quantité en grammes
+function calcMacrosFromFood(food, grams) {
+    if (!food) return { calories:0, proteins:0, carbs:0, fats:0, fiber:0, salt:0, potassium:0 };
+    const r = grams / 100;
+    return {
+        calories:  Math.round((food.calories100g  || food.calories  || 0) * r * 10) / 10,
+        proteins:  Math.round((food.proteins100g  || food.proteins  || 0) * r * 10) / 10,
+        carbs:     Math.round((food.carbs100g     || food.carbs     || 0) * r * 10) / 10,
+        fats:      Math.round((food.fats100g      || food.fats      || 0) * r * 10) / 10,
+        fiber:     Math.round((food.fiber100g     || food.fiber     || 0) * r * 10) / 10,
+        salt:      Math.round((food.salt100g      || food.salt      || 0) * r * 100) / 100,
+        potassium: Math.round((food.potassium100g || food.potassium || 0) * r),
+    };
+}
+
+// Convertit quantité (val, unit) → grammes
+function pmRowGrams(row) {
+    const conv = UNIT_CONV[row.unit || 'g'];
+    return (parseFloat(row.qty) || 0) * conv.ml;
+}
+
 function openPlanModal(draft, presetDate) {
-    pmEditId  = draft?._id || null;
+    pmEditId = draft?._id || null;
     document.getElementById('planModalTitle').textContent = pmEditId ? 'Modifier le brouillon' : 'Planifier un repas';
     document.getElementById('btnPmSave').textContent = pmEditId ? 'Enregistrer' : 'Créer le brouillon';
 
@@ -1303,14 +1102,22 @@ function openPlanModal(draft, presetDate) {
     document.getElementById('pmType').value  = draft?.type  || 'lunch';
     document.getElementById('pmTitle').value = draft?.title || '';
 
-    pmFoodRows = draft?.items?.length
-        ? draft.items.map(i => ({ name: i.name || '', qty: i.quantity || 100 }))
-        : [{ name: '', qty: 100 }];
+    // Reconstruire les lignes aliments depuis le draft (items) ou une ligne vide
+    if (draft?.items?.length) {
+        pmFoodRows = draft.items.map(it => ({
+            name: it.name || '',
+            qty: it.quantity || 100,
+            unit: 'g',
+            selectedFood: null  // on ne peut pas retrouver l'objet catalogue depuis un draft
+        }));
+    } else {
+        pmFoodRows = [{ name: '', qty: 100, unit: 'g', selectedFood: null }];
+    }
 
     renderPmFoodRows();
     updatePmPreview();
     document.getElementById('planModal').classList.add('open');
-    document.getElementById('pmTitle').focus();
+    setTimeout(() => document.getElementById('pmTitle').focus(), 100);
 }
 
 function closePlanModal() {
@@ -1319,7 +1126,7 @@ function closePlanModal() {
     pmFoodRows = [];
 }
 
-document.getElementById('planModal').addEventListener('click', (e) => {
+document.getElementById('planModal').addEventListener('click', e => {
     if (e.target === document.getElementById('planModal')) closePlanModal();
 });
 
@@ -1327,86 +1134,151 @@ function renderPmFoodRows() {
     const cont = document.getElementById('pmFoodRows');
     cont.innerHTML = '';
     pmFoodRows.forEach((row, i) => {
-        const div = document.createElement('div');
-        div.className = 'food-row-pm';
-        div.innerHTML = `
-            <input type="text"   placeholder="Nom de l'aliment" value="${escH(row.name)}" data-i="${i}" data-f="name">
-            <input type="number" placeholder="g" value="${row.qty}" min="0"              data-i="${i}" data-f="qty" style="font-variant-numeric:tabular-nums;">
-            <button class="btn-rm-food" data-i="${i}">×</button>
-        `;
-        div.querySelectorAll('input').forEach(inp => inp.addEventListener('input', e => {
-            const idx = +e.target.dataset.i;
-            const f   = e.target.dataset.f;
-            pmFoodRows[idx][f] = f === 'qty' ? +e.target.value : e.target.value;
-            updatePmPreview();
-        }));
-        div.querySelector('.btn-rm-food').addEventListener('click', e => {
-            pmFoodRows.splice(+e.currentTarget.dataset.i, 1);
-            renderPmFoodRows();
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex; flex-direction:column; gap:3px; margin-bottom:5px;';
+
+        // Ligne principale : recherche + qty + unité + suppr
+        const line = document.createElement('div');
+        line.className = 'food-row-pm';
+
+        // --- Champ recherche avec autocomplete ---
+        const searchWrap = document.createElement('div');
+        searchWrap.className = 'pm-search-wrap';
+        searchWrap.style.position = 'relative';
+
+        const inp = document.createElement('input');
+        inp.type        = 'text';
+        inp.placeholder = 'Nom de l\'aliment';
+        inp.value       = row.name;
+        inp.autocomplete = 'off';
+
+        const resList = document.createElement('div');
+        resList.className = 'pm-results';
+
+        inp.addEventListener('input', () => {
+            const q = inp.value.toLowerCase().trim();
+            row.name = inp.value;
+            row.selectedFood = null;
+            if (q.length < 1) { resList.style.display = 'none'; updatePmPreview(); return; }
+            const hits = fullCatalog.filter(f => f.name.toLowerCase().includes(q)).slice(0, 8);
+            if (hits.length === 0) { resList.style.display = 'none'; updatePmPreview(); return; }
+            resList.innerHTML = hits.map((f, hi) => {
+                const kcal = f.calories100g || f.calories || 0;
+                return `<div class="pm-result-item" data-hi="${hi}">
+                    <strong>${f.name}</strong>
+                    <span>${f.brand || 'Générique'} · ${kcal} kcal/100g</span>
+                </div>`;
+            }).join('');
+            // stocker les hits pour accès au click
+            resList._hits = hits;
+            resList.style.display = 'block';
+        });
+
+        resList.addEventListener('mousedown', e2 => {
+            const item = e2.target.closest('.pm-result-item');
+            if (!item) return;
+            const hi = +item.dataset.hi;
+            const food = resList._hits[hi];
+            row.name         = food.name;
+            row.selectedFood = food;
+            inp.value        = food.name;
+            resList.style.display = 'none';
             updatePmPreview();
         });
-        cont.appendChild(div);
+
+        // Fermer au blur
+        inp.addEventListener('blur', () => setTimeout(() => { resList.style.display = 'none'; }, 150));
+
+        searchWrap.appendChild(inp);
+        searchWrap.appendChild(resList);
+
+        // --- Quantité ---
+        const qtyInp = document.createElement('input');
+        qtyInp.type  = 'number';
+        qtyInp.min   = '0';
+        qtyInp.value = row.qty;
+        qtyInp.addEventListener('input', () => { row.qty = parseFloat(qtyInp.value) || 0; updatePmPreview(); });
+
+        // --- Unité ---
+        const unitSel = document.createElement('select');
+        [
+            { v:'g',      l:'g / ml'        },
+            { v:'cac',    l:'🥄 c. café'    },
+            { v:'cas',    l:'🥄 c. soupe'   },
+            { v:'pincee', l:'🤏 Pincée'     },
+            { v:'unite',  l:'🔢 Unité'      },
+        ].forEach(({ v, l }) => {
+            const opt = document.createElement('option');
+            opt.value = v; opt.textContent = l;
+            if (v === (row.unit || 'g')) opt.selected = true;
+            unitSel.appendChild(opt);
+        });
+        unitSel.addEventListener('change', () => {
+            row.unit = unitSel.value;
+            // Reset qty si besoin
+            if (unitSel.value !== 'g' && row.qty > 20) row.qty = 1;
+            if (unitSel.value === 'g' && row.qty < 5)  row.qty = 100;
+            qtyInp.value = row.qty;
+            updatePmPreview();
+        });
+
+        // --- Supprimer ---
+        const rmBtn = document.createElement('button');
+        rmBtn.className = 'btn-rm-food';
+        rmBtn.textContent = '×';
+        rmBtn.addEventListener('click', () => { pmFoodRows.splice(i, 1); renderPmFoodRows(); updatePmPreview(); });
+
+        line.appendChild(searchWrap);
+        line.appendChild(qtyInp);
+        line.appendChild(unitSel);
+        line.appendChild(rmBtn);
+        wrap.appendChild(line);
+
+        // Sous-ligne : conversion grammes si unité ≠ g (petit texte en gris)
+        const hint = document.createElement('div');
+        hint.style.cssText = 'font-size:0.65rem; color:var(--gray); padding-left:2px; min-height:12px;';
+        hint.className = `pm-hint-${i}`;
+        updateHint(hint, row);
+        unitSel.addEventListener('change',  () => updateHint(hint, row));
+        qtyInp.addEventListener('input',    () => updateHint(hint, row));
+        wrap.appendChild(hint);
+
+        cont.appendChild(wrap);
     });
 }
 
-function escH(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function updateHint(hintEl, row) {
+    const conv = UNIT_CONV[row.unit || 'g'];
+    if (!row.unit || row.unit === 'g') { hintEl.textContent = ''; return; }
+    const g = (parseFloat(row.qty) || 0) * conv.ml;
+    hintEl.textContent = `= ${g % 1 === 0 ? g : g.toFixed(1)} g / ml`;
 }
 
 document.getElementById('btnPmAddFood').addEventListener('click', () => {
-    pmFoodRows.push({ name: '', qty: 100 });
+    pmFoodRows.push({ name:'', qty:100, unit:'g', selectedFood:null });
     renderPmFoodRows();
     updatePmPreview();
 });
 
-// Estimation nutritionnelle simple (aliments courants)
-function estimateMacros(name, qty) {
-    const n = (name || '').toLowerCase();
-    const db = {
-        poulet: {cal:165, prot:31, carb:0,   fat:3.6},
-        riz:    {cal:130, prot:2.7,carb:28,  fat:0.3},
-        pâtes:  {cal:158, prot:5.8,carb:31,  fat:0.9},
-        pates:  {cal:158, prot:5.8,carb:31,  fat:0.9},
-        oeuf:   {cal:155, prot:13, carb:1.1, fat:11 },
-        saumon: {cal:208, prot:20, carb:0,   fat:13 },
-        thon:   {cal:144, prot:30, carb:0,   fat:1  },
-        boeuf:  {cal:250, prot:26, carb:0,   fat:15 },
-        brocoli:{cal:34,  prot:2.8,carb:7,   fat:0.4},
-        lentilles:{cal:116,prot:9, carb:20,  fat:0.4},
-        pain:   {cal:265, prot:9,  carb:49,  fat:3  },
-        fromage:{cal:402, prot:25, carb:1.3, fat:33 },
-        yaourt: {cal:59,  prot:3.5,carb:4,   fat:3.3},
-        banane: {cal:89,  prot:1.1,carb:23,  fat:0.3},
-        pomme:  {cal:52,  prot:0.3,carb:14,  fat:0.2},
-        lait:   {cal:42,  prot:3.4,carb:5,   fat:1  },
-        flocons:{cal:367, prot:13, carb:66,  fat:7  },
-        avoine: {cal:367, prot:13, carb:66,  fat:7  },
-    };
-    const match = Object.keys(db).find(k => n.includes(k));
-    const base  = match ? db[match] : {cal:120, prot:5, carb:15, fat:4};
-    const f = qty / 100;
-    return {
-        calories: Math.round(base.cal  * f),
-        proteins: Math.round(base.prot * f * 10) / 10,
-        carbs:    Math.round(base.carb * f * 10) / 10,
-        fats:     Math.round(base.fat  * f * 10) / 10,
-    };
-}
-
 function updatePmPreview() {
-    let cal=0, prot=0, carb=0, fat=0;
-    pmFoodRows.forEach(r => {
-        if (!r.name) return;
-        const m = estimateMacros(r.name, r.qty || 100);
-        cal  += m.calories;
-        prot += m.proteins;
-        carb += m.carbs;
-        fat  += m.fats;
+    let cal=0, prot=0, carb=0, fat=0, fib=0, salt=0, k=0;
+    pmFoodRows.forEach(row => {
+        const grams = pmRowGrams(row);
+        if (row.selectedFood) {
+            const m = calcMacrosFromFood(row.selectedFood, grams);
+            cal  += m.calories; prot += m.proteins; carb += m.carbs;
+            fat  += m.fats;     fib  += m.fiber;    salt += m.salt; k += m.potassium;
+        }
+        // si pas de selectedFood (aliment tapé manuellement) → on laisse à 0
+        // l'utilisateur doit sélectionner depuis la liste pour avoir des vraies valeurs
     });
     document.getElementById('pmPrevCal').textContent  = Math.round(cal);
-    document.getElementById('pmPrevProt').textContent = Math.round(prot) + 'g';
-    document.getElementById('pmPrevCarb').textContent = Math.round(carb) + 'g';
-    document.getElementById('pmPrevFat').textContent  = Math.round(fat)  + 'g';
+    document.getElementById('pmPrevProt').textContent = prot.toFixed(1)  + 'g';
+    document.getElementById('pmPrevCarb').textContent = carb.toFixed(1)  + 'g';
+    document.getElementById('pmPrevFat').textContent  = fat.toFixed(1)   + 'g';
+    document.getElementById('pmPrevFib').textContent  = fib.toFixed(1)   + 'g';
+    document.getElementById('pmPrevSalt').textContent = salt.toFixed(2)  + 'g';
+    document.getElementById('pmPrevK').textContent    = Math.round(k)    + 'mg';
 }
 
 document.getElementById('btnPmSave').addEventListener('click', async () => {
@@ -1416,28 +1288,39 @@ document.getElementById('btnPmSave').addEventListener('click', async () => {
     if (!date)  return showToast('Choisis une date', 'warn');
     if (!title) return showToast('Donne un nom au repas', 'warn');
 
-    const items = pmFoodRows.filter(r => r.name).map(r => ({
-        name: r.name, quantity: r.qty || 100,
-        ...estimateMacros(r.name, r.qty || 100)
-    }));
-    const payload = { title, type, plannedDate: date, items, isDraft: true };
+    const validRows = pmFoodRows.filter(r => r.name.trim());
+    if (validRows.length === 0) return showToast('Ajoute au moins un aliment', 'warn');
 
-    document.getElementById('btnPmSave').textContent = '…';
-    try {
-        let res;
-        if (pmEditId) {
-            res = await fetch(`/api/nutrition/meals/drafts/${pmEditId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cleanToken}` },
-                body: JSON.stringify(payload)
-            });
-        } else {
-            res = await fetch('/api/nutrition/meals/drafts', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cleanToken}` },
-                body: JSON.stringify(payload)
-            });
+    const items = validRows.map(row => {
+        const grams = pmRowGrams(row);
+        const conv  = UNIT_CONV[row.unit || 'g'];
+        const qtyLabel = row.unit === 'g' ? `${grams}g`
+            : `${row.qty} ${conv.label} (${grams % 1 === 0 ? grams : grams.toFixed(1)}g)`;
+        if (row.selectedFood) {
+            const m = calcMacrosFromFood(row.selectedFood, grams);
+            return {
+                name: row.selectedFood.name, quantity: grams, qtyLabel,
+                calories: m.calories, proteins: m.proteins, carbs: m.carbs,
+                fats: m.fats, fiber: m.fiber, salt: m.salt, potassium: m.potassium
+            };
         }
+        // Aliment tapé sans sélection catalogue → valeurs 0 mais on garde le nom
+        return { name: row.name.trim(), quantity: grams, qtyLabel, calories:0, proteins:0, carbs:0, fats:0, fiber:0, salt:0, potassium:0 };
+    });
+
+    const payload = { title, type, plannedDate: date, items, isDraft: true };
+    const saveBtn = document.getElementById('btnPmSave');
+    saveBtn.textContent = '…';
+    saveBtn.disabled    = true;
+
+    try {
+        const url    = pmEditId ? `/api/nutrition/meals/drafts/${pmEditId}` : '/api/nutrition/meals/drafts';
+        const method = pmEditId ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cleanToken}` },
+            body: JSON.stringify(payload)
+        });
         if (res.ok) {
             showToast(pmEditId ? 'Brouillon mis à jour ✓' : 'Repas planifié 📅', 'ok');
             closePlanModal();
@@ -1448,14 +1331,14 @@ document.getElementById('btnPmSave').addEventListener('click', async () => {
     } catch(e) {
         showToast('Erreur réseau', 'warn');
     }
-    document.getElementById('btnPmSave').textContent = pmEditId ? 'Enregistrer' : 'Créer le brouillon';
+    saveBtn.textContent = pmEditId ? 'Enregistrer' : 'Créer le brouillon';
+    saveBtn.disabled    = false;
 });
 
 // ===== INIT =====
 window.onload = () => {
     loadFullCatalog();
     renderHistory();
-    // Pré-charger la semaine si onglet planning actif (utile si on rouvre l'onglet)
 };
 </script>
 </body>
