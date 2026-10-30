@@ -40,7 +40,6 @@
 
         body.modal-open { overflow: hidden; }
 
-        /* --- HEADER --- */
         header {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
@@ -51,7 +50,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
-        /* --- LAYOUT --- */
         main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
         .dashboard-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; }
 
@@ -61,7 +59,6 @@
             border: 1px solid var(--gray-200);
         }
 
-        /* --- NAVIGATION & BOUTONS --- */
         .period-selector {
             display: inline-flex; gap: 5px; margin-bottom: 2rem;
             background: var(--gray-200); padding: 5px; border-radius: 12px;
@@ -76,7 +73,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        /* --- STATISTIQUES --- */
         .stats-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -98,79 +94,35 @@
             border: 2px solid var(--gray-200);
             transition: var(--transition);
         }
-        .nak-card.good { border-color: var(--success); background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); }
+        .nak-card.good   { border-color: var(--success); background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%); }
         .nak-card.medium { border-color: var(--warning); background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%); }
-        .nak-card.bad { border-color: var(--danger); background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); }
+        .nak-card.bad    { border-color: var(--danger);  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%); }
 
-        .nak-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-        .nak-title {
-            font-size: 1rem;
-            font-weight: 700;
-            color: var(--dark);
-            margin: 0;
-        }
-        .nak-emoji {
-            font-size: 2rem;
-            line-height: 1;
-        }
-        .nak-ratio {
-            font-size: 2.5rem;
-            font-weight: 900;
-            line-height: 1;
-            margin: 0.5rem 0;
-        }
-        .nak-card.good .nak-ratio { color: var(--success); }
-        .nak-card.medium .nak-ratio { color: var(--warning); }
-        .nak-card.bad .nak-ratio { color: var(--danger); }
+        .nak-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .nak-title  { font-size: 1rem; font-weight: 700; color: var(--dark); margin: 0; }
+        .nak-emoji  { font-size: 2rem; line-height: 1; }
+        .nak-ratio  { font-size: 2.5rem; font-weight: 900; line-height: 1; margin: 0.5rem 0; }
+        .nak-card.good    .nak-ratio { color: var(--success); }
+        .nak-card.medium  .nak-ratio { color: var(--warning); }
+        .nak-card.bad     .nak-ratio { color: var(--danger);  }
         .nak-card.unknown .nak-ratio { color: var(--gray-400); }
 
-        .nak-verdict {
-            font-size: 0.95rem;
-            font-weight: 600;
-            margin-bottom: 0.75rem;
-        }
-        .nak-card.good .nak-verdict { color: #22543d; }
+        .nak-verdict { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .nak-card.good   .nak-verdict { color: #22543d; }
         .nak-card.medium .nak-verdict { color: #7b341e; }
-        .nak-card.bad .nak-verdict { color: #742a2a; }
+        .nak-card.bad    .nak-verdict { color: #742a2a; }
 
         .nak-details {
-            display: flex;
-            justify-content: space-around;
-            padding: 0.75rem;
-            background: rgba(255,255,255,0.6);
-            border-radius: 10px;
-            margin-top: 0.75rem;
+            display: flex; justify-content: space-around; padding: 0.75rem;
+            background: rgba(255,255,255,0.6); border-radius: 10px; margin-top: 0.75rem;
         }
-        .nak-detail-item {
-            text-align: center;
-        }
-        .nak-detail-label {
-            font-size: 0.7rem;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .nak-detail-value {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-top: 2px;
-        }
-        .nak-detail-value.salt { color: var(--salt-color); }
+        .nak-detail-item  { text-align: center; }
+        .nak-detail-label { font-size: 0.7rem; color: var(--gray-500); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .nak-detail-value { font-size: 1.1rem; font-weight: 700; margin-top: 2px; }
+        .nak-detail-value.salt      { color: var(--salt-color); }
         .nak-detail-value.potassium { color: var(--k-color); }
 
-        .nak-reliability {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            margin-top: 0.75rem;
-            text-align: center;
-            font-style: italic;
-        }
+        .nak-reliability { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.75rem; text-align: center; font-style: italic; }
         .nak-reliability.warn { color: var(--warning); font-style: normal; font-weight: 600; }
 
         /* --- HISTORIQUE --- */
@@ -194,7 +146,7 @@
         }
         .meal-item:hover { background-color: #f0f4ff; transform: translateX(5px); }
         .meal-info strong { font-size: 1rem; color: var(--dark); }
-        .meal-info span { font-size: 0.8rem; color: var(--gray-400); }
+        .meal-info span   { font-size: 0.8rem; color: var(--gray-400); }
 
         /* --- MODALE --- */
         .modal {
@@ -223,18 +175,13 @@
         .close-modal:hover { color: var(--danger); }
         @keyframes slideUp {
             from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            to   { transform: translateY(0); opacity: 1; }
         }
 
         #modalBody { flex: 1; overflow-y: auto; padding-right: 8px; }
 
-        .food-detail-item {
-            padding: 12px 0; border-bottom: 1px solid var(--gray-200);
-        }
-        .food-header {
-            display: flex; justify-content: space-between;
-            align-items: flex-start; margin-bottom: 8px;
-        }
+        .food-detail-item { padding: 12px 0; border-bottom: 1px solid var(--gray-200); }
+        .food-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
         .food-name { font-weight: 700; color: var(--dark); flex: 1; }
         .macro-badges { display: flex; flex-wrap: wrap; gap: 6px; }
         .macro-badges span {
@@ -251,6 +198,94 @@
             flex-wrap: wrap; gap: 0.5rem;
         }
 
+        /* ============ BILAN SEMAINE INTELLIGENT ============ */
+        #weekBalanceCard { display: none; }
+
+        .wbal-title {
+            font-size: 1rem; font-weight: 700; margin: 0 0 1rem 0;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Barre de progression */
+        .wbal-bar-wrap { margin-bottom: 1.1rem; }
+        .wbal-bar-label {
+            display: flex; justify-content: space-between; align-items: baseline;
+            font-size: 0.78rem; margin-bottom: 4px;
+        }
+        .wbal-bar-label .left  { font-weight: 700; color: var(--dark); }
+        .wbal-bar-label .right { color: var(--gray-500); font-variant-numeric: tabular-nums; }
+        .wbal-track {
+            height: 10px; background: var(--gray-200); border-radius: 5px; overflow: hidden;
+        }
+        .wbal-fill {
+            height: 100%; border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            transition: width 0.5s ease;
+        }
+        .wbal-fill.ok   { background: linear-gradient(90deg, #48bb78, #38a169); }
+        .wbal-fill.warn { background: linear-gradient(90deg, #ed8936, #dd6b20); }
+        .wbal-fill.over { background: linear-gradient(90deg, #f56565, #c53030); }
+
+        /* Indicateur recommandation */
+        .wbal-reco {
+            border-radius: 12px;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.9rem;
+            border: 1px solid;
+        }
+        .wbal-reco.on-track {
+            background: #f0fff4; border-color: #9ae6b4;
+        }
+        .wbal-reco.adjust {
+            background: #fffaf0; border-color: #fbd38d;
+        }
+        .wbal-reco.over {
+            background: #fff5f5; border-color: #feb2b2;
+        }
+        .wbal-reco.prot-low {
+            background: #ebf8ff; border-color: #90cdf4;
+        }
+
+        .wbal-reco-title {
+            font-size: 0.72rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.06em;
+            margin-bottom: 4px;
+        }
+        .wbal-reco.on-track  .wbal-reco-title { color: #276749; }
+        .wbal-reco.adjust    .wbal-reco-title { color: #744210; }
+        .wbal-reco.over      .wbal-reco-title { color: #742a2a; }
+        .wbal-reco.prot-low  .wbal-reco-title { color: #2c5282; }
+
+        .wbal-reco-main {
+            font-size: 1.3rem; font-weight: 900; line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+        }
+        .wbal-reco.on-track  .wbal-reco-main { color: #276749; }
+        .wbal-reco.adjust    .wbal-reco-main { color: #744210; }
+        .wbal-reco.over      .wbal-reco-main { color: #742a2a; }
+        .wbal-reco.prot-low  .wbal-reco-main { color: #2c5282; }
+
+        .wbal-reco-sub {
+            font-size: 0.78rem; color: var(--gray-500); margin-top: 3px;
+        }
+
+        .wbal-days-row {
+            display: flex; gap: 5px; margin-top: 1rem;
+        }
+        .wbal-day-dot {
+            flex: 1; height: 6px; border-radius: 3px;
+            background: var(--gray-200);
+        }
+        .wbal-day-dot.done { background: linear-gradient(90deg, var(--primary), var(--primary-dark)); }
+        .wbal-day-dot.today { background: var(--warning); }
+        .wbal-day-dot.over  { background: var(--danger); }
+        .wbal-day-dot.ok    { background: var(--success); }
+
+        .wbal-footer {
+            font-size: 0.72rem; color: var(--gray-400); margin-top: 0.5rem;
+            display: flex; justify-content: space-between;
+        }
+
         /* --- RESPONSIVE --- */
         @media (max-width: 900px) {
             .dashboard-grid { grid-template-columns: 1fr; }
@@ -259,19 +294,15 @@
             header { padding: 1rem; flex-direction: column; gap: 12px; }
             .stats-row { grid-template-columns: 1fr; gap: 0; }
             .stat-item {
-                border-right: none;
-                border-bottom: 1px solid var(--gray-200);
-                padding: 12px 0;
-                display: flex; justify-content: space-between; align-items: center;
+                border-right: none; border-bottom: 1px solid var(--gray-200);
+                padding: 12px 0; display: flex; justify-content: space-between; align-items: center;
             }
             .stat-item:last-child { border-bottom: none; }
             .stat-label { order: 1; }
             .stat-value { order: 2; font-size: 1.1rem; }
-
             .group-header { flex-direction: column; align-items: flex-start; gap: 8px; }
             .period-selector { display: flex; width: 100%; justify-content: center; }
             .period-btn { flex: 1; padding: 0.5rem; font-size: 0.85rem; }
-
             .nak-ratio { font-size: 2rem; }
             .nak-details { flex-direction: column; gap: 0.5rem; }
         }
@@ -301,39 +332,92 @@
                 <div class="stats-row">
                     <div class="stat-item">
                         <div class="stat-value">
-                            <span id="avgCal">0</span> / <span id="goalValue" style="color: #a0aec0; font-size: 1.1rem; cursor: pointer;" onclick="editGoal()" title="Modifier l'objectif">2000</span>
-                            <small onclick="editGoal()" style="cursor:pointer; font-size: 0.8rem; color: var(--primary);">✏️</small>
+                            <span id="avgCal">0</span> / <span id="goalValue" style="color:#a0aec0; font-size:1.1rem; cursor:pointer;" onclick="editGoal()" title="Modifier l'objectif">2000</span>
+                            <small onclick="editGoal()" style="cursor:pointer; font-size:0.8rem; color:var(--primary);">✏️</small>
                         </div>
                         <div class="stat-label">Calories (kcal)</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">
-                            <span id="avgProt">0</span> / <span id="goalProtValue" style="color: #a0aec0; font-size: 1.1rem; cursor: pointer;" onclick="editProtGoal()" title="Modifier l'objectif">160</span>
-                            <small onclick="editProtGoal()" style="cursor:pointer; font-size: 0.8rem; color: var(--primary);">✏️</small>
+                            <span id="avgProt">0</span> / <span id="goalProtValue" style="color:#a0aec0; font-size:1.1rem; cursor:pointer;" onclick="editProtGoal()" title="Modifier l'objectif">160</span>
+                            <small onclick="editProtGoal()" style="cursor:pointer; font-size:0.8rem; color:var(--primary);">✏️</small>
                         </div>
                         <div class="stat-label">Protéines (g)</div>
                     </div>
-                    <div class="stat-item"><div class="stat-value" id="totalMeals">0</div><div class="stat-label">Repas</div></div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMeals">0</div>
+                        <div class="stat-label">Repas</div>
+                    </div>
                 </div>
                 <div style="height: 350px;">
                     <canvas id="evolutionChart"></canvas>
                 </div>
             </section>
+
             <section class="card">
                 <h3>📜 Historique détaillé</h3>
                 <div id="historyContainer"></div>
             </section>
         </div>
+
         <div class="right-col">
-            <!-- ============ NOUVELLE CARTE : INDICATEUR Na/K ============ -->
+
+            <!-- ============ BILAN SEMAINE INTELLIGENT ============ -->
+            <section class="card" id="weekBalanceCard">
+                <h3 class="wbal-title">📊 Bilan intelligent de la semaine</h3>
+
+                <!-- Barre calories -->
+                <div class="wbal-bar-wrap">
+                    <div class="wbal-bar-label">
+                        <span class="left">🔥 Calories</span>
+                        <span class="right" id="wbalCalLabel">0 / 0 kcal</span>
+                    </div>
+                    <div class="wbal-track">
+                        <div class="wbal-fill" id="wbalCalBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Barre protéines -->
+                <div class="wbal-bar-wrap">
+                    <div class="wbal-bar-label">
+                        <span class="left">💪 Protéines</span>
+                        <span class="right" id="wbalProtLabel">0 / 0 g</span>
+                    </div>
+                    <div class="wbal-track">
+                        <div class="wbal-fill" id="wbalProtBar" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Reco calories -->
+                <div class="wbal-reco" id="wbalCalReco">
+                    <div class="wbal-reco-title" id="wbalCalRecoTitle">—</div>
+                    <div class="wbal-reco-main" id="wbalCalRecoMain">—</div>
+                    <div class="wbal-reco-sub"  id="wbalCalRecoSub">—</div>
+                </div>
+
+                <!-- Reco protéines -->
+                <div class="wbal-reco" id="wbalProtReco">
+                    <div class="wbal-reco-title" id="wbalProtRecoTitle">—</div>
+                    <div class="wbal-reco-main" id="wbalProtRecoMain">—</div>
+                    <div class="wbal-reco-sub"  id="wbalProtRecoSub">—</div>
+                </div>
+
+                <!-- Points jours -->
+                <div class="wbal-days-row" id="wbalDotsRow"></div>
+                <div class="wbal-footer">
+                    <span id="wbalDaysLeft">—</span>
+                    <span id="wbalWeekRange">—</span>
+                </div>
+            </section>
+
+            <!-- ============ INDICATEUR NA/K ============ -->
             <section class="card nak-card unknown" id="nakCard">
                 <div class="nak-header">
                     <h3 class="nak-title">⚖️ Équilibre Sodium / Potassium</h3>
                     <span class="nak-emoji" id="nakEmoji">⚪</span>
                 </div>
-                <div class="nak-ratio" id="nakRatio">—</div>
+                <div class="nak-ratio"  id="nakRatio">—</div>
                 <div class="nak-verdict" id="nakVerdict">Pas encore de données</div>
-
                 <div class="nak-details">
                     <div class="nak-detail-item">
                         <div class="nak-detail-label">🧂 Sel</div>
@@ -344,7 +428,6 @@
                         <div class="nak-detail-value potassium" id="nakK">0 mg</div>
                     </div>
                 </div>
-
                 <div class="nak-reliability" id="nakReliability"></div>
             </section>
 
@@ -364,10 +447,10 @@
         </div>
         <div id="modalBody"></div>
         <div class="total-box">
-            <span id="modalTotalCal" style="color:var(--primary)">0 kcal</span>
+            <span id="modalTotalCal"  style="color:var(--primary)">0 kcal</span>
             <span id="modalTotalProt" style="color:var(--success)">0g Prot</span>
             <span id="modalTotalSalt" style="color:var(--salt-color)">0g Sel</span>
-            <span id="modalTotalK" style="color:var(--k-color)">0mg K</span>
+            <span id="modalTotalK"    style="color:var(--k-color)">0mg K</span>
         </div>
     </div>
 </div>
@@ -375,14 +458,17 @@
 <script>
     let evolutionChart, macroChart;
     const cleanToken = localStorage.getItem('token')?.replace(/"/g, '');
-    let DAILY_CAL_GOAL = 2000;
+    let DAILY_CAL_GOAL  = 2000;
     let DAILY_PROT_GOAL = 160;
     let USER_ID = null;
-    let ALL_MEALS_DATA = [];
+    let ALL_MEALS_DATA  = [];
+    let CURRENT_VIEW    = 'day';
 
-    // Constantes biologiques
-    const SODIUM_FACTOR = 0.4; // 1g de sel = 0.4g de sodium (Na)
+    const SODIUM_FACTOR = 0.4;
 
+    // ─────────────────────────────────────────────
+    //  GRAPHIQUES
+    // ─────────────────────────────────────────────
     function initCharts() {
         const ctxEvo = document.getElementById('evolutionChart').getContext('2d');
         evolutionChart = new Chart(ctxEvo, {
@@ -390,14 +476,14 @@
             data: {
                 labels: [],
                 datasets: [
-                    { label: 'Calories (kcal)', borderColor: '#667eea', data: [], tension: 0.4, yAxisID: 'y', fill: false },
-                    { label: 'Protéines (g)', borderColor: '#48bb78', data: [], tension: 0.4, yAxisID: 'y1', fill: false }
+                    { label: 'Calories (kcal)', borderColor: '#667eea', data: [], tension: 0.4, yAxisID: 'y',  fill: false },
+                    { label: 'Protéines (g)',   borderColor: '#48bb78', data: [], tension: 0.4, yAxisID: 'y1', fill: false }
                 ]
             },
             options: {
                 responsive: true, maintainAspectRatio: false,
                 scales: {
-                    y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Calories' } },
+                    y:  { type: 'linear', display: true, position: 'left',  title: { display: true, text: 'Calories'  } },
                     y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Protéines' } }
                 }
             }
@@ -406,142 +492,269 @@
         const ctxMacro = document.getElementById('macroChart').getContext('2d');
         macroChart = new Chart(ctxMacro, {
             type: 'doughnut',
-            data: { labels: ['Prot (g)', 'Gluc (g)', 'Lip (g)'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#48bb78', '#667eea', '#ed8936'] }] }
+            data: {
+                labels: ['Prot (g)', 'Gluc (g)', 'Lip (g)'],
+                datasets: [{ data: [0, 0, 0], backgroundColor: ['#48bb78', '#667eea', '#ed8936'] }]
+            }
         });
     }
 
+    // ─────────────────────────────────────────────
+    //  CHARGEMENT DONNÉES
+    // ─────────────────────────────────────────────
     async function loadData(view = 'day') {
+        CURRENT_VIEW = view;
         try {
             const res = await fetch('/api/nutrition/meals/log/all', {
                 headers: { 'Authorization': `Bearer ${cleanToken}` }
             });
-            if (!res.ok) throw new Error("Erreur serveur");
+            if (!res.ok) throw new Error('Erreur serveur');
             const allMeals = await res.json();
 
             if (Array.isArray(allMeals)) {
                 ALL_MEALS_DATA = allMeals;
                 const now = new Date();
                 const filteredMeals = allMeals.filter(m => {
-                    const mealDate = new Date(m.date);
-                    if (view === 'day') return mealDate.toDateString() === now.toDateString();
+                    const d = new Date(m.date);
+                    if (view === 'day')   return d.toDateString() === now.toDateString();
                     if (view === 'week') {
-                        const sevenDaysAgo = new Date();
-                        sevenDaysAgo.setDate(now.getDate() - 7);
-                        return mealDate >= sevenDaysAgo;
+                        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(now.getDate() - 7);
+                        return d >= sevenDaysAgo;
                     }
-                    if (view === 'month') return mealDate.getMonth() === now.getMonth() && mealDate.getFullYear() === now.getFullYear();
-                    if (view === 'year') return mealDate.getFullYear() === now.getFullYear();
+                    if (view === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                    if (view === 'year')  return d.getFullYear() === now.getFullYear();
                     return true;
                 });
                 updateUI(filteredMeals, view);
             }
-        } catch (e) {
-            console.error("Erreur", e);
-            document.getElementById('historyContainer').innerHTML = "Erreur de chargement.";
+        } catch(e) {
+            console.error('Erreur', e);
+            document.getElementById('historyContainer').innerHTML = 'Erreur de chargement.';
         }
     }
 
-    /* ===========================================================
-       INDICATEUR NA/K (version honnête)
-       ===========================================================
-       Stratégie : on additionne TOUT le sel et TOUT le potassium
-       de la journée. Pour les aliments sans potassium renseigné,
-       on compte 0 mg (hypothèse pessimiste, le ratio sera donc
-       potentiellement surévalué vers le mauvais côté).
+    // ─────────────────────────────────────────────
+    //  BILAN INTELLIGENT DE LA SEMAINE
+    // ─────────────────────────────────────────────
 
-       L'indicateur de fiabilité dit quel % du potassium provient
-       d'aliments avec données certaines.
-       =========================================================== */
+    /**
+     * Retourne le lundi de la semaine courante (00:00:00)
+     */
+    function getCurrentWeekMonday() {
+        const now = new Date();
+        const day = now.getDay(); // 0=dim, 1=lun...
+        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(now);
+        monday.setDate(diff);
+        monday.setHours(0, 0, 0, 0);
+        return monday;
+    }
+
+    /**
+     * Calcule le bilan semaine et met à jour la carte.
+     * meals = repas filtrés sur la semaine courante (vue 'week')
+     */
+    function renderWeekBalance(meals) {
+        const card = document.getElementById('weekBalanceCard');
+        card.style.display = 'block';
+
+        const monday = getCurrentWeekMonday();
+        const now    = new Date();
+
+        // Jour de la semaine actuel (1=lun … 7=dim)
+        const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); // 1–7
+        const daysElapsed  = dayOfWeek;          // jours écoulés (incl. aujourd'hui)
+        const daysRemaining = 7 - dayOfWeek;     // jours restants après aujourd'hui (excl. aujourd'hui)
+        // Pour le calcul de cible : jours restants INCLUANT aujourd'hui
+        const daysLeft = 7 - dayOfWeek + 1;      // aujourd'hui + jours futurs
+
+        const weekCalGoal  = DAILY_CAL_GOAL  * 7;
+        const weekProtGoal = DAILY_PROT_GOAL * 7;
+
+        // Totaux réels — on ne garde que les repas de la semaine en cours (lundi → aujourd'hui)
+        const weekMeals = meals.filter(m => new Date(m.date) >= monday);
+        const totalCal  = weekMeals.reduce((s, m) => s + (m.totals?.calories || 0), 0);
+        const totalProt = weekMeals.reduce((s, m) => s + (m.totals?.proteins || 0), 0);
+
+        // ── Barres de progression ──
+        const calPct  = Math.min(Math.round(totalCal  / weekCalGoal  * 100), 120);
+        const protPct = Math.min(Math.round(totalProt / weekProtGoal * 100), 120);
+
+        const calBar  = document.getElementById('wbalCalBar');
+        const protBar = document.getElementById('wbalProtBar');
+
+        calBar.style.width  = calPct  + '%';
+        protBar.style.width = protPct + '%';
+
+        // Couleur barre calories
+        calBar.className  = 'wbal-fill ' + (calPct > 105 ? 'over' : calPct >= 85 ? 'ok' : 'warn');
+        protBar.className = 'wbal-fill ' + (protPct >= 85 ? 'ok' : 'warn');
+
+        document.getElementById('wbalCalLabel').textContent  = `${Math.round(totalCal)} / ${weekCalGoal} kcal`;
+        document.getElementById('wbalProtLabel').textContent = `${Math.round(totalProt)} / ${weekProtGoal} g`;
+
+        // ── Recommandation calories ──
+        const calReco     = document.getElementById('wbalCalReco');
+        const calRecoTitle = document.getElementById('wbalCalRecoTitle');
+        const calRecoMain  = document.getElementById('wbalCalRecoMain');
+        const calRecoSub   = document.getElementById('wbalCalRecoSub');
+
+        const calRestant   = weekCalGoal - totalCal;
+        const calCibleJour = daysLeft > 0 ? Math.round(calRestant / daysLeft) : 0;
+
+        if (totalCal > weekCalGoal) {
+            // Quota déjà dépassé
+            calReco.className = 'wbal-reco over';
+            calRecoTitle.textContent = '⚠️ Quota semaine dépassé';
+            calRecoMain.textContent  = `+${Math.round(totalCal - weekCalGoal)} kcal au-dessus`;
+            calRecoSub.textContent   = `Tu as mangé ${Math.round(totalCal)} kcal sur ${weekCalGoal} kcal prévus`;
+        } else if (calCibleJour > DAILY_CAL_GOAL * 1.1) {
+            // Sous consommation — il faut rattraper
+            calReco.className = 'wbal-reco adjust';
+            calRecoTitle.textContent = '📉 Tu as mangé moins que prévu';
+            calRecoMain.textContent  = `Vise ~${calCibleJour} kcal/jour`;
+            calRecoSub.textContent   = `Sur ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''} (incl. aujourd'hui) pour atteindre ${weekCalGoal} kcal`;
+        } else if (calCibleJour < DAILY_CAL_GOAL * 0.9) {
+            // Légère sur-consommation — il faut réduire
+            calReco.className = 'wbal-reco adjust';
+            calRecoTitle.textContent = '📈 Tu as mangé plus que prévu';
+            calRecoMain.textContent  = `Vise ~${calCibleJour} kcal/jour`;
+            calRecoSub.textContent   = `Réduis légèrement sur ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''} pour rester dans le quota`;
+        } else {
+            // En bonne voie
+            calReco.className = 'wbal-reco on-track';
+            calRecoTitle.textContent = '✅ Tu es dans les clous !';
+            calRecoMain.textContent  = `${Math.round(totalCal)} kcal consommées`;
+            calRecoSub.textContent   = `Continue à ~${DAILY_CAL_GOAL} kcal/j — quota semaine : ${weekCalGoal} kcal`;
+        }
+
+        // ── Recommandation protéines ──
+        const protReco     = document.getElementById('wbalProtReco');
+        const protRecoTitle = document.getElementById('wbalProtRecoTitle');
+        const protRecoMain  = document.getElementById('wbalProtRecoMain');
+        const protRecoSub   = document.getElementById('wbalProtRecoSub');
+
+        const protRestant   = weekProtGoal - totalProt;
+        const protCibleJour = daysLeft > 0 ? Math.round(protRestant / daysLeft) : 0;
+
+        if (totalProt >= weekProtGoal) {
+            protReco.className = 'wbal-reco on-track';
+            protRecoTitle.textContent = '✅ Objectif protéines atteint !';
+            protRecoMain.textContent  = `${Math.round(totalProt)}g consommées`;
+            protRecoSub.textContent   = `Objectif semaine : ${weekProtGoal}g — super !`;
+        } else if (protCibleJour > DAILY_PROT_GOAL * 1.3) {
+            protReco.className = 'wbal-reco over';
+            protRecoTitle.textContent = '⚠️ Retard sur les protéines';
+            protRecoMain.textContent  = `Vise ~${protCibleJour}g/jour`;
+            protRecoSub.textContent   = `Il te reste ${Math.round(protRestant)}g à atteindre en ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`;
+        } else {
+            protReco.className = 'wbal-reco prot-low';
+            protRecoTitle.textContent = '💪 Continue sur les protéines';
+            protRecoMain.textContent  = `Vise ~${protCibleJour}g/jour`;
+            protRecoSub.textContent   = `${Math.round(totalProt)}g / ${weekProtGoal}g — encore ${Math.round(protRestant)}g à atteindre`;
+        }
+
+        // ── Points jours (lun → dim) ──
+        const dotsRow = document.getElementById('wbalDotsRow');
+        dotsRow.innerHTML = '';
+        const DAY_NAMES = ['L', 'M', 'Me', 'J', 'V', 'S', 'D'];
+        for (let i = 0; i < 7; i++) {
+            const dayDate  = new Date(monday);
+            dayDate.setDate(monday.getDate() + i);
+            const isToday  = dayDate.toDateString() === now.toDateString();
+            const isPast   = dayDate < now && !isToday;
+            const isFuture = dayDate > now;
+
+            // Repas de ce jour
+            const dayMeals = weekMeals.filter(m => new Date(m.date).toDateString() === dayDate.toDateString());
+            const dayCal   = dayMeals.reduce((s, m) => s + (m.totals?.calories || 0), 0);
+
+            const dot = document.createElement('div');
+            dot.style.cssText = 'display:flex; flex-direction:column; align-items:center; gap:3px; flex:1;';
+
+            const bar = document.createElement('div');
+            bar.className = 'wbal-day-dot';
+            if (isFuture) bar.style.opacity = '0.35';
+            else if (isToday) bar.className += ' today';
+            else if (dayCal > DAILY_CAL_GOAL * 1.05) bar.className += ' over';
+            else if (dayCal > 0) bar.className += ' ok';
+
+            const lbl = document.createElement('span');
+            lbl.style.cssText = 'font-size:0.6rem; color:var(--gray-400); font-weight:600;';
+            lbl.textContent = DAY_NAMES[i];
+
+            dot.appendChild(bar);
+            dot.appendChild(lbl);
+            dotsRow.appendChild(dot);
+        }
+
+        // ── Footer ──
+        const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+        document.getElementById('wbalDaysLeft').textContent =
+            daysRemaining > 0 ? `${daysRemaining} jour${daysRemaining > 1 ? 's' : ''} restant${daysRemaining > 1 ? 's' : ''}` : 'Dernier jour de la semaine';
+        document.getElementById('wbalWeekRange').textContent =
+            `${monday.getDate()}/${monday.getMonth()+1} – ${sunday.getDate()}/${sunday.getMonth()+1}`;
+    }
+
+    // ─────────────────────────────────────────────
+    //  INDICATEUR NA/K
+    // ─────────────────────────────────────────────
     function computeNaKIndicator(meals) {
-        let saltGrams = 0;          // total sel (g) - TOUS les aliments
-        let potassiumMg = 0;        // total K (mg) - aliments avec donnée
-        let itemsWithK = 0;         // nb items avec K renseigné
-        let itemsTotal = 0;         // nb items total
-
+        let saltGrams = 0, potassiumMg = 0, itemsWithK = 0, itemsTotal = 0;
         meals.forEach(meal => {
             (meal.items || []).forEach(item => {
                 itemsTotal++;
-                // On additionne tout le sel, même si K manquant
                 saltGrams += (item.salt || 0);
-
-                // Le potassium n'est ajouté que s'il est renseigné
                 const hasK = item.potassium != null && item.potassium > 0;
-                if (hasK) {
-                    itemsWithK++;
-                    potassiumMg += item.potassium;
-                }
+                if (hasK) { itemsWithK++; potassiumMg += item.potassium; }
             });
         });
-
-        // Conversion en grammes pour le ratio
-        const sodiumG = saltGrams * SODIUM_FACTOR;
+        const sodiumG    = saltGrams * SODIUM_FACTOR;
         const potassiumG = potassiumMg / 1000;
-
         const reliability = itemsTotal > 0 ? itemsWithK / itemsTotal : 0;
-
-        return {
-            saltGrams,
-            potassiumMg,
-            sodiumG,
-            potassiumG,
+        return { saltGrams, potassiumMg, sodiumG, potassiumG,
             ratio: potassiumG > 0 ? sodiumG / potassiumG : null,
-            reliability,
-            itemsWithK,
-            itemsTotal
-        };
+            reliability, itemsWithK, itemsTotal };
     }
 
     function renderNaKIndicator(meals) {
-        const card = document.getElementById('nakCard');
-        const emoji = document.getElementById('nakEmoji');
-        const ratioEl = document.getElementById('nakRatio');
-        const verdict = document.getElementById('nakVerdict');
-        const saltEl = document.getElementById('nakSalt');
-        const kEl = document.getElementById('nakK');
+        const card        = document.getElementById('nakCard');
+        const emoji       = document.getElementById('nakEmoji');
+        const ratioEl     = document.getElementById('nakRatio');
+        const verdict     = document.getElementById('nakVerdict');
+        const saltEl      = document.getElementById('nakSalt');
+        const kEl         = document.getElementById('nakK');
         const reliabilityEl = document.getElementById('nakReliability');
+        const data        = computeNaKIndicator(meals);
 
-        const data = computeNaKIndicator(meals);
-
-        // Reset des classes
         card.classList.remove('good', 'medium', 'bad', 'unknown');
-
-        // Affichage des totaux bruts (toujours visibles)
         saltEl.innerText = data.saltGrams.toFixed(2) + ' g';
-        kEl.innerText = Math.round(data.potassiumMg) + ' mg';
+        kEl.innerText    = Math.round(data.potassiumMg) + ' mg';
 
-        // Cas 1 : aucune donnée exploitable
         if (data.ratio === null) {
             card.classList.add('unknown');
-            emoji.innerText = '⚪';
+            emoji.innerText   = '⚪';
             ratioEl.innerText = '—';
-            if (data.itemsTotal === 0) {
-                verdict.innerText = "Pas encore de repas sur cette période";
-            } else {
-                verdict.innerText = "Aucun potassium renseigné dans tes aliments";
-            }
+            verdict.innerText = data.itemsTotal === 0
+                ? 'Pas encore de repas sur cette période'
+                : 'Aucun potassium renseigné dans tes aliments';
             reliabilityEl.innerText = '';
             return;
         }
 
-        // Cas 2 : on a un ratio à afficher
         const ratio = data.ratio;
         ratioEl.innerText = ratio.toFixed(2);
-
         if (ratio <= 1) {
-            card.classList.add('good');
-            emoji.innerText = '🟢';
+            card.classList.add('good');   emoji.innerText = '🟢';
             verdict.innerText = '✅ Excellent équilibre — autant ou plus de potassium que de sodium';
         } else if (ratio <= 2) {
-            card.classList.add('medium');
-            emoji.innerText = '🟡';
+            card.classList.add('medium'); emoji.innerText = '🟡';
             verdict.innerText = '⚠️ Acceptable — mais l\'OMS recommande un ratio sous 1';
         } else {
-            card.classList.add('bad');
-            emoji.innerText = '🔴';
+            card.classList.add('bad');    emoji.innerText = '🔴';
             verdict.innerText = '❌ Trop de sel par rapport au potassium';
         }
 
-        // Indicateur de fiabilité (couverture du potassium)
         const pct = Math.round(data.reliability * 100);
         if (pct < 70) {
             reliabilityEl.classList.add('warn');
@@ -555,13 +768,16 @@
         }
     }
 
+    // ─────────────────────────────────────────────
+    //  HISTORIQUE
+    // ─────────────────────────────────────────────
     function renderHistory(groups) {
         const container = document.getElementById('historyContainer');
-        container.innerHTML = Object.keys(groups).length ? "" : "Aucun repas sur cette période.";
+        container.innerHTML = Object.keys(groups).length ? '' : 'Aucun repas sur cette période.';
 
         for (const [title, data] of Object.entries(groups)) {
-            let calColor = data.totalCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
-            let protColor = data.totalProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
+            let calColor  = data.totalCal  > DAILY_CAL_GOAL  ? 'var(--danger)'  : 'var(--success)';
+            let protColor = data.totalProt < DAILY_PROT_GOAL ? 'var(--danger)'  : 'var(--success)';
 
             let groupHtml = `
                 <div class="history-group">
@@ -588,22 +804,20 @@
                         </div>
                     </div>`;
             });
-            container.innerHTML += groupHtml + `</div>`;
+            container.innerHTML += groupHtml + '</div>';
         }
     }
 
     function showMealDetails(mealId) {
         const meal = ALL_MEALS_DATA.find(m => (m._id || m.id) === mealId);
         if (!meal) return;
+        document.getElementById('modalTitle').innerText    = meal.title || 'Détails du repas';
+        document.getElementById('modalTotalCal').innerText  = Math.round(meal.totals.calories) + ' kcal';
+        document.getElementById('modalTotalProt').innerText = (meal.totals.proteins || 0).toFixed(1) + 'g Prot';
+        document.getElementById('modalTotalSalt').innerText = (meal.totals.salt || 0).toFixed(2) + 'g Sel';
+        document.getElementById('modalTotalK').innerText    = Math.round(meal.totals.potassium || 0) + 'mg K';
 
-        document.getElementById('modalTitle').innerText = meal.title || "Détails du repas";
-        document.getElementById('modalTotalCal').innerText = Math.round(meal.totals.calories) + " kcal";
-        document.getElementById('modalTotalProt').innerText = (meal.totals.proteins || 0).toFixed(1) + "g Prot";
-        document.getElementById('modalTotalSalt').innerText = (meal.totals.salt || 0).toFixed(2) + "g Sel";
-        document.getElementById('modalTotalK').innerText = Math.round(meal.totals.potassium || 0) + "mg K";
-
-        let bodyHtml = "";
-
+        let bodyHtml = '';
         if (meal.items && meal.items.length > 0) {
             meal.items.forEach(f => {
                 bodyHtml += `
@@ -611,15 +825,10 @@
                         <div class="food-header">
                             <div class="food-name">
                                 ${f.name}
-                                <div style="font-weight: normal; font-size: 0.8rem; color: #718096;">
-                                    ${f.quantity}${f.unit || 'g'}
-                                </div>
+                                <div style="font-weight:normal; font-size:0.8rem; color:#718096;">${f.quantity}${f.unit || 'g'}</div>
                             </div>
-                            <div style="font-weight: bold; color: var(--primary); white-space: nowrap;">
-                                ${Math.round(f.calories)} kcal
-                            </div>
+                            <div style="font-weight:bold; color:var(--primary); white-space:nowrap;">${Math.round(f.calories)} kcal</div>
                         </div>
-
                         <div class="macro-badges">
                             <span title="Protéines">🥩 <strong>P:</strong> ${(f.proteins || 0).toFixed(1)}g</span>
                             <span title="Glucides">🍞 <strong>G:</strong> ${(f.carbs || 0).toFixed(1)}g</span>
@@ -627,33 +836,42 @@
                             <span title="Sel" style="color:var(--salt-color)">🧂 <strong>S:</strong> ${(f.salt || 0).toFixed(2)}g</span>
                             <span title="Potassium" style="color:var(--k-color)">⚡ <strong>K:</strong> ${Math.round(f.potassium || 0)}mg</span>
                         </div>
-                    </div>
-                `;
+                    </div>`;
             });
         } else {
-            bodyHtml = "<p style='text-align:center; padding: 20px; color: #a0aec0;'>Aucun aliment trouvé.</p>";
+            bodyHtml = "<p style='text-align:center; padding:20px; color:#a0aec0;'>Aucun aliment trouvé.</p>";
         }
-
         document.getElementById('modalBody').innerHTML = bodyHtml;
-        document.getElementById('mealModal').style.display = "block";
+        document.getElementById('mealModal').style.display = 'block';
         document.body.classList.add('modal-open');
     }
 
     function closeModal() {
-        document.getElementById('mealModal').style.display = "none";
+        document.getElementById('mealModal').style.display = 'none';
         document.body.classList.remove('modal-open');
     }
 
     window.onclick = function(event) {
-        const modal = document.getElementById('mealModal');
-        if (event.target == modal) closeModal();
-    }
+        if (event.target === document.getElementById('mealModal')) closeModal();
+    };
 
+    // ─────────────────────────────────────────────
+    //  UPDATE UI
+    // ─────────────────────────────────────────────
     function updateUI(meals, view) {
         const groups = groupMeals(meals, view);
         renderHistory(groups);
         renderCharts(meals, view);
-        renderNaKIndicator(meals); // ← NOUVEAU
+        renderNaKIndicator(meals);
+
+        // Bilan semaine : uniquement en vue Semaine
+        const card = document.getElementById('weekBalanceCard');
+        if (view === 'week') {
+            renderWeekBalance(meals);
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
     }
 
     function groupMeals(meals, view) {
@@ -661,26 +879,25 @@
         meals.forEach(m => {
             const d = new Date(m.date);
             let key;
-            if (view === 'day') key = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
-            else if (view === 'week') key = getWeekRange(d);
+            if (view === 'day')   key = d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+            else if (view === 'week')  key = getWeekRange(d);
             else if (view === 'month') key = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-            else if (view === 'year') key = d.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase() + " " + d.getFullYear();
-
+            else if (view === 'year')  key = d.toLocaleDateString('fr-FR', { month: 'long' }).toUpperCase() + ' ' + d.getFullYear();
             if (!groups[key]) groups[key] = { meals: [], totalCal: 0, totalProt: 0, totalSalt: 0, totalK: 0 };
             groups[key].meals.push(m);
-            groups[key].totalCal += m.totals.calories;
+            groups[key].totalCal  += m.totals.calories;
             groups[key].totalProt += m.totals.proteins;
             groups[key].totalSalt += (m.totals.salt || 0);
-            groups[key].totalK += (m.totals.potassium || 0); // ← AJOUT
+            groups[key].totalK    += (m.totals.potassium || 0);
         });
         return groups;
     }
 
     function getWeekRange(date) {
-        const d = new Date(date);
-        const day = d.getDay();
-        const diffToMonday = d.getDate() - day + (day === 0 ? -6 : 1);
-        const monday = new Date(d.setDate(diffToMonday));
+        const d    = new Date(date);
+        const day  = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        const monday = new Date(d.setDate(diff));
         const sunday = new Date(d.setDate(monday.getDate() + 6));
         return `Semaine du ${monday.toLocaleDateString('fr-FR')} au ${sunday.toLocaleDateString('fr-FR')}`;
     }
@@ -689,30 +906,30 @@
         const dailyData = {};
         meals.forEach(m => {
             const d = new Date(m.date).toLocaleDateString('fr-FR');
-            if(!dailyData[d]) dailyData[d] = { cal: 0, prot: 0 };
-            dailyData[d].cal += m.totals.calories;
+            if (!dailyData[d]) dailyData[d] = { cal: 0, prot: 0 };
+            dailyData[d].cal  += m.totals.calories;
             dailyData[d].prot += m.totals.proteins;
         });
 
         const labels = Object.keys(dailyData);
-        evolutionChart.data.labels = labels;
-        evolutionChart.data.datasets[0].data = labels.map(l => dailyData[l].cal);
-        evolutionChart.data.datasets[1].data = labels.map(l => dailyData[l].prot);
+        evolutionChart.data.labels              = labels;
+        evolutionChart.data.datasets[0].data   = labels.map(l => dailyData[l].cal);
+        evolutionChart.data.datasets[1].data   = labels.map(l => dailyData[l].prot);
         evolutionChart.update();
 
         const tProt = meals.reduce((s, c) => s + (c.totals.proteins || 0), 0);
-        const tCarb = meals.reduce((s, c) => s + (c.totals.carbs || 0), 0);
-        const tFat = meals.reduce((s, c) => s + (c.totals.fats || 0), 0);
+        const tCarb = meals.reduce((s, c) => s + (c.totals.carbs    || 0), 0);
+        const tFat  = meals.reduce((s, c) => s + (c.totals.fats     || 0), 0);
         macroChart.data.datasets[0].data = [tProt, tCarb, tFat];
         macroChart.update();
 
         const nbJours = labels.length || 1;
-        const avgCal = Math.round(labels.reduce((s, l) => s + dailyData[l].cal, 0) / nbJours);
+        const avgCal  = Math.round(labels.reduce((s, l) => s + dailyData[l].cal,  0) / nbJours);
         const avgProt = Math.round(labels.reduce((s, l) => s + dailyData[l].prot, 0) / nbJours);
 
-        document.getElementById('avgCal').innerText = avgCal + " kcal";
-        document.getElementById('avgCal').style.color = avgCal > DAILY_CAL_GOAL ? 'var(--danger)' : 'var(--success)';
-        document.getElementById('avgProt').innerText = avgProt + " g";
+        document.getElementById('avgCal').innerText  = avgCal + ' kcal';
+        document.getElementById('avgCal').style.color  = avgCal  > DAILY_CAL_GOAL  ? 'var(--danger)' : 'var(--success)';
+        document.getElementById('avgProt').innerText = avgProt + ' g';
         document.getElementById('avgProt').style.color = avgProt < DAILY_PROT_GOAL ? 'var(--danger)' : 'var(--success)';
         document.getElementById('totalMeals').innerText = meals.length;
     }
@@ -723,27 +940,30 @@
         loadData(p);
     }
 
+    // ─────────────────────────────────────────────
+    //  PROFIL & OBJECTIFS
+    // ─────────────────────────────────────────────
     async function loadUserProfile() {
         try {
-            const res = await fetch('/trackcalorilog/me', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
+            const res  = await fetch('/trackcalorilog/me', { headers: { 'Authorization': `Bearer ${cleanToken}` } });
             const user = await res.json();
             if (user) {
-                USER_ID = user._id || user.id;
-                DAILY_CAL_GOAL = user.dailyCalorieGoal || 2000;
-                DAILY_PROT_GOAL = user.dailyProteinGoal || 160;
-                document.getElementById('goalValue').innerText = DAILY_CAL_GOAL;
+                USER_ID         = user._id || user.id;
+                DAILY_CAL_GOAL  = user.dailyCalorieGoal  || 2000;
+                DAILY_PROT_GOAL = user.dailyProteinGoal  || 160;
+                document.getElementById('goalValue').innerText     = DAILY_CAL_GOAL;
                 document.getElementById('goalProtValue').innerText = DAILY_PROT_GOAL;
                 updateGoalsInChart();
             }
-        } catch (e) { console.error("Erreur profil:", e); }
+        } catch(e) { console.error('Erreur profil:', e); }
     }
 
     function updateGoalsInChart() {
         if (evolutionChart) {
             evolutionChart.options.plugins.annotation = {
                 annotations: {
-                    lineCal: { type: 'line', yMin: DAILY_CAL_GOAL, yMax: DAILY_CAL_GOAL, borderColor: 'rgba(245, 101, 101, 0.7)', borderWidth: 2, borderDash: [5, 5] },
-                    lineProt: { type: 'line', yScaleID: 'y1', yMin: DAILY_PROT_GOAL, yMax: DAILY_PROT_GOAL, borderColor: 'rgba(72, 187, 120, 0.7)', borderWidth: 2, borderDash: [5, 5] }
+                    lineCal:  { type: 'line', yMin: DAILY_CAL_GOAL,  yMax: DAILY_CAL_GOAL,  borderColor: 'rgba(245,101,101,0.7)', borderWidth: 2, borderDash: [5,5] },
+                    lineProt: { type: 'line', yScaleID: 'y1', yMin: DAILY_PROT_GOAL, yMax: DAILY_PROT_GOAL, borderColor: 'rgba(72,187,120,0.7)', borderWidth: 2, borderDash: [5,5] }
                 }
             };
             evolutionChart.update();
@@ -751,30 +971,30 @@
     }
 
     async function editGoal() {
-        const newGoal = prompt("Nouvel objectif calories (kcal) :", DAILY_CAL_GOAL);
+        const newGoal = prompt('Nouvel objectif calories (kcal) :', DAILY_CAL_GOAL);
         if (newGoal && !isNaN(newGoal)) {
-            const response = await fetch(`/api/users/${USER_ID}/daily-goal`, {
+            const res = await fetch(`/api/users/${USER_ID}/daily-goal`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cleanToken}` },
                 body: JSON.stringify({ dailyCalorieGoal: parseInt(newGoal) })
             });
-            if (response.ok) { DAILY_CAL_GOAL = parseInt(newGoal); loadData(); loadUserProfile(); }
+            if (res.ok) { DAILY_CAL_GOAL = parseInt(newGoal); loadData(CURRENT_VIEW); loadUserProfile(); }
         }
     }
 
     async function editProtGoal() {
-        const newGoal = prompt("Nouvel objectif protéines (g) :", DAILY_PROT_GOAL);
+        const newGoal = prompt('Nouvel objectif protéines (g) :', DAILY_PROT_GOAL);
         if (newGoal && !isNaN(newGoal)) {
-            const response = await fetch(`/api/users/${USER_ID}/dailyprot-goal`, {
+            const res = await fetch(`/api/users/${USER_ID}/dailyprot-goal`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${cleanToken}` },
                 body: JSON.stringify({ dailyProteinGoal: parseInt(newGoal) })
             });
-            if (response.ok) { DAILY_PROT_GOAL = parseInt(newGoal); loadData(); loadUserProfile(); }
+            if (res.ok) { DAILY_PROT_GOAL = parseInt(newGoal); loadData(CURRENT_VIEW); loadUserProfile(); }
         }
     }
 
-    window.onload = () => { loadUserProfile(); initCharts(); loadData();};
+    window.onload = () => { loadUserProfile(); initCharts(); loadData(); };
 </script>
 </body>
 </html>
