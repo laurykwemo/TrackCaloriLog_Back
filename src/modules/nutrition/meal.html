@@ -144,19 +144,27 @@
         .macro-salt { color: #c05621; }
         .macro-k    { color: #2b6cb0; }
 
-        .draft-actions { display: none; gap: 4px; margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--light-gray); }
+        .draft-actions {
+            display: none; gap: 4px; margin-top: 8px; padding-top: 7px;
+            border-top: 1px solid var(--light-gray);
+            flex-wrap: wrap; /* ← empêche le débordement */
+        }
         .meal-draft-card:hover .draft-actions,
         .meal-draft-card.expanded .draft-actions { display: flex; }
 
         .btn-da {
-            flex: 1; height: 26px; border-radius: 6px; border: 1px solid var(--light-gray);
-            background: #f7fafc; color: var(--gray); cursor: pointer; font-size: 0.7rem;
-            font-weight: 600; display: flex; align-items: center; justify-content: center;
-            gap: 3px; transition: 0.15s; white-space: nowrap; padding: 0 6px;
+            flex: 1 1 auto; min-width: 0; height: 28px; border-radius: 6px;
+            border: 1px solid var(--light-gray); background: #f7fafc; color: var(--gray);
+            cursor: pointer; font-size: 0.7rem; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            gap: 3px; transition: 0.15s;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            padding: 0 8px;
         }
         .btn-da:hover { border-color: var(--primary); color: var(--primary); background: #f0f4ff; }
         .btn-da.confirm-btn { border-color: #9ae6b4; color: #276749; background: #f0fff4; }
         .btn-da.confirm-btn:hover { background: #48bb78; color: white; border-color: #48bb78; }
+        .btn-da.del-btn { flex: 0 0 32px; padding: 0; font-size: 0.85rem; }
         .btn-da.del-btn:hover { border-color: var(--danger); color: var(--danger); background: #fff5f5; }
 
         .btn-add-day {
@@ -1063,9 +1071,22 @@ async function handleDraftAction(action, id) {
     }
     if (action === 'delete') {
         askConfirm('Supprimer ce brouillon ?', async () => {
-            await fetch(`/api/nutrition/meals/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${cleanToken}` } });
-            showToast('Brouillon supprimé');
-            await loadPlanWeek();
+            try {
+                const res = await fetch(`/api/nutrition/meals/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${cleanToken}` }
+                });
+                if (res.ok) {
+                    showToast('Brouillon supprimé 🗑️', 'ok');
+                    await loadPlanWeek();
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    showToast(`Erreur suppression : ${err.message || res.status}`, 'warn');
+                }
+            } catch(e) {
+                showToast('Erreur réseau lors de la suppression', 'warn');
+                console.error('Delete draft error:', e);
+            }
         });
     }
 }
