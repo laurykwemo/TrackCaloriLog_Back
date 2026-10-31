@@ -518,8 +518,12 @@
                     const d = new Date(m.date);
                     if (view === 'day')   return d.toDateString() === now.toDateString();
                     if (view === 'week') {
-                        const sevenDaysAgo = new Date(); sevenDaysAgo.setDate(now.getDate() - 7);
-                        return d >= sevenDaysAgo;
+                        const day = now.getDay();
+                        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+                        const monday = new Date(now);
+                        monday.setDate(diff);
+                        monday.setHours(0, 0, 0, 0);
+                        return d >= monday;
                     }
                     if (view === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
                     if (view === 'year')  return d.getFullYear() === now.getFullYear();
@@ -562,80 +566,110 @@
         const now    = new Date();
 
         // Jour de la semaine actuel (1=lun … 7=dim)
-        const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); // 1–7
-        const daysElapsed  = dayOfWeek;          // jours écoulés (incl. aujourd'hui)
-        const daysRemaining = 7 - dayOfWeek;     // jours restants après aujourd'hui (excl. aujourd'hui)
-        // Pour le calcul de cible : jours restants INCLUANT aujourd'hui
-        const daysLeft = 7 - dayOfWeek + 1;      // aujourd'hui + jours futurs
+        const dayOfWeek   = now.getDay() === 0 ? 7 : now.getDay();
+        const daysElapsed = dayOfWeek;           // jours écoulés incl. aujourd'hui (lun=1 … dim=7)
+        const daysRemaining = 7 - dayOfWeek;     // jours futurs excl. aujourd'hui
 
         const weekCalGoal  = DAILY_CAL_GOAL  * 7;
         const weekProtGoal = DAILY_PROT_GOAL * 7;
 
-        // Totaux réels — on ne garde que les repas de la semaine en cours (lundi → aujourd'hui)
+        // ── Repas de la semaine (lundi → maintenant) ──
         const weekMeals = meals.filter(m => new Date(m.date) >= monday);
+
+        // Jours passés (lun → hier) qui ont au moins un repas enregistré
+        const daysWithMeals = new Set();
+        weekMeals.forEach(m => {
+            const d = new Date(m.date);
+            if (d.toDateString() !== now.toDateString()) {
+                daysWithMeals.add(d.toDateString());
+            }
+        });
+
+        // Jours passés sans aucun repas enregistré (lun → hier)
+        const missedDays = [];
+        const DAY_LABELS_FULL = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+        for (let i = 0; i < daysElapsed - 1; i++) { // -1 : on exclut aujourd'hui
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            if (!daysWithMeals.has(d.toDateString())) {
+                missedDays.push(DAY_LABELS_FULL[d.getDay()]);
+            }
+        }
+
+        // Totaux réels enregistrés
         const totalCal  = weekMeals.reduce((s, m) => s + (m.totals?.calories || 0), 0);
         const totalProt = weekMeals.reduce((s, m) => s + (m.totals?.proteins || 0), 0);
 
-        // ── Barres de progression ──
+        // ── Barres de progression basées sur jours écoulés ──
+        const quotaEcoule    = DAILY_CAL_GOAL  * daysElapsed;
+        const quotaProtEcoul = DAILY_PROT_GOAL * daysElapsed;
         const calPct  = Math.min(Math.round(totalCal  / weekCalGoal  * 100), 120);
         const protPct = Math.min(Math.round(totalProt / weekProtGoal * 100), 120);
 
         const calBar  = document.getElementById('wbalCalBar');
         const protBar = document.getElementById('wbalProtBar');
-
         calBar.style.width  = calPct  + '%';
         protBar.style.width = protPct + '%';
-
-        // Couleur barre calories
-        calBar.className  = 'wbal-fill ' + (calPct > 105 ? 'over' : calPct >= 85 ? 'ok' : 'warn');
-        protBar.className = 'wbal-fill ' + (protPct >= 85 ? 'ok' : 'warn');
+        calBar.className  = 'wbal-fill ' + (calPct > 105 ? 'over' : calPct >= 75 ? 'ok' : 'warn');
+        protBar.className = 'wbal-fill ' + (protPct >= 75 ? 'ok' : 'warn');
 
         document.getElementById('wbalCalLabel').textContent  = `${Math.round(totalCal)} / ${weekCalGoal} kcal`;
         document.getElementById('wbalProtLabel').textContent = `${Math.round(totalProt)} / ${weekProtGoal} g`;
 
+        // ── Avertissement jours manquants ──
+        // Injecté dans le sous-titre des recommandations
+        const missedWarning = missedDays.length > 0
+            ? `⚠️ Repas non enregistrés : ${missedDays.join(', ')}. Enregistre-les pour un calcul exact.`
+            : null;
+
+        // ── Calcul cible : basé uniquement sur aujourd'hui + jours futurs ──
+        // On ne "rattrape" que ce qu'il reste à faire — pas les jours passés non enregistrés
+        // Restant = quota total − ce qui est enregistré − (jours passés non enregistrés × objectif)
+        const calPasseNonEnreg  = missedDays.length * DAILY_CAL_GOAL;
+        const protPasseNonEnreg = missedDays.length * DAILY_PROT_GOAL;
+
+        const calRestantReel  = weekCalGoal  - totalCal  - calPasseNonEnreg;
+        const protRestantReel = weekProtGoal - totalProt - protPasseNonEnreg;
+
+        // Jours restants = aujourd'hui + jours futurs
+        const daysLeft = Math.max(daysRemaining + 1, 1); // +1 pour aujourd'hui
+        const calCibleJour  = Math.round(calRestantReel  / daysLeft);
+        const protCibleJour = Math.round(protRestantReel / daysLeft);
+
         // ── Recommandation calories ──
-        const calReco     = document.getElementById('wbalCalReco');
+        const calReco      = document.getElementById('wbalCalReco');
         const calRecoTitle = document.getElementById('wbalCalRecoTitle');
         const calRecoMain  = document.getElementById('wbalCalRecoMain');
         const calRecoSub   = document.getElementById('wbalCalRecoSub');
 
-        const calRestant   = weekCalGoal - totalCal;
-        const calCibleJour = daysLeft > 0 ? Math.round(calRestant / daysLeft) : 0;
-
         if (totalCal > weekCalGoal) {
-            // Quota déjà dépassé
             calReco.className = 'wbal-reco over';
             calRecoTitle.textContent = '⚠️ Quota semaine dépassé';
             calRecoMain.textContent  = `+${Math.round(totalCal - weekCalGoal)} kcal au-dessus`;
-            calRecoSub.textContent   = `Tu as mangé ${Math.round(totalCal)} kcal sur ${weekCalGoal} kcal prévus`;
-        } else if (calCibleJour > DAILY_CAL_GOAL * 1.1) {
-            // Sous consommation — il faut rattraper
+            calRecoSub.textContent   = missedWarning || `Tu as consommé ${Math.round(totalCal)} kcal sur ${weekCalGoal} kcal prévus`;
+        } else if (calCibleJour > DAILY_CAL_GOAL * 1.15) {
+            // Cible trop haute → ne pas afficher un chiffre aberrant
             calReco.className = 'wbal-reco adjust';
-            calRecoTitle.textContent = '📉 Tu as mangé moins que prévu';
-            calRecoMain.textContent  = `Vise ~${calCibleJour} kcal/jour`;
-            calRecoSub.textContent   = `Sur ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''} (incl. aujourd'hui) pour atteindre ${weekCalGoal} kcal`;
-        } else if (calCibleJour < DAILY_CAL_GOAL * 0.9) {
-            // Légère sur-consommation — il faut réduire
+            calRecoTitle.textContent = '📋 Enregistre tes repas manquants';
+            calRecoMain.textContent  = `Objectif : ~${DAILY_CAL_GOAL} kcal/jour`;
+            calRecoSub.textContent   = missedWarning || `Continue à ton rythme habituel`;
+        } else if (calCibleJour < DAILY_CAL_GOAL * 0.85) {
             calReco.className = 'wbal-reco adjust';
             calRecoTitle.textContent = '📈 Tu as mangé plus que prévu';
             calRecoMain.textContent  = `Vise ~${calCibleJour} kcal/jour`;
-            calRecoSub.textContent   = `Réduis légèrement sur ${daysLeft} jour${daysLeft > 1 ? 's' : ''} restant${daysLeft > 1 ? 's' : ''} pour rester dans le quota`;
+            calRecoSub.textContent   = missedWarning || `Aujourd'hui + ${daysRemaining} jour${daysRemaining > 1 ? 's' : ''} restant${daysRemaining > 1 ? 's' : ''} pour rester dans ton quota`;
         } else {
-            // En bonne voie
             calReco.className = 'wbal-reco on-track';
             calRecoTitle.textContent = '✅ Tu es dans les clous !';
-            calRecoMain.textContent  = `${Math.round(totalCal)} kcal consommées`;
-            calRecoSub.textContent   = `Continue à ~${DAILY_CAL_GOAL} kcal/j — quota semaine : ${weekCalGoal} kcal`;
+            calRecoMain.textContent  = `Vise ~${calCibleJour} kcal/jour`;
+            calRecoSub.textContent   = missedWarning || `Aujourd'hui + ${daysRemaining} jour${daysRemaining > 1 ? 's' : ''} restant${daysRemaining > 1 ? 's' : ''} — quota semaine : ${weekCalGoal} kcal`;
         }
 
         // ── Recommandation protéines ──
-        const protReco     = document.getElementById('wbalProtReco');
+        const protReco      = document.getElementById('wbalProtReco');
         const protRecoTitle = document.getElementById('wbalProtRecoTitle');
         const protRecoMain  = document.getElementById('wbalProtRecoMain');
         const protRecoSub   = document.getElementById('wbalProtRecoSub');
-
-        const protRestant   = weekProtGoal - totalProt;
-        const protCibleJour = daysLeft > 0 ? Math.round(protRestant / daysLeft) : 0;
 
         if (totalProt >= weekProtGoal) {
             protReco.className = 'wbal-reco on-track';
@@ -643,15 +677,15 @@
             protRecoMain.textContent  = `${Math.round(totalProt)}g consommées`;
             protRecoSub.textContent   = `Objectif semaine : ${weekProtGoal}g — super !`;
         } else if (protCibleJour > DAILY_PROT_GOAL * 1.3) {
-            protReco.className = 'wbal-reco over';
-            protRecoTitle.textContent = '⚠️ Retard sur les protéines';
-            protRecoMain.textContent  = `Vise ~${protCibleJour}g/jour`;
-            protRecoSub.textContent   = `Il te reste ${Math.round(protRestant)}g à atteindre en ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`;
+            protReco.className = 'wbal-reco adjust';
+            protRecoTitle.textContent = '📋 Enregistre tes repas manquants';
+            protRecoMain.textContent  = `Objectif : ~${DAILY_PROT_GOAL}g/jour`;
+            protRecoSub.textContent   = missedWarning || `Continue à ton rythme habituel`;
         } else {
             protReco.className = 'wbal-reco prot-low';
             protRecoTitle.textContent = '💪 Continue sur les protéines';
             protRecoMain.textContent  = `Vise ~${protCibleJour}g/jour`;
-            protRecoSub.textContent   = `${Math.round(totalProt)}g / ${weekProtGoal}g — encore ${Math.round(protRestant)}g à atteindre`;
+            protRecoSub.textContent   = missedWarning || `${Math.round(totalProt)}g / ${weekProtGoal}g — encore ${Math.round(protRestantReel)}g sur ${daysLeft} jour${daysLeft > 1 ? 's' : ''}`;
         }
 
         // ── Points jours (lun → dim) ──
