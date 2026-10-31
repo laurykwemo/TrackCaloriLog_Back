@@ -1119,18 +1119,50 @@ function openPlanModal(draft, presetDate) {
     document.getElementById('planModalTitle').textContent = pmEditId ? 'Modifier le brouillon' : 'Planifier un repas';
     document.getElementById('btnPmSave').textContent = pmEditId ? 'Enregistrer' : 'Créer le brouillon';
 
-    document.getElementById('pmDate').value  = draft ? fmtDate(new Date(draft.plannedDate || draft.date)) : (presetDate || fmtDate(new Date()));
+    // Forcer le parsing en heure locale pour éviter le décalage UTC→Paris
+    const rawDate = draft ? (draft.plannedDate || draft.date) : null;
+    let dateStr;
+    if (rawDate) {
+        const d = new Date(rawDate);
+        // toLocaleDateString en format YYYY-MM-DD
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        dateStr = `${y}-${m}-${day}`;
+    } else {
+        dateStr = presetDate || fmtDate(new Date());
+    }
+    document.getElementById('pmDate').value = dateStr;
     document.getElementById('pmType').value  = draft?.type  || 'lunch';
     document.getElementById('pmTitle').value = draft?.title || '';
 
     // Reconstruire les lignes aliments depuis le draft (items) ou une ligne vide
     if (draft?.items?.length) {
-        pmFoodRows = draft.items.map(it => ({
-            name: it.name || '',
-            qty: it.quantity || 100,
-            unit: 'g',
-            selectedFood: null  // on ne peut pas retrouver l'objet catalogue depuis un draft
-        }));
+        pmFoodRows = draft.items.map(it => {
+            // Chercher dans le catalogue pour récupérer l'objet complet
+            const foundInCatalog = (fullCatalog || []).find(f =>
+                (f.name || '').toLowerCase() === (it.name || '').toLowerCase()
+            );
+            return {
+                name: it.name || '',
+                qty: it.quantity || 100,
+                unit: it.unit || 'g',
+                // Si trouvé dans catalogue → objet complet ; sinon on crée un objet fictif
+                // avec les macros déjà calculées (pour que la preview reste correcte)
+                selectedFood: foundInCatalog || {
+                    name: it.name,
+                    // Les valeurs stockées sont déjà pour la quantité indiquée
+                    // On les ramène à per100g pour que calcMacrosFromFood fonctionne
+                    calories100g:  it.quantity > 0 ? (it.calories  || 0) / it.quantity * 100 : 0,
+                    proteins100g:  it.quantity > 0 ? (it.proteins  || 0) / it.quantity * 100 : 0,
+                    carbs100g:     it.quantity > 0 ? (it.carbs     || 0) / it.quantity * 100 : 0,
+                    fats100g:      it.quantity > 0 ? (it.fats      || 0) / it.quantity * 100 : 0,
+                    fiber100g:     it.quantity > 0 ? (it.fiber     || 0) / it.quantity * 100 : 0,
+                    salt100g:      it.quantity > 0 ? (it.salt      || 0) / it.quantity * 100 : 0,
+                    potassium100g: it.quantity > 0 ? (it.potassium || 0) / it.quantity * 100 : 0,
+                }
+            };
+        });
     } else {
         pmFoodRows = [{ name: '', qty: 100, unit: 'g', selectedFood: null }];
     }
