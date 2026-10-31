@@ -921,8 +921,19 @@ function getMonday(d) {
     return dt;
 }
 function addDays(d, n)  { const dt = new Date(d); dt.setDate(dt.getDate() + n); return dt; }
-function fmtDate(d)     { return d.toISOString().split('T')[0]; }
-function sameDay(a, b)  { return fmtDate(new Date(a)) === fmtDate(new Date(b)); }
+function fmtDate(d) {
+    // Toujours en heure locale pour éviter le décalage UTC→Paris
+    const y   = d.getFullYear();
+    const m   = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+function sameDay(a, b) {
+    const da = new Date(a), db = new Date(b);
+    return da.getFullYear() === db.getFullYear()
+        && da.getMonth()    === db.getMonth()
+        && da.getDate()     === db.getDate();
+}
 
 const DAY_SHORT   = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const MONTH_SHORT = ['jan.','fév.','mar.','avr.','mai','jui.','juil.','aoû.','sep.','oct.','nov.','déc.'];
@@ -1361,7 +1372,10 @@ document.getElementById('btnPmSave').addEventListener('click', async () => {
         return { name: row.name.trim(), quantity: grams, qtyLabel, calories:0, proteins:0, carbs:0, fats:0, fiber:0, salt:0, potassium:0 };
     });
 
-    const payload = { title, type, plannedDate: date, items, isDraft: true };
+    // Envoyer midi heure locale pour éviter le décalage UTC → Paris
+    // Ex: "2026-11-03" → "2026-11-03T12:00:00" interprété localement → jamais décalé d'un jour
+    const plannedDateISO = new Date(`${date}T12:00:00`).toISOString();
+    const payload = { title, type, plannedDate: plannedDateISO, items, isDraft: true };
     const saveBtn = document.getElementById('btnPmSave');
     saveBtn.textContent = '…';
     saveBtn.disabled    = true;
